@@ -17,7 +17,7 @@ export default function HomeScreen() {
           style={styles.reactLogo}
         />
       }>
-      <ThemedView style={styles.titleContainer}>
+      <ThemedView className="flex-row items-center gap-2">
         <ThemedText type="title">Welcome!</ThemedText>
         <HelloWave />
       </ThemedView>
