@@ -1,5 +1,6 @@
 import { Text, View, TouchableOpacity, Image } from "react-native";
-import "../global.css"
+import "../global.css"; // 👈 chỉnh lại đường dẫn cho đúng (vì file này nằm trong components)
+
 export default function TailwindTest() {
   return (
     <View className="flex-1 items-center justify-center bg-gray-100 dark:bg-black">
