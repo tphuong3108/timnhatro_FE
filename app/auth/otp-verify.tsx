@@ -17,7 +17,7 @@ export default function OtpVerify() {
         <Logo width={320} height={320} />
       </View>
 
-      <Text className="text-3xl font-bold text-center mb-2">NHẬP MÃ OTP</Text>
+      <Text className="text-3xl font-inter text-center mb-2">NHẬP MÃ OTP</Text>
       <Text className="text-gray-500 text-center mb-8">
         Mã OTP đã được gửi vào Email của bạn
       </Text>
@@ -36,7 +36,7 @@ export default function OtpVerify() {
         className="bg-[#3F72AF] py-3 rounded-full mb-6"
         onPress={() => router.replace("/(tabs)")}
       >
-        <Text className="text-white font-bold text-center text-lg">GỬI MÃ</Text>
+        <Text className="text-white font-inter text-center text-lg">GỬI MÃ</Text>
       </TouchableOpacity>
 
       <View className="flex-row items-center mb-6">
@@ -59,7 +59,7 @@ export default function OtpVerify() {
       <TouchableOpacity onPress={() => router.push("/auth/register")}>
         <Text className="text-center text-gray-600">
           Bạn chưa có tài khoản?{" "}
-          <Text className="text-[#3F72AF] font-semibold">Đăng ký ngay!</Text>
+          <Text className="text-[#3F72AF] font-inter">Đăng ký ngay!</Text>
         </Text>
       </TouchableOpacity>
     </View>

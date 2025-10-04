@@ -1,11 +1,11 @@
-import { View, Text, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
+import { Text, TouchableOpacity, View } from "react-native";
 import { TextInput } from "react-native-paper";
-import Logo from "../../assets/images/logodoc.svg";
+import AppleIcon from "../../assets/images/apple.svg";
 import FacebookIcon from "../../assets/images/facebook.svg";
 import GoogleIcon from "../../assets/images/google.svg";
-import AppleIcon from "../../assets/images/apple.svg";
+import Logo from "../../assets/images/logodoc.svg";
 
 export default function ForgotPassword() {
   const router = useRouter();
@@ -17,7 +17,7 @@ export default function ForgotPassword() {
         <Logo width={320} height={320} />
       </View>
 
-      <Text className="text-3xl font-bold text-center mb-2">QUÊN MẬT KHẨU</Text>
+      <Text className="text-3xl font-inter text-center mb-2">QUÊN MẬT KHẨU</Text>
       <Text className="text-gray-500 text-center mb-8">
         Hãy nhập Email của bạn để lấy lại Mật khẩu
       </Text>
@@ -25,7 +25,7 @@ export default function ForgotPassword() {
       <TextInput
         label="Email"
         mode="outlined"
-        placeholder="Nhập email của bạn"
+        placeholder=""
         value={email}
         onChangeText={setEmail}
         keyboardType="email-address"
@@ -36,7 +36,7 @@ export default function ForgotPassword() {
         className="bg-[#3F72AF] py-3 rounded-full mb-6"
         onPress={() => router.push("/auth/otp-verify")}
       >
-        <Text className="text-white font-bold text-center text-lg">
+        <Text className="text-white font-inter text-center text-lg">
           LẤY MÃ OTP
         </Text>
       </TouchableOpacity>
@@ -62,7 +62,7 @@ export default function ForgotPassword() {
       <TouchableOpacity onPress={() => router.push("/auth/register")}>
         <Text className="text-center text-gray-600">
           Bạn chưa có tài khoản?{" "}
-          <Text className="text-[#3F72AF] font-semibold">Đăng ký ngay!</Text>
+          <Text className="text-[#3F72AF] font-inter">Đăng ký ngay!</Text>
         </Text>
       </TouchableOpacity>
     </View>
