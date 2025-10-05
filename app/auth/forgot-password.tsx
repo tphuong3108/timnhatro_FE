@@ -1,70 +1,139 @@
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import {
+  SafeAreaView,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { TextInput } from "react-native-paper";
-import AppleIcon from "../../assets/images/apple.svg";
+import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
+import Logo from "../../assets/images/logodoc.svg";
 import FacebookIcon from "../../assets/images/facebook.svg";
 import GoogleIcon from "../../assets/images/google.svg";
-import Logo from "../../assets/images/logodoc.svg";
+import AppleIcon from "../../assets/images/apple.svg";
 
 export default function ForgotPassword() {
   const router = useRouter();
   const [email, setEmail] = useState("");
 
   return (
-    <View className="flex-1 bg-white px-6 pt-12">
-      <View className="items-center mb-6">
-        <Logo width={320} height={320} />
-      </View>
-
-      <Text className="text-3xl font-inter text-center mb-2">QUÊN MẬT KHẨU</Text>
-      <Text className="text-gray-500 text-center mb-8">
-        Hãy nhập Email của bạn để lấy lại Mật khẩu
-      </Text>
-
-      <TextInput
-        label="Email"
-        mode="outlined"
-        placeholder=""
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-        style={{ marginBottom: 16, backgroundColor: "white" }}
-      />
-
-      <TouchableOpacity
-        className="bg-[#3F72AF] py-3 rounded-full mb-6"
-        onPress={() => router.push("/auth/otp-verify")}
+    <SafeAreaView className="flex-1 bg-white">
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        style={{ flex: 1 }}
       >
-        <Text className="text-white font-inter text-center text-lg">
-          LẤY MÃ OTP
-        </Text>
-      </TouchableOpacity>
+        <ScrollView
+          contentContainerStyle={{
+            flexGrow: 1,
+            justifyContent: "center",
+            paddingHorizontal: RFValue(24),
+            paddingVertical: RFValue(32),
+          }}
+          showsVerticalScrollIndicator={false}
+        >
+          <View className="items-center -mt-10">
+            <Logo width={RFValue(165)} height={RFValue(165)} />
+            <Text
+              className="text-center font-bold text-[#3F72AF]"
+              style={{
+                fontSize: RFPercentage(2.8),
+                marginTop: RFValue(20), 
+              }}
+            >
+              QUÊN MẬT KHẨU
+            </Text>
+            <Text
+              className="text-center text-gray-500"
+              style={{
+                fontSize: RFPercentage(1.8),
+                marginTop: RFValue(6),
+                marginBottom: RFValue(20),
+              }}
+            >
+              Hãy nhập Email của bạn để lấy lại Mật khẩu
+            </Text>
+          </View>
+          <View>
+            <TextInput
+              label="Email"
+              mode="outlined"
+              keyboardType="email-address"
+              value={email}
+              onChangeText={setEmail}
+              style={{
+                marginBottom: RFValue(16),
+                backgroundColor: "white",
+                fontSize: RFValue(14),
+              }}
+            />
+            <TouchableOpacity
+              className="bg-[#3F72AF] rounded-full"
+              style={{
+                paddingVertical: RFValue(12),
+                marginBottom: RFValue(28),
+              }}
+              onPress={() => router.push("/auth/otp-verify")}
+            >
+              <Text
+                className="text-white text-center font-semibold"
+                style={{ fontSize: RFPercentage(2.1) }}
+              >
+                LẤY MÃ OTP
+              </Text>
+            </TouchableOpacity>
+          </View>
 
-      <View className="flex-row items-center mb-6">
-        <View className="flex-1 h-px bg-gray-300" />
-        <Text className="text-gray-500 mx-4">Hoặc đăng nhập bằng</Text>
-        <View className="flex-1 h-px bg-gray-300" />
-      </View>
+          <View className="flex-row items-center mb-6">
+            <View className="flex-1 h-px bg-gray-300" />
+            <Text
+              className="text-gray-500 mx-3"
+              style={{ fontSize: RFPercentage(1.7) }}
+            >
+              Hoặc đăng nhập bằng
+            </Text>
+            <View className="flex-1 h-px bg-gray-300" />
+          </View>
 
-    <View className="flex-row justify-between px-6 gap-6 mb-6 mt-2">
-        <TouchableOpacity className="flex-1 h-14 border border-[#3F72AF] rounded-lg items-center justify-center">
-            <FacebookIcon width={24} height={24} />
-        </TouchableOpacity>
-        <TouchableOpacity className="flex-1 h-14 border border-[#3F72AF] rounded-lg items-center justify-center">
-            <GoogleIcon width={24} height={24} />
-        </TouchableOpacity>
-        <TouchableOpacity className="flex-1 h-14 border border-[#3F72AF] rounded-lg items-center justify-center">
-            <AppleIcon width={24} height={24} />
-        </TouchableOpacity>
-        </View>
+          <View
+            className="flex-row justify-between gap-5 mb-6"
+            style={{ marginHorizontal: RFValue(10) }}
+          >
+            <TouchableOpacity
+              className="flex-1 border border-[#3F72AF] rounded-lg items-center justify-center"
+              style={{ height: RFValue(44) }}
+            >
+              <FacebookIcon width={RFValue(20)} height={RFValue(20)} />
+            </TouchableOpacity>
+            <TouchableOpacity
+              className="flex-1 border border-[#3F72AF] rounded-lg items-center justify-center"
+              style={{ height: RFValue(44) }}
+            >
+              <GoogleIcon width={RFValue(20)} height={RFValue(20)} />
+            </TouchableOpacity>
+            <TouchableOpacity
+              className="flex-1 border border-[#3F72AF] rounded-lg items-center justify-center"
+              style={{ height: RFValue(44) }}
+            >
+              <AppleIcon width={RFValue(20)} height={RFValue(20)} />
+            </TouchableOpacity>
+          </View>
 
-      <TouchableOpacity onPress={() => router.push("/auth/register")}>
-        <Text className="text-center text-gray-600">
-          Bạn chưa có tài khoản?{" "}
-          <Text className="text-[#3F72AF] font-inter">Đăng ký ngay!</Text>
-        </Text>
-      </TouchableOpacity>
-    </View>
+          <TouchableOpacity onPress={() => router.push("/auth/register")}>
+            <Text
+              className="text-center font-inter text-gray-600 mt-12"
+              style={{ fontSize: RFPercentage(1.8) }}
+            >
+              Bạn chưa có tài khoản?{" "}
+              <Text className="text-[#3F72AF] font-semibold">Đăng ký ngay!</Text>
+            </Text>
+          </TouchableOpacity>
+
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }

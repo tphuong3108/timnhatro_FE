@@ -4,12 +4,14 @@ import React, { useState } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
+  SafeAreaView,
   ScrollView,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
 import { TextInput } from "react-native-paper";
+import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
 import AppleIcon from "../../assets/images/apple.svg";
 import FacebookIcon from "../../assets/images/facebook.svg";
 import GoogleIcon from "../../assets/images/google.svg";
@@ -21,135 +23,230 @@ export default function Register() {
   const [remember, setRemember] = useState(false);
 
   return (
-    <KeyboardAvoidingView
-      className="flex-1 bg-white"
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-    >
-      <ScrollView
-        contentContainerStyle={{ flexGrow: 1 }}
-        className="px-5 pt-10 pb-7"
-        showsVerticalScrollIndicator={false}
+    <SafeAreaView className="flex-1 bg-white">
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        style={{ flex: 1 }}
       >
-        <Text className="text-4xl font-bold text-[#3F72AF] text-center mb-2">
-          ĐĂNG KÝ
-        </Text>
-        <Text className="text-base text-gray-500 text-center mb-5">
-          Hãy bắt đầu tạo tài khoản cho bản thân
-        </Text>
-
-        <TextInput
-          label="Họ"
-          mode="outlined"
-          className="mb-2 bg-white"
-        />
-        <TextInput
-          label="Tên"
-          mode="outlined"
-          className="mb-2 bg-white"
-        />
-        <TextInput
-          label="Email"
-          mode="outlined"
-          keyboardType="email-address"
-          className="mb-2 bg-white"
-        />
-        <TextInput
-          label="Số điện thoại"
-          mode="outlined"
-          keyboardType="phone-pad"
-          className="mb-2 bg-white"
-        />
-
-        <TextInput
-          label="Mật khẩu"
-          mode="outlined"
-          secureTextEntry={!passwordVisible}
-          right={
-            <TextInput.Icon
-              icon={() => (
-                <Ionicons
-                  name={passwordVisible ? "eye-outline" : "eye-off-outline"}
-                  size={18}
-                  color="gray"
-                />
-              )}
-              onPress={() => setPasswordVisible(!passwordVisible)}
-            />
-          }
-          className="mb-3 bg-white"
-        />
-
-        <TextInput
-          label="Xác thực mật khẩu"
-          mode="outlined"
-          secureTextEntry={!confirmPasswordVisible}
-          right={
-            <TextInput.Icon
-              icon={() => (
-                <Ionicons
-                  name={
-                    confirmPasswordVisible ? "eye-outline" : "eye-off-outline"
-                  }
-                  size={18}
-                  color="gray"
-                />
-              )}
-              onPress={() => setConfirmPasswordVisible(!confirmPasswordVisible)}
-            />
-          }
-          className="mb-4 bg-white"
-        />
-
-        <TouchableOpacity
-          onPress={() => setRemember(!remember)}
-          className="flex-row items-center mb-4"
+        <ScrollView
+          contentContainerStyle={{
+            flexGrow: 1,
+            justifyContent: "space-between",
+            paddingHorizontal: 24,
+            paddingBottom: 24,
+          }}
+          showsVerticalScrollIndicator={false}
         >
-          <View className="w-[18px] h-[18px] border border-gray-400 rounded mr-2 items-center justify-center">
-            {remember && (
-              <Ionicons name="checkmark" size={12} color="#3F72AF" />
-            )}
+          {/* --- Header --- */}
+          <View className="items-center mt-8 mb-4">
+            <Text
+              className="font-bold text-[#3F72AF]"
+              style={{ fontSize: RFPercentage(3.2) }}
+            >
+              ĐĂNG KÝ
+            </Text>
+            <Text
+              className="text-gray-500 text-center"
+              style={{
+                fontSize: RFPercentage(2),
+                marginTop: RFValue(6),
+                marginBottom: RFValue(16),
+              }}
+            >
+              Hãy bắt đầu tạo tài khoản cho bản thân
+            </Text>
           </View>
-          <Text className="text-sm text-gray-500">
-            Tôi đã đọc các điều khoản và điều kiện
-          </Text>
-        </TouchableOpacity>
 
-        <TouchableOpacity
-          className="bg-[#3F72AF] rounded-full py-3 mb-5"
-          onPress={() => router.replace("/(tabs)")}
-        >
-          <Text className="text-white text-lg font-bold text-center">
-            ĐĂNG KÝ
-          </Text>
-        </TouchableOpacity>
+          {/* --- Form --- */}
+          <View>
+            <TextInput
+              label="Họ"
+              mode="outlined"
+              style={{
+                marginBottom: RFValue(12),
+                backgroundColor: "white",
+                fontSize: RFValue(14),
+              }}
+            />
+            <TextInput
+              label="Tên"
+              mode="outlined"
+              style={{
+                marginBottom: RFValue(12),
+                backgroundColor: "white",
+                fontSize: RFValue(14),
+              }}
+            />
+            <TextInput
+              label="Email"
+              mode="outlined"
+              keyboardType="email-address"
+              style={{
+                marginBottom: RFValue(12),
+                backgroundColor: "white",
+                fontSize: RFValue(14),
+              }}
+            />
+            <TextInput
+              label="Số điện thoại"
+              mode="outlined"
+              keyboardType="phone-pad"
+              style={{
+                marginBottom: RFValue(12),
+                backgroundColor: "white",
+                fontSize: RFValue(14),
+              }}
+            />
 
-        <TouchableOpacity onPress={() => router.push("/auth/login")}>
-          <Text className="text-center text-sm text-gray-500 mb-5">
-            Bạn đã có tài khoản?{" "}
-            <Text className="text-[#3F72AF] font-bold">Đăng nhập ngay</Text>
-          </Text>
-        </TouchableOpacity>
+            <TextInput
+              label="Mật khẩu"
+              mode="outlined"
+              secureTextEntry={!passwordVisible}
+              right={
+                <TextInput.Icon
+                  icon={() => (
+                    <Ionicons
+                      name={passwordVisible ? "eye-outline" : "eye-off-outline"}
+                      size={RFValue(18)}
+                      color="gray"
+                    />
+                  )}
+                  onPress={() => setPasswordVisible(!passwordVisible)}
+                />
+              }
+              style={{
+                marginBottom: RFValue(12),
+                backgroundColor: "white",
+                fontSize: RFValue(14),
+              }}
+            />
 
-        <View className="flex-row items-center mb-5">
-          <View className="flex-1 h-px bg-gray-300" />
-          <Text className="mx-2 text-sm text-gray-500">
-            Hoặc đăng ký bằng
-          </Text>
-          <View className="flex-1 h-px bg-gray-300" />
-        </View>
+            <TextInput
+              label="Xác thực mật khẩu"
+              mode="outlined"
+              secureTextEntry={!confirmPasswordVisible}
+              right={
+                <TextInput.Icon
+                  icon={() => (
+                    <Ionicons
+                      name={
+                        confirmPasswordVisible
+                          ? "eye-outline"
+                          : "eye-off-outline"
+                      }
+                      size={RFValue(18)}
+                      color="gray"
+                    />
+                  )}
+                  onPress={() =>
+                    setConfirmPasswordVisible(!confirmPasswordVisible)
+                  }
+                />
+              }
+              style={{
+                marginBottom: RFValue(16),
+                backgroundColor: "white",
+                fontSize: RFValue(14),
+              }}
+            />
 
-        <View className="flex-row justify-between space-x-2 mb-5">
-          <TouchableOpacity className="flex-1 h-11 border border-[#3F72AF] rounded-lg items-center justify-center">
-            <FacebookIcon width={20} height={20} />
-          </TouchableOpacity>
-          <TouchableOpacity className="flex-1 h-11 border border-[#3F72AF] rounded-lg items-center justify-center">
-            <GoogleIcon width={20} height={20} />
-          </TouchableOpacity>
-          <TouchableOpacity className="flex-1 h-11 border border-[#3F72AF] rounded-lg items-center justify-center">
-            <AppleIcon width={20} height={20} />
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+            <TouchableOpacity
+              onPress={() => setRemember(!remember)}
+              className="flex-row items-center mb-5"
+            >
+              <View
+                className="border border-gray-400 rounded items-center justify-center"
+                style={{
+                  width: RFValue(18),
+                  height: RFValue(18),
+                  marginRight: RFValue(6),
+                }}
+              >
+                {remember && (
+                  <Ionicons
+                    name="checkmark"
+                    size={RFValue(12)}
+                    color="#3F72AF"
+                  />
+                )}
+              </View>
+              <Text
+                className="text-gray-600"
+                style={{ fontSize: RFPercentage(1.8) }}
+              >
+                Tôi đã đọc các điều khoản và điều kiện
+              </Text>
+            </TouchableOpacity>
+
+            {/* --- Đăng ký --- */}
+            <TouchableOpacity
+              className="bg-[#3F72AF] rounded-full"
+              style={{
+                paddingVertical: RFValue(12),
+                marginBottom: RFValue(20),
+              }}
+              onPress={() => router.replace("/(tabs)")}
+            >
+              <Text
+                className="text-white text-center font-medium"
+                style={{ fontSize: RFPercentage(2.2) }}
+              >
+                ĐĂNG KÝ
+              </Text>
+            </TouchableOpacity>
+
+            {/* --- Link đăng nhập --- */}
+            <TouchableOpacity onPress={() => router.push("/auth/login")}>
+              <Text
+                className="text-center text-gray-600"
+                style={{
+                  fontSize: RFPercentage(1.8),
+                  marginBottom: RFValue(20),
+                }}
+              >
+                Bạn đã có tài khoản?{" "}
+                <Text className="text-[#3F72AF] font-semibold">
+                  Đăng nhập ngay
+                </Text>
+              </Text>
+            </TouchableOpacity>
+
+            {/* --- Chia cách --- */}
+            <View className="flex-row items-center mb-6">
+              <View className="flex-1 h-px bg-gray-300" />
+              <Text
+                className="text-gray-500 mx-4"
+                style={{ fontSize: RFPercentage(1.8) }}
+              >
+                Hoặc đăng ký bằng
+              </Text>
+              <View className="flex-1 h-px bg-gray-300" />
+            </View>
+
+            {/* --- Nút mạng xã hội --- */}
+            <View className="flex-row justify-between px-6 gap-6 mb-6">
+              <TouchableOpacity
+                className="flex-1 border border-[#3F72AF] rounded-lg items-center justify-center"
+                style={{ height: RFValue(42) }}
+              >
+                <FacebookIcon width={RFValue(20)} height={RFValue(20)} />
+              </TouchableOpacity>
+              <TouchableOpacity
+                className="flex-1 border border-[#3F72AF] rounded-lg items-center justify-center"
+                style={{ height: RFValue(42) }}
+              >
+                <GoogleIcon width={RFValue(20)} height={RFValue(20)} />
+              </TouchableOpacity>
+              <TouchableOpacity
+                className="flex-1 border border-[#3F72AF] rounded-lg items-center justify-center"
+                style={{ height: RFValue(42) }}
+              >
+                <AppleIcon width={RFValue(20)} height={RFValue(20)} />
+              </TouchableOpacity>
+            </View>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }

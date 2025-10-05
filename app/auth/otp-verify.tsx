@@ -25,7 +25,7 @@ export default function OtpVerify() {
       <TextInput
         label="Mã OTP"
         mode="outlined"
-        placeholder="Nhập mã OTP"
+        placeholder=""
         value={otp}
         onChangeText={setOtp}
         secureTextEntry
