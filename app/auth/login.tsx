@@ -8,6 +8,7 @@ import {
   Platform,
   KeyboardAvoidingView,
   SafeAreaView,
+  Alert,
 } from "react-native";
 import { TextInput } from "react-native-paper";
 import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
@@ -15,6 +16,8 @@ import AppleIcon from "../../assets/images/apple.svg";
 import FacebookIcon from "../../assets/images/facebook.svg";
 import GoogleIcon from "../../assets/images/google.svg";
 import Logo from "../../assets/images/logodoc.svg";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import apiClient from "../../utils/apiClient";
 
 export default function Login() {
   const router = useRouter();
@@ -22,6 +25,38 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const handleLogin = async () => {
+    if (!email || !password) {
+      return Alert.alert("Thiếu thông tin", "Vui lòng nhập email và mật khẩu!");
+    }
+
+    try {
+      setLoading(true);
+      const res = await apiClient.post("users/login", { email, password });
+      const { accessToken, user } = res.data;
+
+      await AsyncStorage.setItem("token", accessToken);
+      await AsyncStorage.setItem("user", JSON.stringify(user));
+
+      Alert.alert("Thành công", "Đăng nhập thành công 🎉");
+      router.replace("/home");
+    } catch (error: any) {
+      console.log("Login error:", error.response?.data || error.message);
+      Alert.alert(
+        "Đăng nhập thất bại",
+        error.response?.data?.message || "Sai email hoặc mật khẩu!"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
+  const handleSocialLogin = (provider: string) => {
+    Alert.alert("Đang phát triển", `Tính năng đăng nhập bằng ${provider} sắp có !`);
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-white">
@@ -132,13 +167,14 @@ export default function Login() {
               paddingVertical: RFValue(12),
               marginBottom: RFValue(20),
             }}
-            onPress={() => router.replace("/(tabs)")}
+            onPress={handleLogin}
+            disabled={loading}
           >
             <Text
               className="text-white text-center font-medium"
               style={{ fontSize: RFPercentage(2.2) }}
             >
-              ĐĂNG NHẬP
+              {loading ? "Đang đăng nhập..." : "ĐĂNG NHẬP"}
             </Text>
           </TouchableOpacity>
 
@@ -157,18 +193,21 @@ export default function Login() {
             <TouchableOpacity
               className="flex-1 border border-[#3F72AF] rounded-lg items-center justify-center"
               style={{ height: RFValue(42) }}
+              onPress={() => handleSocialLogin("Facebook")}
             >
               <FacebookIcon width={RFValue(20)} height={RFValue(20)} />
             </TouchableOpacity>
             <TouchableOpacity
               className="flex-1 border border-[#3F72AF] rounded-lg items-center justify-center"
               style={{ height: RFValue(42) }}
+              onPress={() => handleSocialLogin("Google")}
             >
               <GoogleIcon width={RFValue(20)} height={RFValue(20)} />
             </TouchableOpacity>
             <TouchableOpacity
               className="flex-1 border border-[#3F72AF] rounded-lg items-center justify-center"
               style={{ height: RFValue(42) }}
+              onPress={() => handleSocialLogin("Apple")}
             >
               <AppleIcon width={RFValue(20)} height={RFValue(20)} />
             </TouchableOpacity>

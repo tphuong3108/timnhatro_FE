@@ -9,18 +9,86 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Alert,
 } from "react-native";
 import { TextInput } from "react-native-paper";
 import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
 import AppleIcon from "../../assets/images/apple.svg";
 import FacebookIcon from "../../assets/images/facebook.svg";
 import GoogleIcon from "../../assets/images/google.svg";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import apiClient from "../../utils/apiClient";
 
 export default function Register() {
   const router = useRouter();
+
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
-  const [remember, setRemember] = useState(false);
+  const [agree, setAgree] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const validateFields = () => {
+    if (!firstName || !lastName || !email || !phone || !password) {
+      Alert.alert("Thiếu thông tin", "Vui lòng nhập đầy đủ các trường bắt buộc!");
+      return false;
+    }
+    if (password !== confirmPassword) {
+      Alert.alert("Mật khẩu không khớp", "Vui lòng kiểm tra lại mật khẩu!");
+      return false;
+    }
+    if (!agree) {
+      Alert.alert("Chú ý", "Bạn cần đồng ý với điều khoản trước khi đăng ký.");
+      return false;
+    }
+    return true;
+  };
+
+  const handleRegister = async () => {
+    if (!validateFields()) return;
+
+    try {
+      setLoading(true);
+      const res = await apiClient.post("/users/send-otp", { email });
+
+      Alert.alert(
+        "OTP đã được gửi!",
+        "Vui lòng kiểm tra email để lấy mã OTP.",
+        [
+          {
+            text: "OK",
+            onPress: () => {
+              const query = new URLSearchParams({
+                firstName,
+                lastName,
+                phone,
+                password,
+                email,
+              }).toString();
+
+              router.push(`/auth/otp-verify?${query}`);
+            },
+          },
+        ]
+      );
+    } catch (error: any) {
+      console.log("Send OTP error:", error.response?.data || error.message);
+      Alert.alert(
+        "Lỗi gửi OTP",
+        error.response?.data?.message || "Không thể gửi mã OTP. Thử lại sau."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+  const handleSocialRegister = (provider: string) => {
+    Alert.alert("Tính năng đang phát triển", `Đăng ký bằng ${provider} sắp ra mắt! 🚀`);
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-white">
@@ -37,7 +105,6 @@ export default function Register() {
           }}
           showsVerticalScrollIndicator={false}
         >
-          {/* --- Header --- */}
           <View className="items-center mt-8 mb-4">
             <Text
               className="font-bold text-[#3F72AF]"
@@ -57,11 +124,12 @@ export default function Register() {
             </Text>
           </View>
 
-          {/* --- Form --- */}
           <View>
             <TextInput
               label="Họ"
               mode="outlined"
+              value={firstName}
+              onChangeText={setFirstName}
               style={{
                 marginBottom: RFValue(12),
                 backgroundColor: "white",
@@ -71,6 +139,8 @@ export default function Register() {
             <TextInput
               label="Tên"
               mode="outlined"
+              value={lastName}
+              onChangeText={setLastName}
               style={{
                 marginBottom: RFValue(12),
                 backgroundColor: "white",
@@ -80,6 +150,8 @@ export default function Register() {
             <TextInput
               label="Email"
               mode="outlined"
+              value={email}
+              onChangeText={setEmail}
               keyboardType="email-address"
               style={{
                 marginBottom: RFValue(12),
@@ -90,6 +162,8 @@ export default function Register() {
             <TextInput
               label="Số điện thoại"
               mode="outlined"
+              value={phone}
+              onChangeText={setPhone}
               keyboardType="phone-pad"
               style={{
                 marginBottom: RFValue(12),
@@ -97,10 +171,11 @@ export default function Register() {
                 fontSize: RFValue(14),
               }}
             />
-
             <TextInput
               label="Mật khẩu"
               mode="outlined"
+              value={password}
+              onChangeText={setPassword}
               secureTextEntry={!passwordVisible}
               right={
                 <TextInput.Icon
@@ -120,10 +195,11 @@ export default function Register() {
                 fontSize: RFValue(14),
               }}
             />
-
             <TextInput
               label="Xác thực mật khẩu"
               mode="outlined"
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
               secureTextEntry={!confirmPasswordVisible}
               right={
                 <TextInput.Icon
@@ -151,7 +227,7 @@ export default function Register() {
             />
 
             <TouchableOpacity
-              onPress={() => setRemember(!remember)}
+              onPress={() => setAgree(!agree)}
               className="flex-row items-center mb-5"
             >
               <View
@@ -162,12 +238,8 @@ export default function Register() {
                   marginRight: RFValue(6),
                 }}
               >
-                {remember && (
-                  <Ionicons
-                    name="checkmark"
-                    size={RFValue(12)}
-                    color="#3F72AF"
-                  />
+                {agree && (
+                  <Ionicons name="checkmark" size={RFValue(12)} color="#3F72AF" />
                 )}
               </View>
               <Text
@@ -178,24 +250,23 @@ export default function Register() {
               </Text>
             </TouchableOpacity>
 
-            {/* --- Đăng ký --- */}
             <TouchableOpacity
               className="bg-[#3F72AF] rounded-full"
               style={{
                 paddingVertical: RFValue(12),
                 marginBottom: RFValue(20),
               }}
-              onPress={() => router.replace("/(tabs)")}
+              onPress={handleRegister}
+              disabled={loading}
             >
               <Text
                 className="text-white text-center font-medium"
                 style={{ fontSize: RFPercentage(2.2) }}
               >
-                ĐĂNG KÝ
+                {loading ? "Đang đăng ký..." : "ĐĂNG KÝ"}
               </Text>
             </TouchableOpacity>
 
-            {/* --- Link đăng nhập --- */}
             <TouchableOpacity onPress={() => router.push("/auth/login")}>
               <Text
                 className="text-center text-gray-600"
@@ -211,7 +282,6 @@ export default function Register() {
               </Text>
             </TouchableOpacity>
 
-            {/* --- Chia cách --- */}
             <View className="flex-row items-center mb-6">
               <View className="flex-1 h-px bg-gray-300" />
               <Text
@@ -223,23 +293,25 @@ export default function Register() {
               <View className="flex-1 h-px bg-gray-300" />
             </View>
 
-            {/* --- Nút mạng xã hội --- */}
             <View className="flex-row justify-between px-6 gap-6 mb-6">
               <TouchableOpacity
                 className="flex-1 border border-[#3F72AF] rounded-lg items-center justify-center"
                 style={{ height: RFValue(42) }}
+                onPress={() => handleSocialRegister("Facebook")}
               >
                 <FacebookIcon width={RFValue(20)} height={RFValue(20)} />
               </TouchableOpacity>
               <TouchableOpacity
                 className="flex-1 border border-[#3F72AF] rounded-lg items-center justify-center"
                 style={{ height: RFValue(42) }}
+                onPress={() => handleSocialRegister("Google")}
               >
                 <GoogleIcon width={RFValue(20)} height={RFValue(20)} />
               </TouchableOpacity>
               <TouchableOpacity
                 className="flex-1 border border-[#3F72AF] rounded-lg items-center justify-center"
                 style={{ height: RFValue(42) }}
+                onPress={() => handleSocialRegister("Apple")}
               >
                 <AppleIcon width={RFValue(20)} height={RFValue(20)} />
               </TouchableOpacity>

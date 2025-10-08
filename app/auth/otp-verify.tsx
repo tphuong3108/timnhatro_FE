@@ -1,15 +1,69 @@
-import { View, Text, TouchableOpacity } from "react-native";
-import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import { View, Text, TouchableOpacity, Alert } from "react-native";
+import { useRouter, useLocalSearchParams } from "expo-router";
+import React, { useState, useEffect } from "react";
 import { TextInput } from "react-native-paper";
+import apiClient from "../../utils/apiClient";
 import Logo from "../../assets/images/logodoc.svg";
-import FacebookIcon from "../../assets/images/facebook.svg";
-import GoogleIcon from "../../assets/images/google.svg";
-import AppleIcon from "../../assets/images/apple.svg";
 
 export default function OtpVerify() {
   const router = useRouter();
+  const { firstName, lastName, email, phone, password } = useLocalSearchParams();
   const [otp, setOtp] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [timer, setTimer] = useState(60);
+  const [canResend, setCanResend] = useState(false);
+
+  // ⏳ Countdown resend OTP
+  useEffect(() => {
+    if (timer <= 0) {
+      setCanResend(true);
+      return;
+    }
+    const countdown = setTimeout(() => setTimer(timer - 1), 1000);
+    return () => clearTimeout(countdown);
+  }, [timer]);
+
+  // ✅ Xác thực OTP
+  const handleVerify = async () => {
+    if (!otp) return Alert.alert("Thiếu thông tin", "Vui lòng nhập mã OTP");
+
+    try {
+      setLoading(true);
+      const res = await apiClient.post("/users/register", {
+        firstName,
+        lastName,
+        email,
+        phoneNumber: phone,
+        password,
+        otp,
+      });
+
+      Alert.alert("🎉 Thành công", "Tài khoản đã được tạo!", [
+        { text: "OK", onPress: () => router.replace("/auth/login") },
+      ]);
+    } catch (error: any) {
+      console.log("Verify OTP error:", error.response?.data || error.message);
+      Alert.alert(
+        "Lỗi xác thực",
+        error.response?.data?.message || "Mã OTP không hợp lệ hoặc đã hết hạn."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 🔁 Gửi lại OTP
+  const handleResend = async () => {
+    try {
+      setCanResend(false);
+      setTimer(60);
+      await apiClient.post("/users/send-otp", { email });
+      Alert.alert("✅ Đã gửi lại mã OTP", "Vui lòng kiểm tra email.");
+    } catch (error: any) {
+      console.log("Resend OTP error:", error.response?.data || error.message);
+      Alert.alert("Lỗi", "Không thể gửi lại OTP. Thử lại sau.");
+    }
+  };
 
   return (
     <View className="flex-1 bg-white px-6 pt-12">
@@ -19,47 +73,37 @@ export default function OtpVerify() {
 
       <Text className="text-3xl font-inter text-center mb-2">NHẬP MÃ OTP</Text>
       <Text className="text-gray-500 text-center mb-8">
-        Mã OTP đã được gửi vào Email của bạn
+        Mã OTP đã được gửi tới email {email}
       </Text>
 
       <TextInput
         label="Mã OTP"
         mode="outlined"
-        placeholder=""
         value={otp}
         onChangeText={setOtp}
-        secureTextEntry
+        keyboardType="numeric"
         style={{ marginBottom: 16, backgroundColor: "white" }}
       />
 
       <TouchableOpacity
         className="bg-[#3F72AF] py-3 rounded-full mb-6"
-        onPress={() => router.replace("/(tabs)")}
+        onPress={handleVerify}
+        disabled={loading}
       >
-        <Text className="text-white font-inter text-center text-lg">GỬI MÃ</Text>
+        <Text className="text-white font-inter text-center text-lg">
+          {loading ? "Đang xác thực..." : "XÁC NHẬN"}
+        </Text>
       </TouchableOpacity>
 
-      <View className="flex-row items-center mb-6">
-        <View className="flex-1 h-px bg-gray-300" />
-        <Text className="text-gray-500 mx-4">Hoặc đăng nhập bằng</Text>
-        <View className="flex-1 h-px bg-gray-300" />
-      </View>
-    <View className="flex-row justify-between px-6 gap-6 mb-6 mt-2">
-        <TouchableOpacity className="flex-1 h-14 border border-[#3F72AF] rounded-lg items-center justify-center">
-            <FacebookIcon width={24} height={24} />
-        </TouchableOpacity>
-        <TouchableOpacity className="flex-1 h-14 border border-[#3F72AF] rounded-lg items-center justify-center">
-            <GoogleIcon width={24} height={24} />
-        </TouchableOpacity>
-        <TouchableOpacity className="flex-1 h-14 border border-[#3F72AF] rounded-lg items-center justify-center">
-            <AppleIcon width={24} height={24} />
-        </TouchableOpacity>
-        </View>
-
-      <TouchableOpacity onPress={() => router.push("/auth/register")}>
-        <Text className="text-center text-gray-600">
-          Bạn chưa có tài khoản?{" "}
-          <Text className="text-[#3F72AF] font-inter">Đăng ký ngay!</Text>
+      <TouchableOpacity
+        onPress={handleResend}
+        disabled={!canResend}
+        className={`py-2 rounded-full ${canResend ? "bg-blue-100" : "bg-gray-200"}`}
+      >
+        <Text className="text-center text-gray-700">
+          {canResend
+            ? "Gửi lại mã OTP"
+            : `Gửi lại mã sau ${timer}s`}
         </Text>
       </TouchableOpacity>
     </View>

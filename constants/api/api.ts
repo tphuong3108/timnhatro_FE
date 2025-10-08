@@ -1,5 +1,5 @@
 // constants/api.ts
-const API_BASE_URL = "http://localhost:5000/api"; 
+const API_BASE_URL = "http://localhost:5050/api"; 
 
 export const API = {
   REGISTER: `${API_BASE_URL}/users/register`,

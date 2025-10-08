@@ -1,9 +1,9 @@
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { Dimensions, Image, Text, TouchableOpacity, View } from "react-native";
-import Logo from "../assets/images/logo.svg";
-import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
+import { Dimensions, Image, Text, TouchableOpacity, View, Platform } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
+import Logo from "../assets/images/logo.svg";
 
 const { height } = Dimensions.get("window");
 
@@ -17,9 +17,9 @@ const introText =
   "Tìm nhà trọ là nền tảng tìm kiếm và cho thuê phòng trọ uy tín, giúp kết nối nhanh chóng giữa người có nhu cầu thuê và chủ trọ.";
 
 export default function Onboarding() {
+  const router = useRouter();
   const [currentImage, setCurrentImage] = useState(0);
   const [showAuthButtons, setShowAuthButtons] = useState(false);
-  const router = useRouter();
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -29,24 +29,31 @@ export default function Onboarding() {
   }, []);
 
   const handleContinueAsGuest = async () => {
-    await AsyncStorage.setItem("hasSeenIntro", "true");
-    router.replace("/(tabs)/home" as any);
+    try {
+      await AsyncStorage.setItem("hasSeenIntro", "true");
+      await AsyncStorage.setItem("guestMode", "true");
+
+      setTimeout(() => {
+        router.replace("/(tabs)/home");
+      }, 100);
+    } catch (error) {
+      console.error("Error saving guest mode:", error);
+    }
   };
 
   const handleLogin = async () => {
     await AsyncStorage.setItem("hasSeenIntro", "true");
-    router.push("/auth/login" as any);
+    router.push("/auth/login");
   };
 
   const handleRegister = async () => {
     await AsyncStorage.setItem("hasSeenIntro", "true");
-    router.push("/auth/register" as any);
+    router.push("/auth/register");
   };
 
   return (
     <View className="flex-1 bg-white">
-      {/* Ảnh slide */}
-      <View style={{ height: height * 0.51 }}>
+      <View style={{ height: height * 0.52 }}>
         <Image
           source={{ uri: slides[currentImage].image }}
           className="w-full h-full rounded-xl"
@@ -68,11 +75,10 @@ export default function Onboarding() {
         </View>
       </View>
 
-      {/* Phần mô tả */}
       <View style={{ height: height * 0.3, alignItems: "center", paddingHorizontal: 20 }}>
         <Logo width={RFValue(200)} height={RFValue(50)} style={{ marginTop: RFValue(25) }} />
         <Text
-          className="text-center text-gray-700 font-inter"
+          className="text-center text-gray-700"
           style={{
             marginTop: RFValue(20),
             fontSize: RFPercentage(2.2),
@@ -83,7 +89,6 @@ export default function Onboarding() {
         </Text>
       </View>
 
-      {/* Các nút hành động */}
       <View style={{ height: height * 0.2, justifyContent: "center", paddingHorizontal: 24 }}>
         {!showAuthButtons ? (
           <TouchableOpacity
@@ -92,7 +97,7 @@ export default function Onboarding() {
             onPress={() => setShowAuthButtons(true)}
           >
             <Text
-              className="text-white font-inter text-center"
+              className="text-white text-center font-medium"
               style={{ fontSize: RFPercentage(2.2) }}
             >
               TIẾP THEO
@@ -107,7 +112,7 @@ export default function Onboarding() {
                 onPress={handleRegister}
               >
                 <Text
-                  className="text-[#3F72AF] font-inter text-center"
+                  className="text-[#3F72AF] text-center"
                   style={{ fontSize: RFPercentage(2) }}
                 >
                   ĐĂNG KÝ
@@ -120,7 +125,7 @@ export default function Onboarding() {
                 onPress={handleLogin}
               >
                 <Text
-                  className="text-white font-inter text-center"
+                  className="text-white text-center"
                   style={{ fontSize: RFPercentage(2) }}
                 >
                   ĐĂNG NHẬP

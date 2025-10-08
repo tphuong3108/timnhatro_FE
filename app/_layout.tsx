@@ -1,8 +1,7 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from "@react-navigation/native";
+import { DefaultTheme, ThemeProvider } from "@react-navigation/native";
 import { Stack, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { useEffect, useState } from "react";
-import { useColorScheme } from "@/hooks/use-color-scheme";
+import React, { useEffect, useState, useRef } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SplashScreen from "expo-splash-screen";
 import * as Font from "expo-font";
@@ -12,18 +11,20 @@ import {
   Inter_600SemiBold,
   Inter_700Bold,
 } from "@expo-google-fonts/inter";
-import { ActivityIndicator, View } from "react-native";
+import { View, ActivityIndicator, Platform } from "react-native";
 
-SplashScreen.preventAutoHideAsync();
+SplashScreen.preventAutoHideAsync().catch(() => {});
+
+type RoutePath = "/" | "/(tabs)" | "/auth/login" | "/modal";
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
   const router = useRouter();
-  const [loaded, setLoaded] = useState(false);
-  const [checkingAuth, setCheckingAuth] = useState(true);
+  const [appReady, setAppReady] = useState(false);
+  const [initialRoute, setInitialRoute] = useState<RoutePath | null>(null);
+  const hasNavigated = useRef(false);
 
   useEffect(() => {
-    async function load() {
+    async function prepareApp() {
       try {
         await Font.loadAsync({
           InterRegular: Inter_400Regular,
@@ -32,41 +33,51 @@ export default function RootLayout() {
           InterBold: Inter_700Bold,
         });
 
-        const token = await AsyncStorage.getItem("token");
+        const [token, hasSeenIntro, guestMode] = await Promise.all([
+          AsyncStorage.getItem("token"),
+          AsyncStorage.getItem("hasSeenIntro"),
+          AsyncStorage.getItem("guestMode"),
+        ]);
 
-        if (token) {
-          router.replace("/(tabs)" as any);
-        } else {
-          router.replace("/" as any);
-        }
+        console.log("Auth check:", { token, hasSeenIntro, guestMode });
 
-        setLoaded(true);
-        await SplashScreen.hideAsync();
+        if (!hasSeenIntro) setInitialRoute("/");
+        else if (token || guestMode === "true") setInitialRoute("/(tabs)");
+        else setInitialRoute("/auth/login");
       } catch (err) {
-        console.error("App load error:", err);
+        console.error("Init error:", err);
       } finally {
-        setCheckingAuth(false);
+        setAppReady(true);
       }
     }
 
-    load();
-  }, [router]);
+    prepareApp();
+  }, []);
 
-  if (!loaded || checkingAuth) {
+  useEffect(() => {
+    if (appReady && initialRoute && !hasNavigated.current) {
+      hasNavigated.current = true;
+      setTimeout(() => {
+        router.replace(initialRoute);
+        SplashScreen.hideAsync().catch(() => {});
+      }, Platform.OS === "web" ? 100 : 0);
+    }
+  }, [appReady, initialRoute]);
+
+  if (!appReady) {
     return (
-      <View className="flex-1 items-center justify-center bg-white">
+      <View className="flex-1 justify-center items-center bg-white">
         <ActivityIndicator size="large" color="#3F72AF" />
       </View>
     );
   }
 
   return (
-    <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+    <ThemeProvider value={DefaultTheme}>
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(tabs)" />
-        <Stack.Screen name="auth/login" />
-        <Stack.Screen name="auth/register" />
-        <Stack.Screen name="auth/forgot-password" />
+        <Stack.Screen name="auth" />
+        <Stack.Screen name="modal" />
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>

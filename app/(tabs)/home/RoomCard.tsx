@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, TouchableOpacity, Image } from "react-native";
-import { RFValue, RFPercentage } from "react-native-responsive-fontsize";
+import {  RFPercentage } from "react-native-responsive-fontsize";
 
 export default function RoomCard({ room }: any) {
   return (
