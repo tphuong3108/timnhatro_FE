@@ -11,6 +11,7 @@ import {
   Inter_600SemiBold,
   Inter_700Bold,
 } from "@expo-google-fonts/inter";
+import { Ionicons } from "@expo/vector-icons";
 import { View, ActivityIndicator, Platform } from "react-native";
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
@@ -33,6 +34,7 @@ export default function RootLayout() {
           InterMedium: Inter_500Medium,
           InterSemiBold: Inter_600SemiBold,
           InterBold: Inter_700Bold,
+          ...Ionicons.font, 
         });
 
         const [token, guestMode] = await Promise.all([
@@ -41,7 +43,6 @@ export default function RootLayout() {
         ]);
 
         setInitialRoute("/");
-
       } catch (err) {
         console.error("Init error:", err);
       } finally {
@@ -75,6 +76,7 @@ export default function RootLayout() {
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="auth" />
+        <Stack.Screen name="room" />
         <Stack.Screen name="modal" />
       </Stack>
       <StatusBar style="auto" />

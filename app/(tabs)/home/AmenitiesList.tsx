@@ -3,28 +3,39 @@ import { View, Text } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 const amenities = [
-  { icon: "wifi-outline", name: "Wifi miễn phí" },
-  { icon: "car-outline", name: "Chỗ đậu xe" },
-  { icon: "snow-outline", name: "Máy lạnh" },
-  { icon: "restaurant-outline", name: "Khu bếp" },
-  { icon: "tv-outline", name: "TV màn hình phẳng" },
-  { icon: "sparkles-outline", name: "Phòng sạch mới" },
+  { icon: "wifi-outline", name: "Wi-Fi miễn phí", color: "#3F72AF" },
+  { icon: "tv-outline", name: "TV", color: "#3F72AF" },
+  { icon: "snow-outline", name: "Điều hòa", color: "#3F72AF" },
+  { icon: "washer-outline", name: "Máy giặt", color: "#3F72AF" },
+  { icon: "restaurant-outline", name: "Khu bếp", color: "#3F72AF" },
+  { icon: "cube-outline", name: "Tủ lạnh", color: "#3F72AF" },
+  { icon: "car-outline", name: "Chỗ để xe", color: "#3F72AF" },
+  { icon: "flame-outline", name: "Máy báo khói", color: "#3F72AF" },
 ];
 
 export default function AmenitiesList() {
   return (
-    <View className="flex-row flex-wrap justify-between mt-2">
-      {amenities.map((item, i) => (
-        <View
-          key={i}
-          className="w-[30%] bg-[#F9FAFB] rounded-xl p-3 mb-3 items-center justify-center shadow-sm"
-        >
-          <Ionicons name={item.icon as any} size={20} color="#3F72AF" />
-          <Text className="text-gray-700 text-center text-[12px] mt-1">
-            {item.name}
-          </Text>
-        </View>
-      ))}
+    <View className="mt-3">
+      <View className="flex-row flex-wrap justify-between">
+        {amenities.map((item, index) => (
+          <View
+            key={index}
+            className="w-[30%] h-[75px] bg-white rounded-2xl mb-3 items-center justify-center border border-gray-300"
+          >
+            <View className="w-8 h-8 items-center justify-center">
+              <Ionicons name={item.icon as any} size={26} color={item.color} />
+            </View>
+
+            <Text
+              numberOfLines={1}
+              ellipsizeMode="tail"
+              className="text-gray-700 text-center text-[12px] mt-1 font-medium w-[70px]"
+            >
+              {item.name}
+            </Text>
+          </View>
+        ))}
+      </View>
     </View>
   );
 }

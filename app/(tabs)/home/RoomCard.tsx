@@ -1,12 +1,12 @@
 import React from "react";
-import { TouchableOpacity, View, Text } from "react-native";
+import { TouchableOpacity, View, Text, Image, Platform } from "react-native";
 import { SvgProps } from "react-native-svg";
 
 export interface Room {
   id: string;
   title: string;
   views: string;
-  img: React.FC<SvgProps>;
+  img: React.FC<SvgProps> | any;
 }
 
 export default function RoomCard({
@@ -22,10 +22,18 @@ export default function RoomCard({
     <TouchableOpacity
       onPress={onPress}
       activeOpacity={0.85}
-      className="bg-white w-44 h-52 mr-3 rounded-2xl shadow-sm"
+      className="bg-white w-44 h-52 mr-3 rounded-2xl shadow-sm overflow-hidden"
     >
-      <View className="h-[120px] bg-[#F4F6FA] rounded-t-2xl items-center justify-center">
-        <Icon width={70} height={70} />
+      <View className="h-[120px] bg-[#F4F6FA] rounded-t-2xl items-center justify-center overflow-hidden">
+        {Platform.OS === "web" ? (
+          <Image
+            source={room.img}
+            resizeMode="contain"
+            style={{ width: "100%", height: "100%" }}
+          />
+        ) : (
+          <Icon width="100%" height="100%" preserveAspectRatio="xMidYMid meet" />
+        )}
       </View>
 
       <View className="px-3 py-2">
@@ -35,9 +43,7 @@ export default function RoomCard({
         >
           {room.title}
         </Text>
-        <Text className="text-gray-500 text-[11px] mt-0.5">
-          {room.views}
-        </Text>
+        <Text className="text-gray-500 text-[11px] mt-0.5">{room.views}</Text>
       </View>
     </TouchableOpacity>
   );

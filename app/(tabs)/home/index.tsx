@@ -1,5 +1,5 @@
 import React from "react";
-import { SafeAreaView, ScrollView, View } from "react-native";
+import { SafeAreaView, ScrollView, View, useWindowDimensions } from "react-native";
 import HomeBanner from "./HomeBanner";
 import SearchBar from "@/components/ui/SearchBar";
 import SectionHeader from "./SectionHeader";
@@ -7,41 +7,61 @@ import CategoryList from "./CategoryList";
 import NearbyRooms from "./NearbyRooms";
 import RoomCarousel from "./RoomCarousel";
 import AmenitiesList from "./AmenitiesList";
-import rooms from "@/constants/data/rooms";
 
 export default function Home() {
+  const { height } = useWindowDimensions();
+  const isLargeScreen = height > 800;
+  const isMediumScreen = height > 700 && height <= 800;
+
   return (
     <SafeAreaView className="flex-1 bg-white">
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 40 }}
+        bounces={false}
+        overScrollMode="never" 
+        contentContainerStyle={{
+          flexGrow: 1, 
+          justifyContent: "flex-start",
+          alignItems: "center",
+        }}
       >
-        <View className="">
+        <View className="w-full">
           <HomeBanner />
         </View>
 
-        <View className="px-4 mt-1">
+        <View
+          className="w-full max-w-[450px] px-6"
+          style={{
+            marginTop: isLargeScreen ? 40 : isMediumScreen ? 32 : 24,
+            gap: isLargeScreen ? 36 : isMediumScreen ? 32 : 24,
+            marginBottom: isLargeScreen ? 50 : 40,
+          }}
+        >
           <SearchBar />
-        </View>
 
-        <View className="mt-6 px-4">
-          <SectionHeader title="Xu hướng tìm phòng" />
-          <CategoryList />
-        </View>
+          {/* Xu hướng tìm phòng */}
+          <View>
+            <SectionHeader title="Xu hướng tìm phòng" />
+            <CategoryList />
+          </View>
 
-        <View className="mt-8 px-4">
-          <SectionHeader title="Phòng quanh bạn" />
-          <NearbyRooms />
-        </View>
+          {/* Phòng xung quanh bạn */}
+          <View>
+            <SectionHeader title="Phòng xung quanh bạn" />
+            <NearbyRooms />
+          </View>
 
-        <View className="mt-8 px-4">
-          <SectionHeader title="Top phòng nổi bật" />
-          <RoomCarousel rooms={rooms} />
-        </View>
+          {/* Top phòng nổi bật */}
+          <View>
+            <SectionHeader title="Top phòng nổi bật" />
+            <RoomCarousel />
+          </View>
 
-        <View className="mt-8 px-4 mb-10">
-          <SectionHeader title="Tiện ích phổ biến" />
-          <AmenitiesList />
+          {/* Tiện ích phổ biến */}
+          <View>
+            <SectionHeader title="Tiện ích phổ biến" />
+            <AmenitiesList />
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
