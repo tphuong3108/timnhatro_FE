@@ -1,30 +1,41 @@
 import React from "react";
-import { View, Text, TouchableOpacity, Image } from "react-native";
-import {  RFPercentage } from "react-native-responsive-fontsize";
+import { TouchableOpacity, View, Text } from "react-native";
+import { SvgProps } from "react-native-svg";
 
-export default function RoomCard({ room }: any) {
+export interface Room {
+  id: string;
+  title: string;
+  views: string;
+  img: React.FC<SvgProps>;
+}
+
+export default function RoomCard({
+  room,
+  onPress,
+}: {
+  room: Room;
+  onPress?: () => void;
+}) {
+  const Icon = room.img;
+
   return (
     <TouchableOpacity
-      className="w-[48%] bg-white border border-gray-200 rounded-xl mb-4 shadow-sm"
-      activeOpacity={0.9}
+      onPress={onPress}
+      activeOpacity={0.85}
+      className="bg-white w-44 h-52 mr-3 rounded-2xl shadow-sm"
     >
-      <Image
-        source={room.img}
-        className="w-full h-[100px] rounded-t-xl"
-        resizeMode="cover"
-      />
-      <View className="p-2">
+      <View className="h-[120px] bg-[#F4F6FA] rounded-t-2xl items-center justify-center">
+        <Icon width={70} height={70} />
+      </View>
+
+      <View className="px-3 py-2">
         <Text
-          className="font-semibold text-gray-800"
-          style={{ fontSize: RFPercentage(1.8) }}
-          numberOfLines={1}
+          numberOfLines={2}
+          className="text-[#3F72AF] font-bold text-[13px] leading-4"
         >
           {room.title}
         </Text>
-        <Text
-          className="text-gray-500 mt-1"
-          style={{ fontSize: RFPercentage(1.6) }}
-        >
+        <Text className="text-gray-500 text-[11px] mt-0.5">
           {room.views}
         </Text>
       </View>

@@ -1,36 +1,30 @@
 import React from "react";
-import { View, Text, TouchableOpacity, Image, TextInput } from "react-native";
+import { TouchableOpacity, Platform, View, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { RFValue } from "react-native-responsive-fontsize";
+import { BlurView } from "expo-blur";
+import Logo from "../assets/images/logo.svg";
 
 export default function Header() {
   return (
-    <View className="absolute top-0 left-0 w-full z-10 bg-white/80 backdrop-blur-md px-4 pt-12 pb-3">
-      <View className="flex-row justify-between items-center mb-3">
-        <View className="flex-row items-center">
-          <Image
-            source={require("../assets/images/logo.svg")}
-            className="w-7 h-7 mr-2"
-            resizeMode="contain"
-          />
-        </View>
-
-        <TouchableOpacity activeOpacity={0.8}>
-          <Ionicons name="globe-outline" size={RFValue(20)} color="#3F72AF" />
-        </TouchableOpacity>
-      </View>
-
-      <View className="flex-row items-center bg-[#F1F4F9] rounded-full px-4 py-2">
-        <Ionicons name="search-outline" size={RFValue(18)} color="#3F72AF" />
-        <TextInput
-          placeholder="Tìm phòng giá tốt tại đây"
-          placeholderTextColor="#777"
-          className="flex-1 ml-2 text-gray-800 text-[13px]"
+    <View className="w-full z-20 overflow-hidden bg-[#B9D7EA]">
+      <View
         />
-        <TouchableOpacity activeOpacity={0.8}>
-          <Ionicons name="notifications-outline" size={RFValue(20)} color="#3F72AF" />
+        <BlurView
+          intensity={40}
+          tint="light"
+          style={{
+            paddingHorizontal: 20,
+            paddingTop: Platform.OS === "ios" ? 60 : 40,
+            paddingBottom: 12,
+          }}
+        className="flex-row justify-between items-center"
+      >
+        <Logo width={RFValue(95)} height={RFValue(30)} />
+        <TouchableOpacity activeOpacity={0.7}>
+          <Ionicons name="globe-outline" size={RFValue(22)} color="#ffffff" />
         </TouchableOpacity>
-      </View>
+      </BlurView>
     </View>
   );
 }

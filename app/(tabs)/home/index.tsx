@@ -1,40 +1,47 @@
 import React from "react";
-import { SafeAreaView, ScrollView, View, Image } from "react-native";
-
-import Header from "@/components/Header";
+import { SafeAreaView, ScrollView, View } from "react-native";
+import HomeBanner from "./HomeBanner";
+import SearchBar from "@/components/ui/SearchBar";
 import SectionHeader from "./SectionHeader";
 import CategoryList from "./CategoryList";
-import RoomCard from "./RoomCard";
+import NearbyRooms from "./NearbyRooms";
+import RoomCarousel from "./RoomCarousel";
+import AmenitiesList from "./AmenitiesList";
 import rooms from "@/constants/data/rooms";
 
 export default function Home() {
   return (
     <SafeAreaView className="flex-1 bg-white">
-      <View className="relative">
-        <Image
-          source={require("../../../assets/images/phong.svg")}
-          className="w-full h-52"
-          resizeMode="cover"
-        />
-        <Header />
-      </View>
-
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 30 }}
+        contentContainerStyle={{ paddingBottom: 40 }}
       >
-        <View className="mt-4 px-4">
+        <View className="">
+          <HomeBanner />
+        </View>
+
+        <View className="px-4 mt-1">
+          <SearchBar />
+        </View>
+
+        <View className="mt-6 px-4">
           <SectionHeader title="Xu hướng tìm phòng" />
           <CategoryList />
         </View>
 
-        <View className="mt-6 px-4 mb-10">
+        <View className="mt-8 px-4">
+          <SectionHeader title="Phòng quanh bạn" />
+          <NearbyRooms />
+        </View>
+
+        <View className="mt-8 px-4">
           <SectionHeader title="Top phòng nổi bật" />
-          <View className="flex-row justify-between flex-wrap mt-2">
-            {rooms.map((room, i) => (
-              <RoomCard key={i} room={room} />
-            ))}
-          </View>
+          <RoomCarousel rooms={rooms} />
+        </View>
+
+        <View className="mt-8 px-4 mb-10">
+          <SectionHeader title="Tiện ích phổ biến" />
+          <AmenitiesList />
         </View>
       </ScrollView>
     </SafeAreaView>

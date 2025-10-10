@@ -26,6 +26,8 @@ export default function RootLayout() {
   useEffect(() => {
     async function prepareApp() {
       try {
+        await AsyncStorage.removeItem("hasSeenIntro");
+
         await Font.loadAsync({
           InterRegular: Inter_400Regular,
           InterMedium: Inter_500Medium,
@@ -33,17 +35,13 @@ export default function RootLayout() {
           InterBold: Inter_700Bold,
         });
 
-        const [token, hasSeenIntro, guestMode] = await Promise.all([
+        const [token, guestMode] = await Promise.all([
           AsyncStorage.getItem("token"),
-          AsyncStorage.getItem("hasSeenIntro"),
           AsyncStorage.getItem("guestMode"),
         ]);
 
-        console.log("Auth check:", { token, hasSeenIntro, guestMode });
+        setInitialRoute("/");
 
-        if (!hasSeenIntro) setInitialRoute("/");
-        else if (token || guestMode === "true") setInitialRoute("/(tabs)");
-        else setInitialRoute("/auth/login");
       } catch (err) {
         console.error("Init error:", err);
       } finally {
