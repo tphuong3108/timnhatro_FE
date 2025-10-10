@@ -105,7 +105,7 @@ export default function Onboarding() {
           </TouchableOpacity>
         ) : (
           <>
-            <View className="flex-row justify-between mb-3" style={{ marginTop: RFValue(10) }}>
+            <View className="flex-row justify-between mb-3 -top-6" style={{ marginTop: RFValue(10) }}>
               <TouchableOpacity
                 className="border border-[#3F72AF] rounded-xl"
                 style={{ width: "45%", paddingVertical: RFValue(10) }}
@@ -135,7 +135,7 @@ export default function Onboarding() {
 
             <TouchableOpacity onPress={handleContinueAsGuest}>
               <Text
-                className="text-center text-gray-600 underline"
+                className="text-center text-gray-600 underline -top-4"
                 style={{ fontSize: RFPercentage(1.9) }}
               >
                 Tiếp tục mà không đăng nhập

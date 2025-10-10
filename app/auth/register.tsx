@@ -54,30 +54,33 @@ export default function Register() {
 
     try {
       setLoading(true);
-      const res = await apiClient.post("/users/send-otp", { email });
 
-      Alert.alert(
-        "OTP đã được gửi!",
-        "Vui lòng kiểm tra email để lấy mã OTP.",
-        [
-          {
-            text: "OK",
-            onPress: () => {
-              const query = new URLSearchParams({
-                firstName,
-                lastName,
-                phone,
-                password,
-                email,
-              }).toString();
+      const res = await apiClient.post("/users/register", {
+        firstName,
+        lastName,
+        phone,
+        password,
+        confirmPassword,
+        email,
+      });
 
-              router.push(`/auth/otp-verify?${query}`);
-            },
+      Alert.alert("OTP đã được gửi!", "Vui lòng kiểm tra email để lấy mã OTP.", [
+        {
+          text: "OK",
+          onPress: () => {
+            const query = new URLSearchParams({
+              firstName,
+              lastName,
+              phone,
+              password,
+              email,
+            }).toString();
+            router.push(`/auth/otp-verify?${query}`);
           },
-        ]
-      );
+        },
+      ]);
     } catch (error: any) {
-      console.log("Send OTP error:", error.response?.data || error.message);
+      console.log("Register error:", error.response?.data || error.message);
       Alert.alert(
         "Lỗi gửi OTP",
         error.response?.data?.message || "Không thể gửi mã OTP. Thử lại sau."
@@ -86,6 +89,7 @@ export default function Register() {
       setLoading(false);
     }
   };
+
   const handleSocialRegister = (provider: string) => {
     Alert.alert("Tính năng đang phát triển", `Đăng ký bằng ${provider} sắp ra mắt! 🚀`);
   };
@@ -206,9 +210,7 @@ export default function Register() {
                   icon={() => (
                     <Ionicons
                       name={
-                        confirmPasswordVisible
-                          ? "eye-outline"
-                          : "eye-off-outline"
+                        confirmPasswordVisible ? "eye-outline" : "eye-off-outline"
                       }
                       size={RFValue(18)}
                       color="gray"
@@ -263,7 +265,7 @@ export default function Register() {
                 className="text-white text-center font-medium"
                 style={{ fontSize: RFPercentage(2.2) }}
               >
-                {loading ? "Đang đăng ký..." : "ĐĂNG KÝ"}
+                {loading ? "Đang gửi OTP..." : "ĐĂNG KÝ"}
               </Text>
             </TouchableOpacity>
 
