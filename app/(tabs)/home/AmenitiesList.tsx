@@ -15,27 +15,27 @@ const amenities = [
 
 export default function AmenitiesList() {
   return (
-    <View className="mt-3">
-      <View className="flex-row flex-wrap justify-between">
-        {amenities.map((item, index) => (
-          <View
-            key={index}
-            className="w-[30%] h-[75px] bg-white rounded-2xl mb-3 items-center justify-center border border-gray-300"
-          >
-            <View className="w-8 h-8 items-center justify-center">
-              <Ionicons name={item.icon as any} size={26} color={item.color} />
-            </View>
-
-            <Text
-              numberOfLines={1}
-              ellipsizeMode="tail"
-              className="text-gray-700 text-center text-[12px] mt-1 font-medium w-[70px]"
-            >
-              {item.name}
-            </Text>
+  <View className="mt-3">
+    <View className="flex-row flex-wrap justify-start gap-x-3">
+      {amenities.map((item, index) => (
+        <View
+          key={index}
+          className="w-[30%] h-[75px] bg-white rounded-2xl mb-3 items-center justify-center border border-gray-300"
+        >
+          <View className="w-8 h-8 items-center justify-center">
+            <Ionicons name={item.icon as any} size={26} color={item.color} />
           </View>
-        ))}
-      </View>
+
+          <Text
+            numberOfLines={1}
+            ellipsizeMode="tail"
+            className="text-gray-700 text-center text-[12px] mt-1 font-medium w-[70px]"
+          >
+            {item.name}
+          </Text>
+        </View>
+      ))}
     </View>
+  </View>
   );
 }

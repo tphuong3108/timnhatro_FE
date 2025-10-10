@@ -32,9 +32,9 @@ export default function Home() {
         <View
           className="w-full max-w-[450px] px-6"
           style={{
-            marginTop: isLargeScreen ? 40 : isMediumScreen ? 32 : 24,
-            gap: isLargeScreen ? 36 : isMediumScreen ? 32 : 24,
-            marginBottom: isLargeScreen ? 50 : 40,
+            marginTop: isLargeScreen ? 24 : isMediumScreen ? 20 : 16,
+            rowGap: isLargeScreen ? 36 : isMediumScreen ? 32 : 24,
+            marginBottom: isLargeScreen ? 40 : 30,
           }}
         >
           <SearchBar />

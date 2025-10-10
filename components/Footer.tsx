@@ -17,7 +17,7 @@ export default function Footer({ onTabPress }: FooterProps) {
 
   const tabs = [
     { key: "Trang chủ", route: "/home" as const, icon: "home-outline", activeIcon: "home" },
-    { key: "Nhắn tin", route: "/chat" as const, icon: "chatbubble-outline", activeIcon: "chatbubble" },
+    { key: "Nhắn tin", route: "/chat" as any, icon: "chatbubble-outline", activeIcon: "chatbubble" },
     { key: "Tìm phòng", route: "/explore" as const, icon: "business-outline", activeIcon: "business" },
     { key: "Tài khoản", route: "/user" as const, icon: "person-outline", activeIcon: "person" },
   ];
