@@ -8,6 +8,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Alert,
 } from "react-native";
 import { TextInput } from "react-native-paper";
 import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
@@ -15,10 +16,49 @@ import Logo from "../../assets/images/logodoc.svg";
 import FacebookIcon from "../../assets/images/facebook.svg";
 import GoogleIcon from "../../assets/images/google.svg";
 import AppleIcon from "../../assets/images/apple.svg";
+import apiClient from "../../utils/apiClient";
 
 export default function ForgotPassword() {
   const router = useRouter();
   const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleSendOTP = async () => {
+    if (!email.trim()) {
+      Alert.alert("Thiếu thông tin", "Vui lòng nhập email của bạn!");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const res = await apiClient.post("/users/forgot-password", { email });
+
+      Alert.alert(
+        "OTP đã được gửi!",
+        "Vui lòng kiểm tra email để lấy mã OTP.",
+        [
+          {
+            text: "OK",
+            onPress: () => {
+              router.push({
+                pathname: "/auth/reset-password",
+                params: { email },
+              });
+            },
+          },
+        ]
+      );
+    } catch (error: any) {
+      console.log("Forgot password error:", error.response?.data || error.message);
+      Alert.alert(
+        "Lỗi",
+        error.response?.data?.message ||
+          "Không thể gửi mã OTP. Vui lòng thử lại sau."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-white">
@@ -41,7 +81,7 @@ export default function ForgotPassword() {
               className="text-center font-bold text-[#3F72AF]"
               style={{
                 fontSize: RFPercentage(2.8),
-                marginTop: RFValue(20), 
+                marginTop: RFValue(20),
               }}
             >
               QUÊN MẬT KHẨU
@@ -57,6 +97,7 @@ export default function ForgotPassword() {
               Hãy nhập Email của bạn để lấy lại Mật khẩu
             </Text>
           </View>
+
           <View>
             <TextInput
               label="Email"
@@ -76,13 +117,14 @@ export default function ForgotPassword() {
                 paddingVertical: RFValue(12),
                 marginBottom: RFValue(28),
               }}
-              onPress={() => router.push("/auth/otp-verify")}
+              onPress={handleSendOTP}
+              disabled={loading}
             >
               <Text
                 className="text-white text-center font-semibold"
                 style={{ fontSize: RFPercentage(2.1) }}
               >
-                LẤY MÃ OTP
+                {loading ? "Đang gửi..." : "LẤY MÃ OTP"}
               </Text>
             </TouchableOpacity>
           </View>
@@ -131,7 +173,6 @@ export default function ForgotPassword() {
               <Text className="text-[#3F72AF] font-semibold">Đăng ký ngay!</Text>
             </Text>
           </TouchableOpacity>
-
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
