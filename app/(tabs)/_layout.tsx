@@ -8,7 +8,6 @@ export default function TabsLayout() {
   return (
     <View className="flex-1 bg-white relative overflow-hidden">
       <Header />
-
       <View className="flex-1 mb-[65px]">
         <Tabs
           screenOptions={{

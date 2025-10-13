@@ -55,7 +55,6 @@ export default function CategoryList() {
       }}
       renderItem={({ item }) => (
         <View className="items-center mx-1.5" style={{ width: CARD_WIDTH }}>
-          {/* Ảnh full thẻ */}
           <ImageBackground
             source={{ uri: item.image }}
             resizeMode="cover"
@@ -65,7 +64,6 @@ export default function CategoryList() {
             <View className="absolute inset-0 bg-black/10 rounded-2xl" />
           </ImageBackground>
 
-          {/* Tiêu đề — 1 dòng + ... */}
           <Text
             numberOfLines={1}
             ellipsizeMode="tail"

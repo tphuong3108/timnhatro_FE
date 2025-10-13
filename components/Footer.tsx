@@ -102,10 +102,9 @@ export default function Footer({ onTabPress }: FooterProps) {
       <TouchableOpacity
         onPress={handleAddRoom}
         activeOpacity={0.9}
-        className="absolute left-1/2 -translate-x-1/2 -top-[20px]
-        w-[65px] h-[55px] rounded-3xl bg-[#3F72AF]
-        items-center justify-center shadow-lg border-[4px] border-white"
-      >
+          className="absolute left-1/2 -translate-x-1/2 -top-[10px]
+          w-[60px] h-[60px] rounded-full bg-[#3F72AF]
+          items-center justify-center shadow-lg border-[4px] border-white">
         <Ionicons name="add" size={30} color="white" />
       </TouchableOpacity>
     </View>
