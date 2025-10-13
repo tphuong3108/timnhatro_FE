@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { View, Text, FlatList, Image, TouchableOpacity, Alert } from "react-native";
 import apiClient from "@/utils/apiClient";
 import { Ionicons } from "@expo/vector-icons";
+import PostCard from "@/components/ui/PostCard";
 
 export default function Favorites() {
   const [favorites, setFavorites] = useState<any[]>([]);
@@ -52,38 +53,16 @@ export default function Favorites() {
         <Text className="text-gray-500 mt-3">Bạn chưa lưu phòng nào</Text>
       </View>
     );
-
-  return (
-    <View className="w-full mt-2">
-      <FlatList
-        data={favorites}
-        keyExtractor={(item, index) => item._id || item.id || `fav-${index}`}
-        contentContainerStyle={{ paddingBottom: 30 }}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            activeOpacity={0.9}
-            className="bg-white border border-gray-200 rounded-2xl mb-4 p-3 flex-row shadow-sm"
-          >
-            <Image
-              source={
-                item.images && item.images[0]
-                  ? { uri: item.images[0] }
-                  : require("@/assets/images/user.png")
-              }
-              className="w-[90px] h-[90px] rounded-xl mr-3"
-            />
-            <View className="flex-1 justify-center">
-              <Text className="text-gray-800 font-semibold text-base" numberOfLines={1}>
-                {item.title || "Phòng chưa có tiêu đề"}
-              </Text>
-              <Text className="text-gray-500 text-sm mt-1" numberOfLines={2}>
-                {item.address || item.content}
-              </Text>
-            </View>
-            <Ionicons name="heart" size={20} color="#ef4444" className="ml-2" />
-          </TouchableOpacity>
-        )}
-      />
-    </View>
-  );
+    return (
+      <View className="w-full mt-2">
+        <FlatList
+          data={favorites}
+          keyExtractor={(item) => item._id}
+          renderItem={({ item }) => <PostCard item={item} isFavorite />}
+          scrollEnabled={false} 
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ padding: 10, paddingBottom: 50 }}
+        />
+      </View>
+    );
 }

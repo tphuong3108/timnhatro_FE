@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { View, Text, FlatList, ImageBackground, TouchableOpacity, Alert } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import apiClient from "@/utils/apiClient";
+import PostCard from "@/components/ui/PostCard";
 
 export default function MyPosts() {
   const [posts, setPosts] = useState<any[]>([]);
@@ -53,58 +54,16 @@ export default function MyPosts() {
       </View>
     );
 
-  return (
-    <View className="w-full bg-[#f9fafb] py-2">
-      <FlatList
-        data={posts}
-        keyExtractor={(item) => item._id}
-        contentContainerStyle={{
-          paddingHorizontal: 14,
-          paddingBottom: 30,
-          paddingTop: 6,
-        }}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            activeOpacity={0.9}
-            className="bg-white rounded-2xl mb-4 shadow-md flex-row overflow-hidden"
-            style={{
-              elevation: 2,
-              shadowColor: "#000",
-              shadowOpacity: 0.1,
-              shadowRadius: 5,
-              shadowOffset: { width: 0, height: 2 },
-            }}
-          >
-            {/* Ảnh phòng */}
-            <ImageBackground
-              source={{ uri: item.images?.[0] }}
-              resizeMode="cover"
-              className="w-[100px] h-[100px] justify-end"
-              imageStyle={{ borderRadius: 16 }}
-            >
-              <View className="absolute inset-0 bg-black/10 rounded-2xl" />
-            </ImageBackground>
-
-            {/* Thông tin phòng */}
-            <View className="flex-1 p-3 justify-center">
-              <Text
-                className="text-gray-800 font-semibold"
-                numberOfLines={1}
-                style={{ fontSize: 15, lineHeight: 20 }}
-              >
-                {item.title}
-              </Text>
-              <Text
-                className="text-gray-500 mt-1"
-                numberOfLines={2}
-                style={{ fontSize: 13, lineHeight: 18 }}
-              >
-                {item.address || item.content}
-              </Text>
-            </View>
-          </TouchableOpacity>
-        )}
-      />
-    </View>
-  );
+    return (
+      <View className="w-full bg-[#f9fafb] py-2">
+        <FlatList
+          data={posts}
+          keyExtractor={(item) => item._id}
+          renderItem={({ item }) => <PostCard item={item} />}
+          scrollEnabled={false}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ padding: 10, paddingBottom: 50 }}
+        />
+      </View>
+    );
 }

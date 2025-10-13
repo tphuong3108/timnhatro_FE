@@ -1,12 +1,12 @@
-import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import React from "react";
 import { TouchableOpacity, View, Text } from "react-native";
 
-export default function ActionButtons() {
-  const router = useRouter();
-  const [activeTab, setActiveTab] = useState<"posts" | "favorites">("posts");
+interface ActionButtonsProps {
+  activeTab: "posts" | "favorites";
+  onChangeTab: (tab: "posts" | "favorites") => void;
+}
 
+export default function ActionButtons({ activeTab, onChangeTab }: ActionButtonsProps) {
   return (
     <View className="mt-4">
       <View className="flex-row bg-white border-b border-gray-200">
@@ -16,22 +16,13 @@ export default function ActionButtons() {
         ].map((tab) => (
           <TouchableOpacity
             key={tab.key}
-            onPress={() => {
-              setActiveTab(tab.key as "posts" | "favorites");
-              router.push(
-                tab.key === "posts"
-                  ? "/(tabs)/user/MyPosts"
-                  : "/(tabs)/user/Favorites"
-              );
-            }}
+            onPress={() => onChangeTab(tab.key as "posts" | "favorites")}
             activeOpacity={0.8}
             className="flex-1 items-center py-3"
           >
             <Text
               className={`font-medium ${
-                activeTab === tab.key
-                  ? "text-[#3F72AF]"
-                  : "text-gray-500"
+                activeTab === tab.key ? "text-[#3F72AF]" : "text-gray-500"
               }`}
             >
               {tab.label}
