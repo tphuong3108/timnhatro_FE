@@ -58,12 +58,12 @@ export default function AddRoom() {
     }
   };
 
+
   const handleSubmit = () => {
     if (!roomName || !price || !location) {
       Alert.alert("Thiếu thông tin", "Vui lòng nhập đầy đủ thông tin phòng!");
       return;
     }
-
     const newRoom = {
       name: roomName,
       price,
@@ -74,6 +74,7 @@ export default function AddRoom() {
     };
 
     console.log("Dữ liệu đăng phòng:", newRoom);
+
     Alert.alert("Thành công", "Phòng của bạn đã được đăng!");
     router.push("/home");
   };
@@ -93,6 +94,7 @@ export default function AddRoom() {
         contentContainerStyle={{ paddingBottom: 10 }}
       >
         {/* Tên phòng */}
+
         <Text className="text-gray-700 font-semibold mb-1">Tên phòng</Text>
         <TextInput
           value={roomName}
@@ -100,8 +102,6 @@ export default function AddRoom() {
           placeholder="VD: Phòng trọ sinh viên gần ĐH Bách Khoa"
           className="border border-gray-300 rounded-xl px-4 py-3 mb-4 text-[14px]"
         />
-
-        {/* Giá thuê */}
         <Text className="text-gray-700 font-semibold mb-1">Giá thuê (VNĐ/tháng)</Text>
         <TextInput
           value={price}
@@ -110,28 +110,6 @@ export default function AddRoom() {
           placeholder="VD: 2.500.000"
           className="border border-gray-300 rounded-xl px-4 py-3 mb-4 text-[14px]"
         />
-
-        {/* Địa chỉ */}
-        <Text className="text-gray-700 font-semibold mb-1">Địa chỉ</Text>
-        <TextInput
-          value={location}
-          onChangeText={setLocation}
-          placeholder="VD: 25 Lý Thường Kiệt, Q.10, TP.HCM"
-          className="border border-gray-300 rounded-xl px-4 py-3 mb-4 text-[14px]"
-        />
-
-        {/* Mô tả */}
-        <Text className="text-gray-700 font-semibold mb-1">Mô tả chi tiết</Text>
-        <TextInput
-          value={description}
-          onChangeText={setDescription}
-          placeholder="Thêm mô tả về tiện nghi, diện tích, nội thất..."
-          multiline
-          numberOfLines={4}
-          textAlignVertical="top"
-          className="border border-gray-300 rounded-xl px-4 py-3 mb-6 text-[14px]"
-        />
-
         {/* Ảnh & video */}
         <Text className="text-gray-700 font-semibold mb-2">Ảnh / Video</Text>
         <View className="flex-row flex-wrap gap-3 mb-4">
@@ -186,6 +164,7 @@ export default function AddRoom() {
           onPress={handleSubmit}
           activeOpacity={0.8}
           className="bg-[#3F72AF] rounded-2xl py-4 mt-8 mb-10 self-center w-[90%]"
+
         >
           <Text className="text-white font-semibold text-center text-[16px]">
             Đăng phòng ngay
