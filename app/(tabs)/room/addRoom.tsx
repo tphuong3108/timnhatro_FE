@@ -21,16 +21,6 @@ export default function AddRoom() {
 
   return (
     <View className="flex-1 bg-white">
-      {/* Header */}
-      <View className="flex-row items-center justify-between px-4 py-4 border-b border-gray-200">
-        <TouchableOpacity onPress={() => router.back()} className="p-2">
-          <Ionicons name="arrow-back" size={22} color="#3F72AF" />
-        </TouchableOpacity>
-        <Text className="text-lg font-semibold text-[#3F72AF]">Đăng phòng</Text>
-        <View className="w-6" />
-      </View>
-
-      {/* Form */}
       <ScrollView className="flex-1 px-5 pt-4" showsVerticalScrollIndicator={false}>
         <Text className="text-gray-700 font-semibold mb-1">Tên phòng</Text>
         <TextInput
