@@ -1,5 +1,13 @@
-import React, { useState } from "react";
-import { View, Text, ScrollView, KeyboardAvoidingView, Platform, Image,TouchableOpacity } from "react-native";
+import React, { useState, useRef, useEffect } from "react";
+import {
+  View,
+  Text,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+  Image,
+  TouchableOpacity,
+} from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import MessageBubble from "./MessageBubble";
 import MessageInput from "./MessageInput";
@@ -8,6 +16,7 @@ import { Ionicons } from "@expo/vector-icons";
 export default function ChatScreen() {
   const router = useRouter();
   const { chatId } = useLocalSearchParams();
+  const scrollViewRef = useRef<ScrollView | null>(null);
 
   const [messages, setMessages] = useState([
     { id: 1, text: "Chào bạn, phòng này còn trống không ạ?", isUser: true },
@@ -17,37 +26,41 @@ export default function ChatScreen() {
 
   const handleSend = () => {
     if (!input.trim()) return;
-    setMessages((prev) => [...prev, { id: Date.now(), text: input, isUser: true }]);
+    const newMsg = { id: Date.now(), text: input, isUser: true };
+    setMessages((prev) => [...prev, newMsg]);
     setInput("");
   };
 
+  useEffect(() => {
+    scrollViewRef.current?.scrollToEnd({ animated: true });
+  }, [messages]);
+
   return (
     <View className="flex-1 bg-white">
-      {/* Header */}
-      <View className="bg-[#E8F0FE] py-4 px-5 border-b border-gray-200 flex-row items-center">
-        <TouchableOpacity onPress={() => router.back()} className="mr-3">
+      <View className="py-3 px-3 border-b border-gray-200 flex-row items-center">
+        <TouchableOpacity onPress={() => router.back()} className="mr-2">
           <Ionicons name="arrow-back" size={22} color="#3F72AF" />
         </TouchableOpacity>
         <Image
           source={{
             uri: "https://cdn-icons-png.flaticon.com/512/9131/9131529.png",
           }}
-          className="w-9 h-9 rounded-full mr-3"
+          className="w-8 h-8 rounded-full mr-2"
         />
-        <Text className="text-lg font-semibold text-[#3F72AF]">
-          Chủ trọ #{chatId}
+        <Text className="text-base font-semibold text-[#3F72AF]">
+          Chủ trọ {chatId}
         </Text>
       </View>
-
-      {/* Nội dung chat */}
-      <KeyboardAvoidingView
-        className="flex-1"
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-        keyboardVerticalOffset={80}
-      >
+        <KeyboardAvoidingView
+          style={{ flex: 0.97 }}
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          keyboardVerticalOffset={Platform.OS === "ios" ? 120 : 80}
+        >
         <ScrollView
-          className="flex-1 px-5 pt-5 pb-3"
+          ref={scrollViewRef}
+          className="flex-1 px-3 pt-3 pb-2"
           showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 10 }}
         >
           {messages.map((msg) => (
             <MessageBubble
@@ -63,8 +76,11 @@ export default function ChatScreen() {
           ))}
         </ScrollView>
 
-        {/* Input */}
-        <MessageInput value={input} onChangeText={setInput} onSend={handleSend} />
+        <MessageInput
+          value={input}
+          onChangeText={setInput}
+          onSend={handleSend}
+        />
       </KeyboardAvoidingView>
     </View>
   );

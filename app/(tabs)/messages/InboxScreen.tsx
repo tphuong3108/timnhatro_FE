@@ -28,14 +28,12 @@ export default function InboxScreen() {
 
   return (
     <View className="flex-1 bg-white">
-      {/* Header */}
       <View className="bg-[#E8F0FE] py-4 px-5 border-b border-gray-200">
         <Text className="text-lg font-semibold text-[#3F72AF] text-center">
           Tin nhắn
         </Text>
       </View>
 
-      {/* Danh sách hội thoại */}
       <ScrollView
         className="px-5 pt-4"
         contentContainerStyle={{ paddingBottom: 40 }}
@@ -45,7 +43,6 @@ export default function InboxScreen() {
           <TouchableOpacity
             key={chat.id}
             className="flex-row items-center py-3 border-b border-gray-100"
-            // ✅ dùng relative path để không lỗi type
             onPress={() =>
               router.push({
                 pathname: "../messages/[chatId]",

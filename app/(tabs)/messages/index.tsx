@@ -28,11 +28,10 @@ export default function InboxScreen() {
 
   return (
     <View className="flex-1 bg-white">
-        <Text className="text-lg font-semibold text-[#3F72AF] text-center mt-4">
+        <Text className="text-xl font-semibold text-[#3F72AF] text-center mt-4">
           Tin nhắn
         </Text>
 
-      {/* Danh sách hội thoại */}
       <ScrollView
         className="px-5 pt-4"
         contentContainerStyle={{ paddingBottom: 40 }}
