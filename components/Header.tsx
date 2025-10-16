@@ -1,20 +1,16 @@
-import React, { useState } from "react";
-import {
-  TouchableOpacity,
-  Platform,
-  View,
-  ActivityIndicator,
-  Alert,
-  Text,
-  Modal,
-  Pressable,
-} from "react-native";
+import apiClient from "@/utils/apiClient";
 import { Ionicons } from "@expo/vector-icons";
-import { RFValue } from "react-native-responsive-fontsize";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { BlurView } from "expo-blur";
 import { useRouter } from "expo-router";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import apiClient from "@/utils/apiClient";
+import React, { useState } from "react";
+import {
+  Alert,
+  Platform,
+  TouchableOpacity,
+  View
+} from "react-native";
+import { RFValue } from "react-native-responsive-fontsize";
 import Logo from "../assets/images/logo.svg";
 
 export default function Header() {
@@ -63,106 +59,11 @@ export default function Header() {
         {/* Nút menu 3 gạch */}
         <TouchableOpacity
           activeOpacity={0.8}
-          onPress={() => setShowPopup(true)}
+          onPress={() => router.push("/account/menu")}
         >
           <Ionicons name="menu-outline" size={RFValue(26)} color="#fff" />
         </TouchableOpacity>
       </BlurView>
-
-      {/* Popup dạng Modal */}
-      <Modal
-        visible={showPopup}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setShowPopup(false)}
-      >
-        {/* Nền mờ */}
-        <Pressable
-          style={{
-            flex: 1,
-            backgroundColor: "rgba(0,0,0,0.2)",
-          }}
-          onPress={() => setShowPopup(false)}
-        >
-          {/* Menu nổi */}
-          <View
-            style={{
-              position: "absolute",
-              top: Platform.OS === "ios" ? 90 : 70,
-              right: 10,
-              backgroundColor: "#fff",
-              borderRadius: 10,
-              width: 180,
-              paddingVertical: 8,
-              shadowColor: "#000",
-              shadowOpacity: 0.25,
-              shadowOffset: { width: 0, height: 2 },
-              shadowRadius: 4,
-              elevation: 10,
-            }}
-          >
-            {/* ✅ Mục Trang cá nhân */}
-            <TouchableOpacity
-              onPress={() => {
-                setShowPopup(false);
-                router.push("/user");
-              }}
-              activeOpacity={0.7}
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                paddingVertical: 10,
-                paddingHorizontal: 14,
-                borderBottomWidth: 0.5,
-                borderColor: "#E5E7EB",
-              }}
-            >
-              <Ionicons name="person-outline" size={20} color="#3F72AF" />
-              <Text
-                style={{
-                  marginLeft: 8,
-                  color: "#3F72AF",
-                  fontSize: 15,
-                  fontWeight: "500",
-                }}
-              >
-                Trang cá nhân
-              </Text>
-            </TouchableOpacity>
-
-            {/* Mục Đăng xuất */}
-            <TouchableOpacity
-              onPress={handleLogout}
-              disabled={loading}
-              activeOpacity={0.7}
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                paddingVertical: 10,
-                paddingHorizontal: 14,
-              }}
-            >
-              {loading ? (
-                <ActivityIndicator size="small" color="#3F72AF" />
-              ) : (
-                <>
-                  <Ionicons name="log-out-outline" size={20} color="#3F72AF" />
-                  <Text
-                    style={{
-                      marginLeft: 8,
-                      color: "#3F72AF",
-                      fontSize: 15,
-                      fontWeight: "500",
-                    }}
-                  >
-                    Đăng xuất
-                  </Text>
-                </>
-              )}
-            </TouchableOpacity>
-          </View>
-        </Pressable>
-      </Modal>
     </View>
   );
 }

@@ -1,12 +1,38 @@
 import React from "react";
-import { View, Image, TouchableOpacity, Text, Dimensions } from "react-native";
+import { View, Image, TouchableOpacity, Text, Dimensions, Alert } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import * as ImagePicker from "expo-image-picker";
 
 export default function CoverSection({ user }: any) {
   const screenWidth = Dimensions.get("window").width;
   const coverHeight = screenWidth * 0.45;
   const router = useRouter();
+
+  const handlePickImage = async () => {
+    try {
+      const { status } = await ImagePicker.requestCameraPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert("Quyền bị từ chối", "Vui lòng cấp quyền truy cập camera.");
+        return;
+      }
+
+      // Mở camera
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+      });
+
+      if (!result.canceled) {
+        const uri = result.assets[0].uri;
+        Alert.alert("Ảnh mới", `Đã chọn: ${uri}`);
+      }
+    } catch (error) {
+      Alert.alert("Lỗi", "Không thể mở camera.");
+    }
+  };
 
   return (
     <View className="w-full mb-10">
@@ -31,7 +57,9 @@ export default function CoverSection({ user }: any) {
             resizeMode="cover"
           />
 
+          {/* Nút camera */}
           <TouchableOpacity
+            onPress={handlePickImage}
             activeOpacity={0.8}
             className="absolute bottom-0 right-0 bg-[#3F72AF] p-[6px] rounded-full border-2 border-white"
           >

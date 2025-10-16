@@ -1,136 +1,88 @@
-import React, { useState } from "react";
-import {
-  View,
-  Text,
-  Image,
-  TouchableOpacity,
-  Dimensions,
-  ImageSourcePropType,
-} from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import Carousel from "react-native-reanimated-carousel";
-import { Video, ResizeMode } from "expo-av";
-import CommentSection from "./CommentSection";
+import React from "react";
+import { View, Text, TouchableOpacity, ImageBackground } from "react-native";
+import { useRouter } from "expo-router";
 
-const { width } = Dimensions.get("window");
-
-interface UserInfo {
-  name: string;
-  avatar: string;
-  createdAt?: string;
-}
-
-interface RoomItem {
-  _id?: string;
-  title: string;
-  address?: string;
-  content?: string;
-  images?: string[];
-  media?: string[];
-  user?: UserInfo;
-  createdAt?: string;
-}
-
-interface PostCardProps {
-  item: RoomItem;
+interface RoomCardProps {
+  item: {
+    id?: string;
+    _id?: string;
+    title?: string;
+    name?: string;
+    address?: string;
+    distance?: string;
+    image?: string;
+    images?: string[];
+  };
   isFavorite?: boolean;
 }
 
-export default function PostCard({ item, isFavorite = false }: PostCardProps) {
-  const [liked, setLiked] = useState(isFavorite);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const media: string[] = item.media || item.images || [];
+export default function PostCard({ item, isFavorite }: RoomCardProps) {
+  const router = useRouter();
+
+  const imageUri = item.image || item.images?.[0];
 
   return (
-    <View className="bg-white rounded-2xl mb-6 border border-gray-100 overflow-hidden">
-      {media.length > 0 && (
-       <View className="relative overflow-hidden rounded-2xl">
-          <Carousel
-            width={width - 42}
-            height={380}
-            data={media}
-            scrollAnimationDuration={400}
-            onSnapToItem={(index: number) => setCurrentIndex(index)}
-            renderItem={({ item: mediaItem }: { item: string }) => (
-              <View className="w-full h-full">
-                {mediaItem.endsWith(".mp4") ? (
-                  <Video
-                    source={{ uri: mediaItem }}
-                    className="w-full h-full"
-                    useNativeControls
-                    resizeMode={ResizeMode.COVER}
-                  />
-                ) : (
-                  <Image
-                    source={{ uri: mediaItem } as ImageSourcePropType}
-                    className="w-full h-full"
-                    resizeMode="cover"
-                  />
-                )}
-              </View>
-            )}
-          />
-
-          <View className="absolute top-3 left-3 flex-row items-center bg-black/45 rounded-full px-2 py-1">
-            <Image
-              source={{
-                uri: item.user?.avatar || "https://i.pravatar.cc/100?img=1",
-              }}
-              className="w-8 h-8 rounded-full border border-white"
-            />
-            <View className="ml-2">
-              <Text className="text-white font-semibold text-sm" numberOfLines={1}>
-                {item.user?.name || "Người dùng"}
-              </Text>
-              <Text className="text-gray-200 text-xs">
-                {item.createdAt ? item.createdAt : "Vừa xong"}
-              </Text>
-            </View>
-          </View>
-
-          <TouchableOpacity
-            onPress={() => setLiked(!liked)}
-            activeOpacity={0.8}
-            className="absolute top-3 right-3 p-2"
-          >
-            <Ionicons
-              name={liked ? "heart" : "heart-outline"}
-              size={32}
-              color={liked ? "#ef4444" : "#ffff"}
-            />
-          </TouchableOpacity>
-
-          {media.length > 1 && (
-            <View className="absolute bottom-2 w-full flex-row justify-center space-x-1">
-              {media.map((_, idx: number) => (
-                <View
-                  key={idx}
-                  className={`h-[6px] w-[6px] rounded-full ${
-                    currentIndex === idx ? "bg-white" : "bg-white/40"
-                  }`}
-                />
-              ))}
-            </View>
-          )}
-        </View>
-      )}
-
-      {/* Nội dung */}
-      <View className="p-4">
-        <Text
-          className="text-base font-semibold text-gray-800"
-          numberOfLines={1}
+    <View
+      style={{
+        width: "48%",
+        height: 200,
+        marginBottom: 14,
+        borderRadius: 16,
+        overflow: "hidden",
+        backgroundColor: "#fff",
+        shadowColor: "#000",
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 3,
+      }}
+    >
+      <TouchableOpacity
+        activeOpacity={0.9}
+        style={{ flex: 1 }}
+        onPress={() => router.push(`/room/${item.id || item._id}` as any)}
+      >
+        <ImageBackground
+          source={{ uri: imageUri }}
+          resizeMode="cover"
+          style={{ flex: 1, justifyContent: "flex-end" }}
         >
-          {item.title}
-        </Text>
-        <Text className="text-gray-500 text-sm mb-1" numberOfLines={1}>
-          {item.address}
-        </Text>
-        <Text className="text-gray-700 text-sm">{item.content}</Text>
-      </View>
+          <View
+            style={{
+              position: "absolute",
+              bottom: 0,
+              left: 0,
+              right: 0,
+              height: 55,
+              backgroundColor: "rgba(0,0,0,0.35)",
+            }}
+          />
+          <View style={{ padding: 8 }}>
+            <Text
+              style={{
+                color: "#fff",
+                fontWeight: "600",
+                fontSize: 14,
+                lineHeight: 20,
+              }}
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
+              {item.name || item.title}
+            </Text>
 
-      {/* Bình luận */}
-      <CommentSection />
+            <Text
+              style={{
+                color: "#ddd",
+                fontSize: 12,
+                marginTop: 2,
+              }}
+              numberOfLines={1}
+            >
+              {item.distance || item.address}
+            </Text>
+          </View>
+        </ImageBackground>
+      </TouchableOpacity>
     </View>
   );
 }

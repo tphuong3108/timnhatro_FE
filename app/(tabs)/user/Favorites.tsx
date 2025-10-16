@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, FlatList, Image, TouchableOpacity, Alert } from "react-native";
-import apiClient from "@/utils/apiClient";
+import { View, Text, FlatList, Alert } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import PostCard from "@/components/ui/PostCard";
 
@@ -8,32 +7,31 @@ export default function Favorites() {
   const [favorites, setFavorites] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-    const fetchFavorites = async () => {
+  const fetchFavorites = async () => {
     try {
-        const mockFavorites = [
+      const mockFavorites = [
         {
-            _id: "f1",
-            title: "Phòng mini Q3, có gác lửng",
-            address: "22 CMT8, Quận 3",
-            images: ["https://picsum.photos/200/200?7"],
-            content: "Phòng 20m², nội thất cơ bản, giá 3.5 triệu/tháng.",
+          _id: "f1",
+          title: "Phòng mini Q3, có gác lửng",
+          address: "22 CMT8, Quận 3",
+          images: ["https://picsum.photos/200/200?7"],
+          content: "Phòng 20m², nội thất cơ bản, giá 3.5 triệu/tháng.",
         },
         {
-            _id: "f2",
-            title: "Phòng cao cấp view Landmark",
-            address: "Vinhome Central Park, Bình Thạnh",
-            images: ["https://picsum.photos/200/200?8"],
-            content: "Phòng 35m², full tiện nghi, giá 8 triệu/tháng.",
+          _id: "f2",
+          title: "Phòng cao cấp view Landmark",
+          address: "Vinhome Central Park, Bình Thạnh",
+          images: ["https://picsum.photos/200/200?8"],
+          content: "Phòng 35m², full tiện nghi, giá 8 triệu/tháng.",
         },
-        ];
-
-        setFavorites(mockFavorites);
+      ];
+      setFavorites(mockFavorites);
     } catch {
-        Alert.alert("Lỗi", "Không thể tải phòng yêu thích.");
+      Alert.alert("Lỗi", "Không thể tải phòng yêu thích.");
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
-    };
+  };
 
   useEffect(() => {
     fetchFavorites();
@@ -53,16 +51,18 @@ export default function Favorites() {
         <Text className="text-gray-500 mt-3">Bạn chưa lưu phòng nào</Text>
       </View>
     );
-    return (
-      <View className="w-full mt-2">
-        <FlatList
-          data={favorites}
-          keyExtractor={(item) => item._id}
-          renderItem={({ item }) => <PostCard item={item} isFavorite />}
-          scrollEnabled={false} 
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ padding: 10, paddingBottom: 50 }}
-        />
-      </View>
-    );
+
+  return (
+    <View className="px-4 mt-2">
+      <FlatList
+        data={favorites}
+        numColumns={2}
+        keyExtractor={(item) => item._id}
+        renderItem={({ item }) => <PostCard item={item} isFavorite />}
+        columnWrapperStyle={{ justifyContent: "space-between" }}
+        showsVerticalScrollIndicator={false}
+        scrollEnabled={false}
+      />
+    </View>
+  );
 }
