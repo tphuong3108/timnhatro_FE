@@ -4,8 +4,8 @@ import {
   Text,
   TouchableOpacity,
   ScrollView,
-  Alert,
   ActivityIndicator,
+  Platform,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -13,33 +13,24 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type MenuItem =
   | { label: string; icon: string; route: string }
-  | { label: string; icon: string; action: () => Promise<void> }; 
+  | { label: string; icon: string; action: () => void };
+
 export default function AccountMenu() {
   const router = useRouter();
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
 
-  const checkLoginStatus = async () => {
-    const token = await AsyncStorage.getItem("token");
-    setIsLoggedIn(!!token);
-  };
-
   useEffect(() => {
+    const checkLoginStatus = async () => {
+      const token = await AsyncStorage.getItem("token");
+      setIsLoggedIn(!!token);
+    };
     checkLoginStatus();
   }, []);
 
   const handleLogout = async () => {
-    Alert.alert("Đăng xuất", "Bạn có chắc muốn đăng xuất?", [
-      { text: "Hủy", style: "cancel" },
-      {
-        text: "Đăng xuất",
-        style: "destructive",
-        onPress: async () => {
-          await AsyncStorage.removeItem("token");
-          setIsLoggedIn(false);
-          router.replace("/auth/login");
-        },
-      },
-    ]);
+    await AsyncStorage.multiRemove(["token", "user"]);
+    setIsLoggedIn(false);
+    router.replace("/home");
   };
 
   if (isLoggedIn === null) {
@@ -80,16 +71,10 @@ export default function AccountMenu() {
 
   return (
     <ScrollView
-      className="flex-1 bg-[#f9fafb]"
+      className="flex-1 bg-white px-4 pt-6"
       contentContainerStyle={{ padding: 16, paddingBottom: 50 }}
       showsVerticalScrollIndicator={false}
     >
-      <View className="mb-6">
-        <Text className="text-2xl font-bold text-[#3F72AF] text-center">
-          Menu tài khoản
-        </Text>
-      </View>
-
       {allItems.map((item, index) => (
         <TouchableOpacity
           key={index}

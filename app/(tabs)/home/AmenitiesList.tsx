@@ -12,12 +12,13 @@ const amenities = [
   { icon: "fridge-outline", name: "Tủ lạnh", color: "#3F72AF", type: "Material" },
   { icon: "car-outline", name: "Chỗ để xe", color: "#3F72AF", type: "Ionicons" },
   { icon: "smoke-detector", name: "Máy báo khói", color: "#3F72AF", type: "Material" },
+  { icon: "shield-account", name: "An ninh", color: "#3F72AF", type: "Material" },
 ];
 
 export default function AmenitiesList() {
   return (
     <View className="mt-3">
-      <View className="flex-row flex-wrap justify-start gap-x-3">
+      <View className="flex-row flex-wrap justify-between px-2">
         {amenities.map((item, index) => (
           <View
             key={index}

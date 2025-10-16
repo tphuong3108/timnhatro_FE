@@ -4,7 +4,7 @@ import { ScrollView, View, Text } from "react-native";
 export default function AboutScreen() {
   return (
     <ScrollView className="flex-1 bg-white px-5 py-6">
-      <Text className="text-xl font-semibold text-[#3F72AF] mb-4">
+      <Text className="text-xl text-center font-semibold text-[#3F72AF] mb-4">
         Giới thiệu ứng dụng
       </Text>
 
@@ -23,7 +23,7 @@ export default function AboutScreen() {
       <Text className="text-gray-600 leading-6 mt-3">
         Nếu bạn cần hỗ trợ, vui lòng liên hệ với chúng tôi qua email{" "}
         <Text className="font-semibold text-[#3F72AF]">
-          hotro@timnhatro.vn
+          timnhatro@gmail.com
         </Text>{" "}
         hoặc fanpage chính thức.
       </Text>
