@@ -12,6 +12,7 @@ import * as ImagePicker from "expo-image-picker";
 import { Ionicons } from "@expo/vector-icons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useRouter } from "expo-router";
+import AmenitiesList from "../home/AmenitiesList";
 
 const amenities = [
   { key: "wifi", icon: "wifi-outline", name: "Wi-Fi miễn phí", type: "Ionicons" },
@@ -172,33 +173,7 @@ export default function AddRoom() {
 
         {/* Tiện nghi */}
         <Text className="text-gray-700 font-semibold mb-2">Tiện nghi</Text>
-        <View className="flex-row flex-wrap justify-start">
-          {amenities.map((item, index) => {
-            const selected = selectedAmenities.includes(item.key);
-            const IconComp =
-              item.type === "Ionicons" ? Ionicons : MaterialCommunityIcons;
-            return (
-              <TouchableOpacity
-                key={index}
-                onPress={() => toggleAmenity(item.key)}
-                className={`w-[30%] h-[75px] rounded-2xl mb-3 items-center justify-center border ${
-                  selected
-                    ? "border-[#3F72AF] bg-blue-50"
-                    : "border-gray-300 bg-white"
-                }`}
-              >
-                <IconComp name={item.icon as any} size={24} color="#3F72AF" />
-                <Text
-                  className={`text-[12px] mt-1 ${
-                    selected ? "text-[#3F72AF] font-semibold" : "text-gray-700"
-                  }`}
-                >
-                  {item.name}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
+            <AmenitiesList/>
 
         {/* Nút Đăng phòng */}
         <TouchableOpacity
