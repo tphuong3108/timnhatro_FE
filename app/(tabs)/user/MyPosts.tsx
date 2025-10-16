@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, FlatList, ImageBackground, TouchableOpacity, Alert } from "react-native";
+import { View, Text, FlatList, Alert } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import apiClient from "@/utils/apiClient";
 import PostCard from "@/components/ui/PostCard";
 
 export default function MyPosts() {
@@ -10,7 +9,6 @@ export default function MyPosts() {
 
   const fetchPosts = async () => {
     try {
-      // Dữ liệu mẫu
       const mockPosts = [
         {
           _id: "p1",
@@ -41,29 +39,30 @@ export default function MyPosts() {
 
   if (loading)
     return (
-      <View className="flex-1 justify-center items-center bg-white py-6">
+      <View className="py-6 items-center">
         <Text className="text-gray-500">Đang tải...</Text>
       </View>
     );
 
   if (posts.length === 0)
     return (
-      <View className="flex-1 justify-center items-center bg-white py-8">
+      <View className="py-10 items-center">
         <Ionicons name="document-text-outline" size={60} color="#3F72AF" />
         <Text className="text-gray-500 mt-3">Bạn chưa đăng bài nào</Text>
       </View>
     );
 
-    return (
-      <View className="w-full bg-[#f9fafb] py-2">
-        <FlatList
-          data={posts}
-          keyExtractor={(item) => item._id}
-          renderItem={({ item }) => <PostCard item={item} />}
-          scrollEnabled={false}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ padding: 10, paddingBottom: 50 }}
-        />
-      </View>
-    );
+  return (
+    <View className="px-4 mt-2">
+      <FlatList
+        data={posts}
+        numColumns={2}
+        keyExtractor={(item) => item._id}
+        renderItem={({ item }) => <PostCard item={item} />}
+        columnWrapperStyle={{ justifyContent: "space-between" }}
+        showsVerticalScrollIndicator={false}
+        scrollEnabled={false}
+      />
+    </View>
+  );
 }
