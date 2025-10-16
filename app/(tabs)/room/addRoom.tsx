@@ -58,12 +58,14 @@ export default function AddRoom() {
     }
   };
 
-
   const handleSubmit = () => {
+    console.log("Kiểm tra state:", roomName, price, location);
+
     if (!roomName || !price || !location) {
       Alert.alert("Thiếu thông tin", "Vui lòng nhập đầy đủ thông tin phòng!");
       return;
     }
+
     const newRoom = {
       name: roomName,
       price,
@@ -75,13 +77,26 @@ export default function AddRoom() {
 
     console.log("Dữ liệu đăng phòng:", newRoom);
 
-    Alert.alert("Thành công", "Phòng của bạn đã được đăng!");
-    router.push("/home");
+    Alert.alert(
+  "Thành công",
+  "Phòng của bạn đã được đăng!",
+  [
+    {
+      text: "OK",
+      onPress: () => {
+        console.log("Chuyển về tab Home...");
+        router.replace("/");
+      },
+    },
+  ],
+  { cancelable: false }
+);
+
   };
 
   return (
     <View className="flex-1 bg-white">
-      {/* Tiêu đề ở giữa */}
+      {/* Tiêu đề */}
       <View className="py-4">
         <Text className="text-xl font-semibold text-[#3F72AF] text-center">
           Đăng phòng
@@ -91,10 +106,10 @@ export default function AddRoom() {
       <ScrollView
         className="flex-1 px-5 pt-2"
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 10 }}
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={{ paddingBottom: 20 }}
       >
         {/* Tên phòng */}
-
         <Text className="text-gray-700 font-semibold mb-1">Tên phòng</Text>
         <TextInput
           value={roomName}
@@ -102,7 +117,11 @@ export default function AddRoom() {
           placeholder="VD: Phòng trọ sinh viên gần ĐH Bách Khoa"
           className="border border-gray-300 rounded-xl px-4 py-3 mb-4 text-[14px]"
         />
-        <Text className="text-gray-700 font-semibold mb-1">Giá thuê (VNĐ/tháng)</Text>
+
+        {/* Giá thuê */}
+        <Text className="text-gray-700 font-semibold mb-1">
+          Giá thuê (VNĐ/tháng)
+        </Text>
         <TextInput
           value={price}
           onChangeText={setPrice}
@@ -110,6 +129,28 @@ export default function AddRoom() {
           placeholder="VD: 2.500.000"
           className="border border-gray-300 rounded-xl px-4 py-3 mb-4 text-[14px]"
         />
+
+        {/* Địa chỉ */}
+        <Text className="text-gray-700 font-semibold mb-1">Địa chỉ</Text>
+        <TextInput
+          value={location}
+          onChangeText={setLocation}
+          placeholder="VD: 123 Nguyễn Văn Cừ, Q.10, TP.HCM"
+          className="border border-gray-300 rounded-xl px-4 py-3 mb-4 text-[14px]"
+        />
+
+        {/* Mô tả chi tiết */}
+        <Text className="text-gray-700 font-semibold mb-1">Mô tả chi tiết</Text>
+        <TextInput
+          value={description}
+          onChangeText={setDescription}
+          placeholder="VD: Phòng rộng 20m², có gác lửng, gần chợ và trường học..."
+          className="border border-gray-300 rounded-xl px-4 py-3 mb-4 text-[14px]"
+          multiline
+          numberOfLines={5}
+          textAlignVertical="top"
+        />
+
         {/* Ảnh & video */}
         <Text className="text-gray-700 font-semibold mb-2">Ảnh / Video</Text>
         <View className="flex-row flex-wrap gap-3 mb-4">
@@ -164,7 +205,6 @@ export default function AddRoom() {
           onPress={handleSubmit}
           activeOpacity={0.8}
           className="bg-[#3F72AF] rounded-2xl py-4 mt-8 mb-10 self-center w-[90%]"
-
         >
           <Text className="text-white font-semibold text-center text-[16px]">
             Đăng phòng ngay
