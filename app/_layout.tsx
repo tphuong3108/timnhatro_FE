@@ -13,6 +13,7 @@ import {
 } from "@expo-google-fonts/inter";
 import { Ionicons } from "@expo/vector-icons";
 import { View, ActivityIndicator, Platform } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler"; 
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
@@ -34,7 +35,7 @@ export default function RootLayout() {
           InterMedium: Inter_500Medium,
           InterSemiBold: Inter_600SemiBold,
           InterBold: Inter_700Bold,
-          ...Ionicons.font, 
+          ...Ionicons.font,
         });
 
         const [token, guestMode] = await Promise.all([
@@ -72,14 +73,16 @@ export default function RootLayout() {
   }
 
   return (
-    <ThemeProvider value={DefaultTheme}>
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="(tabs)" />
-        <Stack.Screen name="auth" />
-        <Stack.Screen name="room" />
-        <Stack.Screen name="modal" />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <ThemeProvider value={DefaultTheme}>
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="auth" />
+          <Stack.Screen name="room" />
+          <Stack.Screen name="modal" />
+        </Stack>
+        <StatusBar style="auto" />
+      </ThemeProvider>
+    </GestureHandlerRootView>
   );
 }
