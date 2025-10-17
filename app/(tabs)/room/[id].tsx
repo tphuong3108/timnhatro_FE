@@ -13,8 +13,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import rooms from "@/constants/data/rooms";
-import type { Room } from "@/app/(tabs)/home/RoomCard";
+import rooms, { Room } from "@/constants/data/rooms";
 
 const { width } = Dimensions.get("window");
 
@@ -24,58 +23,22 @@ export default function RoomDetail() {
 
   const [liked, setLiked] = useState(false);
   const [comment, setComment] = useState("");
-  const [showMenu, setShowMenu] = useState(false); // ✅ popup ba chấm
+  const [showMenu, setShowMenu] = useState(false);
 
-  const roomInfo = useMemo<Room>(() => {
-    return rooms.find((r) => r.id === id) || rooms[0];
+  // ✅ Tìm phòng theo id (nếu không có thì lấy phòng đầu tiên)
+  const room = useMemo<Room>(() => {
+    return rooms.find((r) => r._id === id) || rooms[0];
   }, [id]);
-
-  const room = {
-    ...roomInfo,
-    address: "123 Lý Tự Trọng, Quận 1, TP.HCM",
-    avgRating: 4.7,
-    totalRatings: 128,
-    description:
-      "Phòng trọ mới xây, sạch sẽ, có ban công, view đẹp. Gần trung tâm, siêu thị và trường học. Giá đã bao gồm wifi và rác.",
-    owner: {
-      name: "Nguyễn Văn A",
-      phone: "0909 123 456",
-      avatar: "https://cdn-icons-png.flaticon.com/512/1946/1946429.png",
-    },
-    images: [
-      "https://i.imgur.com/Mx7dA2l.jpg",
-      "https://i.imgur.com/3mT4HcV.jpg",
-      "https://i.imgur.com/bRg1YDJ.jpg",
-    ],
-    amenities: [
-      { name: "Wifi miễn phí", icon: "wifi-outline" },
-      { name: "Máy lạnh", icon: "snow-outline" },
-      { name: "Chỗ để xe", icon: "car-outline" },
-      { name: "Camera an ninh", icon: "videocam-outline" },
-    ],
-    comments: [
-      {
-        user: "Trần Thị B",
-        avatar: "https://cdn-icons-png.flaticon.com/512/1946/1946429.png",
-        content: "Phòng sạch, chủ nhà thân thiện lắm ạ!",
-      },
-      {
-        user: "Lê Văn C",
-        avatar: "https://cdn-icons-png.flaticon.com/512/1946/1946429.png",
-        content: "Giá hơi cao nhưng đáng tiền, vị trí đẹp.",
-      },
-    ],
-  };
 
   return (
     <View className="flex-1 bg-white">
-      {/* Hình ảnh + nút 3 chấm */}
+      {/* Hình ảnh */}
       <View>
         <ScrollView
           horizontal
           pagingEnabled
           showsHorizontalScrollIndicator={false}
-          className="w-full bg-gray-100 relative"
+          className="w-full bg-gray-100"
           style={{ height: width * 0.55 }}
         >
           {room.images.map((img, i) => (
@@ -89,7 +52,7 @@ export default function RoomDetail() {
           ))}
         </ScrollView>
 
-        {/* Nút 3 chấm góc phải ảnh */}
+        {/* Nút ba chấm */}
         <TouchableOpacity
           onPress={() => setShowMenu(true)}
           className="absolute top-3 right-3 bg-[rgba(0,0,0,0.4)] p-2 rounded-full"
@@ -106,7 +69,7 @@ export default function RoomDetail() {
             className="font-bold text-gray-800 flex-1"
             style={{ fontSize: width > 400 ? 20 : 17 }}
           >
-            {room.title}
+            {room.name}
           </Text>
           <TouchableOpacity onPress={() => setLiked(!liked)} activeOpacity={0.8}>
             <Ionicons
@@ -117,7 +80,7 @@ export default function RoomDetail() {
           </TouchableOpacity>
         </View>
 
-        {/* Địa chỉ + rating */}
+        {/* Địa chỉ + đánh giá */}
         <View className="px-4 mb-2">
           <Text className="text-gray-600 text-[13px]">📍 {room.address}</Text>
           <View className="flex-row items-center mt-1">
@@ -128,68 +91,42 @@ export default function RoomDetail() {
           </View>
         </View>
 
-        {/* Người cho thuê */}
+        {/* Giá phòng */}
         <View className="px-4 py-3 border-t border-gray-100">
-          <Text className="font-semibold text-lg mb-2">Người cho thuê</Text>
-          <View className="flex-row items-center">
-            <Image
-              source={{ uri: room.owner.avatar }}
-              className="w-12 h-12 rounded-full mr-3"
-            />
-            <View>
-              <Text className="font-semibold text-gray-800">
-                {room.owner.name}
-              </Text>
-              <Text className="text-gray-600 text-[13px]">
-                📞 {room.owner.phone}
-              </Text>
-            </View>
-          </View>
+          <Text className="text-[#3F72AF] font-bold text-lg">
+            {room.price.toLocaleString("vi-VN")}đ / đêm
+          </Text>
         </View>
 
         {/* Mô tả */}
         <View className="px-4 py-3 border-t border-gray-100">
           <Text className="font-semibold text-lg mb-2">Mô tả</Text>
-          <Text className="text-gray-700 leading-5">{room.description}</Text>
-        </View>
-
-        {/* Tiện ích */}
-        <View className="px-4 py-3 border-t border-gray-100">
-          <Text className="font-semibold text-lg mb-2">Tiện ích</Text>
-          <View className="flex-row flex-wrap">
-            {room.amenities.map((item, i) => (
-              <View
-                key={i}
-                className="flex-row items-center bg-gray-100 px-3 py-2 rounded-full mr-2 mb-2"
-              >
-                <Ionicons name={item.icon as any} size={18} color="#3F72AF" />
-                <Text className="ml-2 text-gray-700 text-[13px]">
-                  {item.name}
-                </Text>
-              </View>
-            ))}
-          </View>
+          <Text className="text-gray-700 leading-5">
+            {room.name} nằm ở vị trí thuận tiện, sạch sẽ, gần trung tâm, có view
+            đẹp và tiện nghi đầy đủ.
+          </Text>
         </View>
 
         {/* Bình luận */}
         <View className="px-4 py-3 border-t border-gray-100">
           <Text className="font-semibold text-lg mb-3">Bình luận</Text>
-          {room.comments.map((cmt, i) => (
-            <View key={i} className="flex-row mb-3">
-              <Image
-                source={{ uri: cmt.avatar }}
-                className="w-10 h-10 rounded-full mr-3"
-              />
-              <View className="flex-1 bg-gray-50 rounded-xl p-3">
-                <Text className="font-semibold text-gray-800 text-[14px]">
-                  {cmt.user}
-                </Text>
-                <Text className="text-gray-600 mt-1 text-[13px]">
-                  {cmt.content}
-                </Text>
-              </View>
+
+          <View className="flex-row mb-3">
+            <Image
+              source={{
+                uri: "https://cdn-icons-png.flaticon.com/512/1946/1946429.png",
+              }}
+              className="w-10 h-10 rounded-full mr-3"
+            />
+            <View className="flex-1 bg-gray-50 rounded-xl p-3">
+              <Text className="font-semibold text-gray-800 text-[14px]">
+                Trần Thị B
+              </Text>
+              <Text className="text-gray-600 mt-1 text-[13px]">
+                Phòng sạch, chủ nhà thân thiện lắm ạ!
+              </Text>
             </View>
-          ))}
+          </View>
 
           {/* Nhập bình luận */}
           <View className="flex-row items-center mt-2 border-t border-gray-200 pt-2">
@@ -215,7 +152,7 @@ export default function RoomDetail() {
         <View className="h-8" />
       </ScrollView>
 
-      {/* Popup chọn hành động */}
+      {/* Popup menu */}
       <Modal visible={showMenu} transparent animationType="fade">
         <Pressable
           className="flex-1 bg-[rgba(0,0,0,0.3)] justify-end"
@@ -225,7 +162,7 @@ export default function RoomDetail() {
             <TouchableOpacity
               onPress={() => {
                 setShowMenu(false);
-                router.push(`/room/ReportRoom?id=${id}`);
+                router.push(`/room/ReportRoom?id=${room._id}`);
               }}
               className="flex-row items-center py-3 border-b border-gray-100"
             >

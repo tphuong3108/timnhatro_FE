@@ -99,7 +99,7 @@ export default function AddRoom() {
     <View className="flex-1 bg-white">
       {/* Tiêu đề */}
       <View className="py-4">
-        <Text className="text-xl font-semibold text-[#3F72AF] text-center">
+        <Text className="text-2xl font-semibold text-[#3F72AF] text-center">
           Đăng phòng
         </Text>
       </View>
@@ -111,7 +111,7 @@ export default function AddRoom() {
         contentContainerStyle={{ paddingBottom: 20 }}
       >
         {/* Tên phòng */}
-        <Text className="text-gray-700 font-semibold mb-1">Tên phòng</Text>
+        <Text className="text-[#3F72AF] font-semibold mb-1">Tên phòng</Text>
         <TextInput
           value={roomName}
           onChangeText={setRoomName}
@@ -120,7 +120,7 @@ export default function AddRoom() {
         />
 
         {/* Giá thuê */}
-        <Text className="text-gray-700 font-semibold mb-1">
+        <Text className="text-[#3F72AF] font-semibold mb-1">
           Giá thuê (VNĐ/tháng)
         </Text>
         <TextInput
@@ -132,7 +132,7 @@ export default function AddRoom() {
         />
 
         {/* Địa chỉ */}
-        <Text className="text-gray-700 font-semibold mb-1">Địa chỉ</Text>
+        <Text className="text-[#3F72AF] font-semibold mb-1">Địa chỉ</Text>
         <TextInput
           value={location}
           onChangeText={setLocation}
@@ -141,7 +141,7 @@ export default function AddRoom() {
         />
 
         {/* Mô tả chi tiết */}
-        <Text className="text-gray-700 font-semibold mb-1">Mô tả chi tiết</Text>
+        <Text className="text-[#3F72AF] font-semibold mb-1">Mô tả chi tiết</Text>
         <TextInput
           value={description}
           onChangeText={setDescription}
@@ -153,7 +153,7 @@ export default function AddRoom() {
         />
 
         {/* Ảnh & video */}
-        <Text className="text-gray-700 font-semibold mb-2">Ảnh / Video</Text>
+        <Text className="text-[#3F72AF] font-semibold mb-2">Ảnh / Video</Text>
         <View className="flex-row flex-wrap gap-3 mb-4">
           {media.map((uri, index) => (
             <Image
@@ -172,7 +172,7 @@ export default function AddRoom() {
         </View>
 
         {/* Tiện nghi */}
-        <Text className="text-gray-700 font-semibold mb-2">Tiện nghi</Text>
+        <Text className="text-[#3F72AF] font-semibold mb-2">Tiện nghi</Text>
             <AmenitiesList/>
 
         {/* Nút Đăng phòng */}
