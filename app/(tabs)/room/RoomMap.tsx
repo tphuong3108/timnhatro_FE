@@ -1,13 +1,20 @@
 import React from "react";
-import { View, Animated, Text, StyleSheet } from "react-native";
+import { View, Animated, Text, StyleSheet, Image } from "react-native";
 import MapView, { Marker, UrlTile } from "react-native-maps";
 
-export function RoomMap({ mapRef, rooms, markersAnim, selectedRoom, scrollToCard, setIsMapReady }: any) {
+export function RoomMap({
+  mapRef,
+  rooms,
+  markersAnim,
+  selectedRoom,
+  scrollToCard,
+  setIsMapReady,
+}: any) {
   return (
     <View style={StyleSheet.absoluteFillObject}>
       <MapView
         ref={mapRef}
-        provider={undefined}
+        provider={MapView.PROVIDER_DEFAULT}
         style={StyleSheet.absoluteFillObject}
         onMapReady={() => setIsMapReady(true)}
         initialRegion={{
@@ -21,7 +28,11 @@ export function RoomMap({ mapRef, rooms, markersAnim, selectedRoom, scrollToCard
         zoomEnabled
         scrollEnabled
       >
-        <UrlTile urlTemplate="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" maximumZ={19} />
+        <UrlTile
+          urlTemplate="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+          maximumZ={19}
+          zIndex={-1}
+        />
 
         {rooms.map((room: any, i: number) => {
           const scale = markersAnim[i].interpolate({
@@ -36,18 +47,35 @@ export function RoomMap({ mapRef, rooms, markersAnim, selectedRoom, scrollToCard
           return (
             <Marker
               key={room._id}
-              coordinate={{ latitude: room.latitude, longitude: room.longitude }}
+              coordinate={{
+                latitude: room.latitude,
+                longitude: room.longitude,
+              }}
               onPress={() => scrollToCard(room._id)}
             >
-              <Animated.View style={{ transform: [{ scale }], opacity }}>
+              <Animated.View
+                style={{
+                  transform: [{ scale }],
+                  opacity,
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Image
+                  source={require("@/assets/images/marker.png")}
+                  style={{ width: 42, height: 42 }}
+                  resizeMode="contain"
+                />
                 <View
-                  className={`rounded-full px-2 py-[3px] border border-gray-300 shadow ${
+                  className={`absolute -bottom-5 bg-white px-2 py-[2px] rounded-full border border-gray-200 shadow-sm ${
                     selectedRoom === room._id ? "bg-[#DBE2EF]" : "bg-white"
                   }`}
                 >
                   <Text
                     className={`text-[12px] font-semibold ${
-                      selectedRoom === room._id ? "text-[#112D4E]" : "text-[#3F72AF]"
+                      selectedRoom === room._id
+                        ? "text-[#112D4E]"
+                        : "text-[#3F72AF]"
                     }`}
                   >
                     {room.price.toLocaleString("vi-VN")}đ

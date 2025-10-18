@@ -1,3 +1,11 @@
+export type Host = {
+  _id: string;
+  fullName: string;
+  avatar: string;
+  bio?: string;
+  email?: string;
+};
+
 export type Room = {
   _id: string;
   name: string;
@@ -8,6 +16,8 @@ export type Room = {
   latitude: number;
   longitude: number;
   images: string[];
+  videos?: string[];
+  host?: Host;
 };
 
 const rooms: Room[] = [
@@ -21,10 +31,19 @@ const rooms: Room[] = [
     latitude: 11.9401,
     longitude: 108.4589,
     images: [
-      "https://images.unsplash.com/photo-1600585154315-8cc1b6b1e8da",
-      "https://images.unsplash.com/photo-1600585153930-9ccbb41c95d9",
-      "https://images.unsplash.com/photo-1600585154207-6d47a3b0c5cd",
+      "https://i.pinimg.com/736x/3e/14/5b/3e145bd017d7afc6552248ad7fb99143.jpg",
+      "https://i.pinimg.com/736x/99/61/de/9961dedbc854c8c2a54f5f3868681f47.jpg",
     ],
+    videos: [
+      "https://www.w3schools.com/html/mov_bbb.mp4",
+    ],
+    host: {
+      _id: "host1",
+      fullName: "Tracy Nguyễn",
+      avatar: "https://randomuser.me/api/portraits/women/65.jpg",
+      bio: "Chủ nhà siêu cấp với 60+ đánh giá tích cực.",
+      email: "tracy@example.com",
+    },
   },
   {
     _id: "2",
@@ -36,23 +55,16 @@ const rooms: Room[] = [
     latitude: 11.9445,
     longitude: 108.4456,
     images: [
-      "https://images.unsplash.com/photo-1600585153955-3aaf85f6e0b4",
-      "https://images.unsplash.com/photo-1600585153965-94d8d73cae10",
+      "https://i.pinimg.com/736x/43/80/52/438052acbf98fdd8faba02ec20960f61.jpg",
+      "https://i.pinimg.com/736x/3e/14/5b/3e145bd017d7afc6552248ad7fb99143.jpg",
     ],
-  },
-  {
-    _id: "3",
-    name: "Khách sạn tại Đà Lạt",
-    address: "Phòng lớn cho cặp đôi gần chợ đêm, 1 giường queen",
-    avgRating: 4.53,
-    totalRatings: 19,
-    price: 486000,
-    latitude: 11.9385,
-    longitude: 108.4468,
-    images: [
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c",
-      "https://images.unsplash.com/photo-1600585153909-012f3959d1e5",
-    ],
+    videos: [],
+    host: {
+      _id: "host2",
+      fullName: "Nguyệt Cầm",
+      avatar: "https://randomuser.me/api/portraits/women/43.jpg",
+      bio: "Thích chia sẻ không gian ấm cúng cho du khách.",
+    },
   },
 ];
 
