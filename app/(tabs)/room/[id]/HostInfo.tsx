@@ -8,35 +8,34 @@ export default function HostInfo({ room, contactHost }: any) {
 
   if (!room.host) return null;
 
-  // Hàm hiển thị sao vàng (có nửa sao)
   const renderStars = (rating: number) => {
     const stars = [];
     for (let i = 1; i <= 5; i++) {
-      if (rating >= i) {
-        stars.push(
-          <Ionicons key={i} name="star" size={18} color="#FFD700" />
-        );
-      } else if (rating >= i - 0.5) {
+      if (rating >= i)
+        stars.push(<Ionicons key={i} name="star" size={18} color="#FFD700" />);
+      else if (rating >= i - 0.5)
         stars.push(
           <Ionicons key={i} name="star-half" size={18} color="#FFD700" />
         );
-      } else {
+      else
         stars.push(
           <Ionicons key={i} name="star-outline" size={18} color="#FFD700" />
         );
-      }
     }
     return stars;
   };
 
+  const handleChatNow = () => {
+    const chatId = room.host._id;
+    router.push(`/messages/${chatId}`);
+  };
+
   return (
     <View className="px-5 py-5 border-t border-gray-200">
-      <Text className="text-lg font-semibold text-[#112D4E] mb-3">
-        Chủ trọ
-      </Text>
+      <Text className="text-lg font-semibold text-[#112D4E] mb-3">Chủ trọ</Text>
 
       {/* Thông tin chủ trọ */}
-      <View className="flex-row items-center">
+      <View className="flex-row items-center mb-3">
         <TouchableOpacity
           activeOpacity={0.8}
           onPress={() =>
@@ -61,8 +60,6 @@ export default function HostInfo({ room, contactHost }: any) {
               {room.host.bio}
             </Text>
           )}
-
-          {/* ⭐ Rating */}
           <View className="flex-row items-center mt-1">
             {renderStars(room.avgRating)}
             <Text className="ml-2 text-gray-700 text-[13px]">
@@ -72,24 +69,37 @@ export default function HostInfo({ room, contactHost }: any) {
         </View>
       </View>
 
-      {/* Nút liên hệ */}
-      <View className="flex-row mt-4">
+      <View className="flex-row items-center mt-2">
         {room.host.email && (
           <TouchableOpacity
             onPress={() => contactHost("email")}
-            className="flex-row bg-[#3F72AF] px-4 py-2 rounded-xl mr-3 items-center"
+            className="flex-row bg-[#3F72AF] px-4 py-2 rounded-full items-center"
+            style={{ marginRight: 8 }}
           >
             <MaterialIcons name="email" size={18} color="#fff" />
-            <Text className="text-white ml-2 font-medium">Gửi Email</Text>
+            <Text className="text-white ml-2 font-medium text-[13px]">
+              Gửi Email
+            </Text>
           </TouchableOpacity>
         )}
 
         <TouchableOpacity
           onPress={() => contactHost("call")}
-          className="flex-row bg-[#112D4E] px-4 py-2 rounded-xl items-center"
+          className="flex-row bg-[#3F72AF] px-4 py-2 rounded-full items-center"
+          style={{ marginRight: 8 }}
         >
           <Feather name="phone-call" size={18} color="#fff" />
-          <Text className="text-white ml-2 font-medium">Gọi</Text>
+          <Text className="text-white ml-2 font-medium text-[13px]">Gọi</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={handleChatNow}
+          className="flex-row bg-[#3F72AF] px-4 py-2 rounded-full items-center"
+        >
+          <Ionicons name="chatbubbles-outline" size={18} color="#fff" />
+          <Text className="text-white ml-2 font-medium text-[13px]">
+            Chat ngay
+          </Text>
         </TouchableOpacity>
       </View>
     </View>

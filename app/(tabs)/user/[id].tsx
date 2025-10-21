@@ -65,18 +65,6 @@ export default function UserProfile() {
         <View className="mt-8">
           {activeTab === "posts" ? <MyPosts /> : <Favorites />}
         </View>
-
-        {/* Nút quay về */}
-        <TouchableOpacity
-          onPress={() => router.back()}
-          activeOpacity={0.8}
-          className="mt-6 border border-[#3F72AF] py-3 rounded-full flex-row justify-center items-center"
-        >
-          <Ionicons name="arrow-back-outline" size={18} color="#3F72AF" />
-          <Text className="text-[#3F72AF] font-semibold text-[16px] ml-2">
-            Quay lại
-          </Text>
-        </TouchableOpacity>
       </View>
     </Animated.ScrollView>
   );

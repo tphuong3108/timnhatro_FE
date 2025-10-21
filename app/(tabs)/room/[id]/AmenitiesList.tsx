@@ -36,7 +36,7 @@ function useRippleAnimation(index: number) {
   return animatedStyle;
 }
 
-// ✅ Danh sách tiện ích (chuẩn cả Ionicons và MaterialCommunityIcons)
+// Danh sách tiện ích
 const allAmenities = [
   { icon: "wifi-outline", name: "Wi-Fi miễn phí", color: "#3F72AF", type: "Ionicons" },
   { icon: "tv-outline", name: "TV", color: "#3F72AF", type: "Ionicons" },
@@ -56,7 +56,7 @@ const AmenityItem = ({ item, index }: { item: any; index: number }) => {
   return (
     <Animated.View
       style={animatedStyle}
-      className="w-[31%] h-[85px] bg-white rounded-2xl mb-3 items-center justify-center border border-gray-300 shadow-sm"
+      className="w-[31%] h-[85px] bg-white rounded-2xl mb-3 items-center justify-center border border-gray-300"
     >
       {item.type === "Ionicons" ? (
         <Ionicons name={item.icon as any} size={28} color={item.color} />

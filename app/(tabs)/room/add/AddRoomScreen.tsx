@@ -1,25 +1,43 @@
 import { useRouter } from "expo-router";
 import React from "react";
 import { Alert, ScrollView, Text, TouchableOpacity, View } from "react-native";
-import AmenitiesList from "../../home/AmenitiesList";
 import AddRoomForm from "./AddRoomForm";
 import { useAddRoomLogic } from "./AddRoomLogic";
 import MapPicker from "./MapPicker";
 import MediaPicker from "./MediaPicker";
+import AmenitiesList from "./AmenitiesList";
 
 export default function AddRoomScreen() {
   const router = useRouter();
   const logic = useAddRoomLogic();
 
   const handleSubmit = () => {
-    const { roomName, price, location, marker, description, media, selectedAmenities } = logic;
+    const {
+      roomName,
+      price,
+      location,
+      description,
+      marker,
+      media,
+      selectedAmenities,
+    } = logic;
+
     if (!roomName || !price || !location || !marker) {
       Alert.alert("Thiếu thông tin", "Vui lòng nhập đầy đủ thông tin và chọn vị trí!");
       return;
     }
 
-    const newRoom = { roomName, price, location, description, media, amenities: selectedAmenities, marker };
-    console.log("Dữ liệu đăng phòng:", newRoom);
+    const newRoom = {
+      roomName,
+      price,
+      location,
+      description,
+      amenities: selectedAmenities,
+      media,
+      marker,
+    };
+
+    console.log(" Dữ liệu đăng phòng:", newRoom);
 
     Alert.alert("Thành công", "Phòng của bạn đã được đăng!", [
       { text: "OK", onPress: () => router.replace("/") },
@@ -34,13 +52,24 @@ export default function AddRoomScreen() {
         </Text>
       </View>
 
-      <ScrollView className="px-5 pt-2" showsVerticalScrollIndicator={false}>
+      <ScrollView
+        className="px-5 pt-2"
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="always"
+      >
         <AddRoomForm {...logic} />
         <MapPicker {...logic} />
-        <MediaPicker media={logic.media} pickMedia={logic.pickMedia} />
+        <MediaPicker
+          media={logic.media}
+          pickMedia={logic.pickMedia}
+          removeMedia={logic.removeMedia}
+        />
 
         <Text className="text-[#3F72AF] font-semibold mb-2">Tiện nghi</Text>
-        <AmenitiesList />
+        <AmenitiesList
+          selectedAmenities={logic.selectedAmenities}
+          setSelectedAmenities={logic.setSelectedAmenities}
+        />
 
         <TouchableOpacity
           onPress={handleSubmit}

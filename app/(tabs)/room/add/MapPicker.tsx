@@ -38,19 +38,20 @@ export default function MapPicker({
         </Text>
       )}
 
-      <TouchableOpacity
-        onPress={getCurrentLocation}
-        className="flex-row items-center justify-center mt-4 bg-[#3F72AF] py-3 rounded-xl"
-      >
-        {loadingLocation ? (
-          <ActivityIndicator color="#fff" />
-        ) : (
-          <>
-            <Ionicons name="locate-outline" size={20} color="#fff" />
-            <Text className="text-white ml-2 font-medium">Dùng vị trí hiện tại</Text>
-          </>
-        )}
-      </TouchableOpacity>
+    <TouchableOpacity
+      onPress={getCurrentLocation}
+      className="flex-row items-center justify-center mt-4 bg-[#B9D7EA] py-3 rounded-xl w-[90%] self-center"
+    >
+      {loadingLocation ? (
+        <ActivityIndicator color="#3F72AF" />
+      ) : (
+        <>
+          <Ionicons name="locate-outline" size={20} color="#3F72AF" />
+          <Text className="text-[#3F72AF] ml-2 font-bold">Dùng vị trí hiện tại</Text>
+        </>
+      )}
+    </TouchableOpacity>
+
     </View>
   );
 }
