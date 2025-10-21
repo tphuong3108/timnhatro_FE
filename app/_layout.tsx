@@ -11,9 +11,9 @@ import {
   Inter_600SemiBold,
   Inter_700Bold,
 } from "@expo-google-fonts/inter";
-import { Ionicons } from "@expo/vector-icons";
+import { AntDesign, Ionicons } from "@expo/vector-icons";
 import { View, ActivityIndicator, Platform } from "react-native";
-import { GestureHandlerRootView } from "react-native-gesture-handler"; 
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
@@ -36,6 +36,7 @@ export default function RootLayout() {
           InterSemiBold: Inter_600SemiBold,
           InterBold: Inter_700Bold,
           ...Ionicons.font,
+          ...AntDesign.font,
         });
 
         const [token, guestMode] = await Promise.all([
@@ -75,10 +76,32 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ThemeProvider value={DefaultTheme}>
-        <Stack screenOptions={{ headerShown: false }}>
+        <Stack
+          screenOptions={{
+            headerShown: false,
+             animation: "fade",
+            gestureEnabled: true,
+            gestureDirection: "horizontal",
+          }}
+        >
+          {/* Tabs chính */}
           <Stack.Screen name="(tabs)" />
+
+          {/* Auth */}
           <Stack.Screen name="auth" />
-          <Stack.Screen name="room" />
+
+          {/* Màn hình chi tiết phòng */}
+          <Stack.Screen
+            name="room"
+            options={{
+              gestureEnabled: true,
+              gestureDirection: "horizontal",
+              animation: "slide_from_right",
+            }}
+          />
+          <Stack.Screen name="user" />
+
+          {/* Modal */}
           <Stack.Screen name="modal" />
         </Stack>
         <StatusBar style="auto" />

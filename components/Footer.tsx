@@ -29,7 +29,7 @@ export default function Footer({ onTabPress }: FooterProps) {
   };
 
   const handleAddRoom = () => {
-    router.push("/room/addRoom");
+    router.push("/room/add");
   };
 
   useEffect(() => {

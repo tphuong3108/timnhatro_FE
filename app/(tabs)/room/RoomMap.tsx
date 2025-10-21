@@ -1,6 +1,7 @@
+import { FontAwesome5 } from "@expo/vector-icons";
 import React from "react";
 import { View, Animated, Text, StyleSheet, Image } from "react-native";
-import MapView, { Marker, UrlTile } from "react-native-maps";
+import MapView, { Marker, UrlTile, PROVIDER_DEFAULT } from "react-native-maps";
 
 export function RoomMap({
   mapRef,
@@ -14,7 +15,7 @@ export function RoomMap({
     <View style={StyleSheet.absoluteFillObject}>
       <MapView
         ref={mapRef}
-        provider={MapView.PROVIDER_DEFAULT}
+        provider={PROVIDER_DEFAULT}
         style={StyleSheet.absoluteFillObject}
         onMapReady={() => setIsMapReady(true)}
         initialRegion={{
@@ -61,13 +62,9 @@ export function RoomMap({
                   justifyContent: "center",
                 }}
               >
-                <Image
-                  source={require("@/assets/images/marker.png")}
-                  style={{ width: 42, height: 42 }}
-                  resizeMode="contain"
-                />
+              <FontAwesome5 name="map-marker-alt" size={24} color="red" />
                 <View
-                  className={`absolute -bottom-5 bg-white px-2 py-[2px] rounded-full border border-gray-200 shadow-sm ${
+                  className={`absolute -bottom-5 bg-white px-2 py-[2px] rounded-full border border-gray-200 shadow-sm w-[70px] ${
                     selectedRoom === room._id ? "bg-[#DBE2EF]" : "bg-white"
                   }`}
                 >
@@ -78,7 +75,7 @@ export function RoomMap({
                         : "text-[#3F72AF]"
                     }`}
                   >
-                    {room.price.toLocaleString("vi-VN")}đ
+                    {room.price.toLocaleString("vi-VN")}
                   </Text>
                 </View>
               </Animated.View>

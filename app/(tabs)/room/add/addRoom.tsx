@@ -14,7 +14,7 @@ import * as Location from "expo-location";
 import MapView, { Marker, UrlTile } from "react-native-maps";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import AmenitiesList from "../home/AmenitiesList";
+import AmenitiesList from "../../home/AmenitiesList";
 
 export default function AddRoom() {
   const router = useRouter();
@@ -28,7 +28,7 @@ export default function AddRoom() {
   const [marker, setMarker] = useState<{ latitude: number; longitude: number } | null>(null);
   const [loadingLocation, setLoadingLocation] = useState(false);
 
-  // ✅ Lấy vị trí hiện tại
+  // Lấy vị trí hiện tại
   const getCurrentLocation = async () => {
     try {
       setLoadingLocation(true);
@@ -44,7 +44,7 @@ export default function AddRoom() {
       setMarker({ latitude, longitude });
       setLoadingLocation(false);
 
-      // 👉 Thêm reverse geocode (địa chỉ text)
+      // reverse geocode (địa chỉ text)
       const addr = await Location.reverseGeocodeAsync({ latitude, longitude });
       if (addr.length > 0) {
         const a = addr[0];

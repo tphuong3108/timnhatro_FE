@@ -4,7 +4,6 @@ import { useRoomMapLogic } from "@/hooks/useRoomMapLogic";
 import { RoomBottomSheet } from "./RoomBottomSheet";
 import { RoomMap } from "./RoomMap";
 
-
 export default function RoomMapScreen() {
   const logic = useRoomMapLogic();
 
