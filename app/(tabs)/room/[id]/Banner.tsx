@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   ScrollView,
@@ -6,11 +6,15 @@ import {
   TouchableOpacity,
   Text,
   Dimensions,
-  StyleSheet,
+  Modal,
+  Pressable,
 } from "react-native";
-import { Feather, AntDesign, Ionicons } from "@expo/vector-icons";
-import { Heart, HeartOff, Share2, MoreVertical } from "lucide-react-native";
-const { width } = Dimensions.get("window");
+import { Video, ResizeMode } from "expo-av";
+import { Feather, Ionicons } from "@expo/vector-icons";
+import { Heart } from "lucide-react-native";
+import { useRouter } from "expo-router";
+
+const { width, height } = Dimensions.get("window");
 
 export default function Banner({
   room,
@@ -19,47 +23,91 @@ export default function Banner({
   currentImage,
   handleScroll,
   shareRoom,
-  setShowMenu,
 }: any) {
+  const [showViewer, setShowViewer] = useState(false);
+  const [viewerIndex, setViewerIndex] = useState(0);
+  const [showMenu, setShowMenu] = useState(false);
+  const router = useRouter();
+
+  // ảnh và video
+  const mediaItems = [
+    ...(room.images || []).map((img: string) => ({ type: "image", uri: img })),
+    ...(room.videos || []).map((vid: string) => ({ type: "video", uri: vid })),
+  ];
+
+  const openViewer = (index: number) => {
+    setViewerIndex(index);
+    setShowViewer(true);
+  };
+
+  const handleReport = () => {
+    setShowMenu(false);
+    router.push(`/room/ReportRoom?id=${room._id}`);
+  };
+
   return (
     <View className="relative">
-      {/* Ảnh phòng */}
-      <ScrollView
-        horizontal
-        pagingEnabled
-        onScroll={handleScroll}
-        scrollEventThrottle={16}
-        showsHorizontalScrollIndicator={false}
-        className="w-full"
-        style={{ height: width * 0.6 }}
-      >
-        {room.images.map((img: string, i: number) => (
-          <Image
-            key={i}
-            source={{ uri: img }}
-            style={{ width, height: width * 0.6 }}
-            resizeMode="cover"
-          />
-        ))}
-      </ScrollView>
-
-      {/* Chỉ số ảnh */}
-      <View className="absolute bottom-3 right-4 bg-black/60 rounded-md px-2 py-[2px]">
-        <Text className="text-white font-semibold text-[12px]">
-          {currentImage} / {room.images.length}
-        </Text>
+      {/* Ảnh & video */}
+      <View style={{ height: width * 0.6 }}>
+        <ScrollView
+          horizontal
+          pagingEnabled
+          onScroll={handleScroll}
+          scrollEventThrottle={16}
+          showsHorizontalScrollIndicator={false}
+          className="w-full"
+        >
+          {mediaItems.map((item, i) => (
+            <TouchableOpacity
+              key={i}
+              activeOpacity={0.9}
+              onPress={() => openViewer(i)}
+            >
+              {item.type === "image" ? (
+                <Image
+                  source={{ uri: item.uri }}
+                  className="w-full"
+                  style={{ width, height: width * 0.6 }}
+                  resizeMode="cover"
+                />
+              ) : (
+                <Video
+                  source={{ uri: item.uri }}
+                  className="w-full"
+                  style={{ width, height: width * 0.6 }}
+                  resizeMode={ResizeMode.COVER}
+                  shouldPlay={false}
+                  isLooping
+                  useNativeControls
+                />
+              )}
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
       </View>
 
-      {/* Nút chia sẻ, yêu thích, menu */}
+      {/* Nhóm nút góc phải */}
       <View
-        style={styles.iconContainer}
-        className="absolute top-3 right-3 flex-row"
+        style={{
+          position: "absolute",
+          top: 12,
+          right: 12,
+          flexDirection: "row",
+          gap: 10,
+          zIndex: 99,
+        }}
       >
-        <TouchableOpacity onPress={shareRoom} style={styles.iconButton}>
+        <TouchableOpacity
+          onPress={shareRoom}
+          className="bg-white/80 p-2.5 rounded-full"
+        >
           <Feather name="share-2" size={20} color="#112D4E" />
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => setLiked(!liked)} style={styles.iconButton}>
+        <TouchableOpacity
+          onPress={() => setLiked(!liked)}
+          className="bg-white/80 p-2.5 rounded-full"
+        >
           {liked ? (
             <Heart size={20} color="#E63946" fill="#E63946" />
           ) : (
@@ -67,23 +115,95 @@ export default function Banner({
           )}
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => setShowMenu(true)} style={styles.iconButton}>
+        <TouchableOpacity
+          onPress={() => setShowMenu(true)}
+          className="bg-white/80 p-2.5 rounded-full"
+        >
           <Ionicons name="ellipsis-vertical" size={20} color="#112D4E" />
         </TouchableOpacity>
       </View>
+
+    <Modal
+      visible={showMenu}
+      transparent
+      animationType="slide"
+      onRequestClose={() => setShowMenu(false)}
+    >
+      <Pressable
+        className="flex-1 bg-black/40 justify-end"
+        onPress={() => setShowMenu(false)}
+      >
+        <View
+          className="bg-white rounded-t-3xl pt-3 pb-6 px-5"
+          onStartShouldSetResponder={() => true}
+        >
+          {/* Thanh kéo */}
+          <View className="self-center w-10 h-1.5 bg-gray-300 rounded-full mb-4" />
+
+          <TouchableOpacity
+            onPress={handleReport}
+            className="py-3.5 border-b border-gray-100 active:bg-gray-50"
+          >
+            <Text className="text-[#E63946] font-semibold text-center text-base">
+              Báo cáo phòng
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => setShowMenu(false)}
+            className="py-3.5 mt-2 active:bg-gray-50 rounded-xl"
+          >
+            <Text className="text-[#112D4E] font-semibold text-center text-base">
+              Đóng
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </Pressable>
+    </Modal>
+
+
+      {/* Modal xem ảnh/video phóng to */}
+      <Modal visible={showViewer} transparent animationType="fade">
+        <View className="bg-black flex-1 justify-center items-center">
+          <ScrollView
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            contentOffset={{ x: viewerIndex * width, y: 0 }}
+          >
+            {mediaItems.map((item, i) =>
+              item.type === "image" ? (
+                <Image
+                  key={i}
+                  source={{ uri: item.uri }}
+                  className="w-full h-full"
+                  resizeMode="contain"
+                  style={{ width, height }}
+                />
+              ) : (
+                <Video
+                  key={i}
+                  source={{ uri: item.uri }}
+                  className="w-full h-full"
+                  resizeMode={ResizeMode.CONTAIN}
+                  shouldPlay
+                  useNativeControls
+                  isLooping
+                  style={{ width, height }}
+                />
+              )
+            )}
+          </ScrollView>
+
+          {/* Nút đóng */}
+          <Pressable
+            className="absolute top-12 right-6 bg-white/80 px-3 py-2 rounded-full"
+            onPress={() => setShowViewer(false)}
+          >
+            <Text className="text-[#112D4E] font-semibold">Đóng</Text>
+          </Pressable>
+        </View>
+      </Modal>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  iconContainer: {
-    gap: 10,
-    zIndex: 20,
-    pointerEvents: "box-none",
-  },
-  iconButton: {
-    backgroundColor: "rgba(255,255,255,0.85)",
-    padding: 10,
-    borderRadius: 50,
-  },
-});

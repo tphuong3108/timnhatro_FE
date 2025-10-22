@@ -8,7 +8,7 @@ const { height } = Dimensions.get("window");
 export const SNAP_POINTS = [0.15, 0.5, 0.95];
 
 export function useRoomMapLogic() {
-  const insets = useSafeAreaInsets(); // 👈 lấy chiều cao header / status bar
+  const insets = useSafeAreaInsets(); 
   const mapRef = useRef<MapView>(null);
   const flatListRef = useRef<any>(null);
   const [selectedRoom, setSelectedRoom] = useState<string | null>(null);
@@ -16,8 +16,8 @@ export function useRoomMapLogic() {
   const [isVisible, setIsVisible] = useState(true);
   const [isMapReady, setIsMapReady] = useState(false);
 
-  // 👇 chiều cao khả dụng = chiều cao thật - header - padding top
-  const availableHeight = height - insets.top - 60; // 60 là chiều cao header thực tế (bạn chỉnh cho phù hợp)
+  // chiều cao khả dụng = chiều cao thật - header - padding top
+  const availableHeight = height - insets.top - 60;
   const modalHeight = useRef(new Animated.Value(availableHeight * SNAP_POINTS[snapIndex])).current;
 
   const markersAnim = useRef(rooms.map(() => new Animated.Value(0))).current;
