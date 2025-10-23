@@ -9,14 +9,15 @@ import {
   TouchableOpacity,
   View,
   Alert,
+  ActivityIndicator,
 } from "react-native";
-import { TextInput } from "react-native-paper";
 import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
 import Logo from "../../assets/images/logodoc.svg";
 import FacebookIcon from "../../assets/images/facebook.svg";
 import GoogleIcon from "../../assets/images/google.svg";
 import AppleIcon from "../../assets/images/apple.svg";
 import apiClient from "../../utils/apiClient";
+import InputField from "../../components/InputField";
 
 export default function ForgotPassword() {
   const router = useRouter();
@@ -31,20 +32,18 @@ export default function ForgotPassword() {
 
     try {
       setLoading(true);
-      const res = await apiClient.post("/users/forgot-password", { email });
-
+      await apiClient.post("/users/forgot-password", { email });
       Alert.alert(
         "OTP đã được gửi!",
         "Vui lòng kiểm tra email để lấy mã OTP.",
         [
           {
             text: "OK",
-            onPress: () => {
+            onPress: () =>
               router.push({
                 pathname: "/auth/reset-password",
                 params: { email },
-              });
-            },
+              }),
           },
         ]
       );
@@ -75,6 +74,7 @@ export default function ForgotPassword() {
           }}
           showsVerticalScrollIndicator={false}
         >
+          {/* Logo + Tiêu đề */}
           <View className="items-center -mt-10">
             <Logo width={RFValue(165)} height={RFValue(165)} />
             <Text
@@ -98,37 +98,38 @@ export default function ForgotPassword() {
             </Text>
           </View>
 
-          <View>
-            <TextInput
-              label="Email"
-              mode="outlined"
-              keyboardType="email-address"
-              value={email}
-              onChangeText={setEmail}
-              style={{
-                marginBottom: RFValue(16),
-                backgroundColor: "white",
-                fontSize: RFValue(14),
-              }}
-            />
-            <TouchableOpacity
-              className="bg-[#3F72AF] rounded-full"
-              style={{
-                paddingVertical: RFValue(12),
-                marginBottom: RFValue(28),
-              }}
-              onPress={handleSendOTP}
-              disabled={loading}
-            >
+          {/* Ô nhập Email (đã đồng bộ InputField) */}
+          <InputField
+            label="Email"
+            value={email}
+            onChangeText={setEmail}
+            keyboardType="email-address"
+          />
+
+          {/* Nút gửi OTP */}
+          <TouchableOpacity
+            className="bg-[#3F72AF] rounded-full"
+            style={{
+              paddingVertical: RFValue(12),
+              marginBottom: RFValue(28),
+            }}
+            onPress={handleSendOTP}
+            disabled={loading}
+            activeOpacity={0.8}
+          >
+            {loading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
               <Text
                 className="text-white text-center font-semibold"
                 style={{ fontSize: RFPercentage(2.1) }}
               >
-                {loading ? "Đang gửi..." : "LẤY MÃ OTP"}
+                LẤY MÃ OTP
               </Text>
-            </TouchableOpacity>
-          </View>
+            )}
+          </TouchableOpacity>
 
+          {/* Hoặc đăng nhập bằng */}
           <View className="flex-row items-center mb-6">
             <View className="flex-1 h-px bg-gray-300" />
             <Text
@@ -140,6 +141,7 @@ export default function ForgotPassword() {
             <View className="flex-1 h-px bg-gray-300" />
           </View>
 
+          {/* Nút mạng xã hội */}
           <View
             className="flex-row justify-between gap-5 mb-6"
             style={{ marginHorizontal: RFValue(10) }}
@@ -164,6 +166,7 @@ export default function ForgotPassword() {
             </TouchableOpacity>
           </View>
 
+          {/* Link đăng ký */}
           <TouchableOpacity onPress={() => router.push("/auth/register")}>
             <Text
               className="text-center font-inter text-gray-600 mt-12"

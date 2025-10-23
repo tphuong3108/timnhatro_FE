@@ -16,7 +16,7 @@ export default function HomeBanner() {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrent((prev) => (prev + 1) % banners.length);
-    }, 3500);
+    }, 2000);
     return () => clearInterval(interval);
   }, []);
 
