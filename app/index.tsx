@@ -24,7 +24,7 @@ export default function Onboarding() {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentImage((prev) => (prev + 1) % slides.length);
-    }, 4000);
+    }, 2000);
     return () => clearInterval(interval);
   }, []);
 

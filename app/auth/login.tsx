@@ -9,8 +9,8 @@ import {
   KeyboardAvoidingView,
   SafeAreaView,
   Alert,
+  ActivityIndicator,
 } from "react-native";
-import { TextInput } from "react-native-paper";
 import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
 import AppleIcon from "../../assets/images/apple.svg";
 import FacebookIcon from "../../assets/images/facebook.svg";
@@ -18,6 +18,7 @@ import GoogleIcon from "../../assets/images/google.svg";
 import Logo from "../../assets/images/logodoc.svg";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import apiClient from "../../utils/apiClient";
+import InputField from "../../components/InputField";
 
 export default function Login() {
   const router = useRouter();
@@ -40,7 +41,7 @@ export default function Login() {
       await AsyncStorage.setItem("token", accessToken);
       await AsyncStorage.setItem("user", JSON.stringify(user));
 
-      Alert.alert("Thành công", "Đăng nhập thành công 🎉");
+      Alert.alert("🎉 Thành công", "Đăng nhập thành công!");
       router.replace("/home");
     } catch (error: any) {
       console.log("Login error:", error.response?.data || error.message);
@@ -53,9 +54,8 @@ export default function Login() {
     }
   };
 
-
   const handleSocialLogin = (provider: string) => {
-    Alert.alert("Đang phát triển", `Tính năng đăng nhập bằng ${provider} sắp có !`);
+    Alert.alert("Đang phát triển", `Tính năng đăng nhập bằng ${provider} sắp có!`);
   };
 
   return (
@@ -64,6 +64,7 @@ export default function Login() {
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         className="flex-1 justify-between px-6 pb-4"
       >
+        {/* Logo & tiêu đề */}
         <View className="items-center mt-4">
           <Logo width={RFValue(165)} height={RFValue(165)} />
           <Text
@@ -85,44 +86,31 @@ export default function Login() {
         </View>
 
         <View>
-          <TextInput
+          {/* Email */}
+          <InputField
             label="Email"
-            mode="outlined"
             value={email}
             onChangeText={setEmail}
             keyboardType="email-address"
-            style={{
-              marginBottom: RFValue(12),
-              backgroundColor: "white",
-              fontSize: RFValue(14),
-            }}
           />
 
-          <TextInput
+          {/* Mật khẩu */}
+          <InputField
             label="Mật khẩu"
-            mode="outlined"
             value={password}
             onChangeText={setPassword}
             secureTextEntry={!passwordVisible}
             right={
-              <TextInput.Icon
-                icon={() => (
-                  <Ionicons
-                    name={passwordVisible ? "eye-outline" : "eye-off-outline"}
-                    size={RFValue(18)}
-                    color="gray"
-                  />
-                )}
+              <Ionicons
+                name={passwordVisible ? "eye-outline" : "eye-off-outline"}
+                size={RFValue(20)}
+                color="gray"
                 onPress={() => setPasswordVisible(!passwordVisible)}
               />
             }
-            style={{
-              marginBottom: RFValue(14),
-              backgroundColor: "white",
-              fontSize: RFValue(14),
-            }}
           />
 
+          {/* Ghi nhớ mật khẩu & quên mật khẩu */}
           <View className="flex-row justify-between items-center mb-4">
             <TouchableOpacity
               onPress={() => setRemember(!remember)}
@@ -149,9 +137,7 @@ export default function Login() {
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity
-              onPress={() => router.push("/auth/forgot-password")}
-            >
+            <TouchableOpacity onPress={() => router.push("/auth/forgot-password")}>
               <Text
                 className="text-blue-600"
                 style={{ fontSize: RFPercentage(1.8) }}
@@ -161,6 +147,7 @@ export default function Login() {
             </TouchableOpacity>
           </View>
 
+          {/* Nút đăng nhập */}
           <TouchableOpacity
             className="bg-[#3F72AF] rounded-full"
             style={{
@@ -169,15 +156,21 @@ export default function Login() {
             }}
             onPress={handleLogin}
             disabled={loading}
+            activeOpacity={0.8}
           >
-            <Text
-              className="text-white text-center font-medium"
-              style={{ fontSize: RFPercentage(2.2) }}
-            >
-              {loading ? "Đang đăng nhập..." : "ĐĂNG NHẬP"}
-            </Text>
+            {loading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text
+                className="text-white text-center font-medium"
+                style={{ fontSize: RFPercentage(2.2) }}
+              >
+                ĐĂNG NHẬP
+              </Text>
+            )}
           </TouchableOpacity>
 
+          {/* Hoặc đăng nhập bằng */}
           <View className="flex-row items-center mb-6">
             <View className="flex-1 h-px bg-gray-300" />
             <Text
@@ -189,6 +182,7 @@ export default function Login() {
             <View className="flex-1 h-px bg-gray-300" />
           </View>
 
+          {/* Đăng nhập mạng xã hội */}
           <View className="flex-row justify-between px-6 gap-6 mb-10">
             <TouchableOpacity
               className="flex-1 border border-[#3F72AF] rounded-lg items-center justify-center"
@@ -214,6 +208,7 @@ export default function Login() {
           </View>
         </View>
 
+        {/* Link đăng ký */}
         <TouchableOpacity onPress={() => router.push("/auth/register")}>
           <Text
             className="text-center font-inter text-gray-600 -mt-10"

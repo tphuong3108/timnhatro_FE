@@ -1,7 +1,6 @@
-import { FontAwesome5 } from "@expo/vector-icons";
 import React from "react";
-import { View, Animated, Text, StyleSheet, Image } from "react-native";
-import MapView, { Marker, UrlTile, PROVIDER_DEFAULT } from "react-native-maps";
+import { Animated, StyleSheet, Text, View } from "react-native";
+import MapView, { Marker, PROVIDER_DEFAULT, UrlTile } from "react-native-maps";
 
 export function RoomMap({
   mapRef,
@@ -34,7 +33,6 @@ export function RoomMap({
           maximumZ={19}
           zIndex={-1}
         />
-
         {rooms.map((room: any, i: number) => {
           const scale = markersAnim[i].interpolate({
             inputRange: [0, 1],
@@ -45,6 +43,8 @@ export function RoomMap({
             outputRange: [0.7, 1],
           });
 
+          const translateY = selectedRoom === room._id ? -120 : 0;
+
           return (
             <Marker
               key={room._id}
@@ -53,29 +53,29 @@ export function RoomMap({
                 longitude: room.longitude,
               }}
               onPress={() => scrollToCard(room._id)}
+              centerOffset={{ x: 0, y: -25 }} 
             >
               <Animated.View
                 style={{
-                  transform: [{ scale }],
+                  transform: [{ scale }, { translateY }],
                   opacity,
                   alignItems: "center",
                   justifyContent: "center",
                 }}
               >
-              <FontAwesome5 name="map-marker-alt" size={24} color="red" />
                 <View
-                  className={`absolute -bottom-5 bg-white px-2 py-[2px] rounded-full border border-gray-200 shadow-sm w-[70px] ${
+                  className={`px-3 py-[3px] rounded-full border border-gray-300 shadow-sm ${
                     selectedRoom === room._id ? "bg-[#DBE2EF]" : "bg-white"
                   }`}
                 >
                   <Text
-                    className={`text-[12px] font-semibold ${
+                    className={`text-[13px] font-semibold ${
                       selectedRoom === room._id
                         ? "text-[#112D4E]"
                         : "text-[#3F72AF]"
                     }`}
                   >
-                    {room.price.toLocaleString("vi-VN")}
+                    {room.price.toLocaleString("vi-VN")} ₫
                   </Text>
                 </View>
               </Animated.View>

@@ -1,14 +1,16 @@
 import React, { useState } from "react";
-import { View, Text, TextInput } from "react-native";
-import Slider from "@react-native-community/slider";
+import { View, Text, TextInput, useWindowDimensions } from "react-native";
+import MultiSlider from "@ptomasroos/react-native-multi-slider";
 import { useFilter } from "./FilterContext";
 
 export default function PriceRange() {
+  const { width } = useWindowDimensions();
   const { filters, setFilters } = useFilter();
   const [localMin, setLocalMin] = useState(filters.minPrice);
   const [localMax, setLocalMax] = useState(filters.maxPrice);
 
-  const handleSliderChange = (min: number, max: number) => {
+  const handleSliderChange = (values: number[]) => {
+    const [min, max] = values;
     setLocalMin(min);
     setLocalMax(max);
     setFilters({ ...filters, minPrice: min, maxPrice: max });
@@ -16,9 +18,11 @@ export default function PriceRange() {
 
   return (
     <View className="mb-5">
-      <Text className="font-semibold text-base mb-3">Khoảng giá thuê (VNĐ/tháng)</Text>
+      <Text className="font-semibold text-base mb-3">
+        Khoảng giá thuê (VNĐ/tháng)
+      </Text>
 
-      {/* Hiển thị giá */}
+      {/* Input nhập tay */}
       <View className="flex-row justify-between items-center mb-2">
         <View className="flex-1 mr-2">
           <Text className="text-gray-500 text-[13px] mb-1">Từ</Text>
@@ -49,26 +53,42 @@ export default function PriceRange() {
         </View>
       </View>
 
-      {/* Thanh trượt giá */}
+      {/* Thanh trượt 2 đầu */}
       <View className="mt-1">
-        <Slider
-          style={{ width: "100%", height: 40 }}
-          minimumValue={0}
-          maximumValue={10000000}
+        <MultiSlider
+          values={[localMin, localMax]}
+          min={0}
+          max={10000000}
           step={50000}
-          value={localMax}
-          minimumTrackTintColor="#3F72AF"
-          maximumTrackTintColor="#d3d3d3"
-          thumbTintColor="#3F72AF"
-          onValueChange={(val) => handleSliderChange(localMin, val)}
+          sliderLength={width - 40}
+          onValuesChange={handleSliderChange}
+          selectedStyle={{ backgroundColor: "#3F72AF" }}
+          unselectedStyle={{ backgroundColor: "#d3d3d3" }}
+          containerStyle={{ alignSelf: "center" }}
+          trackStyle={{ height: 4, borderRadius: 2 }}
+          markerStyle={{
+            height: 20,
+            width: 20,
+            borderRadius: 10,
+            backgroundColor: "#3F72AF",
+            borderWidth: 1.5,
+            borderColor: "#fff",
+            elevation: 0,
+          }}
+          pressedMarkerStyle={{
+            backgroundColor: "#112D4E",
+            shadowColor: "transparent",
+            elevation: 0,
+          }}
         />
-        <View className="flex-row justify-between">
+
+        <View className="flex-row justify-between mt-1">
           <Text className="text-[12px] text-gray-500">0₫</Text>
           <Text className="text-[12px] text-gray-500">10.000.000₫+</Text>
         </View>
       </View>
 
-      {/* Tóm tắt giá đang chọn */}
+      {/* Hiển thị giá hiện tại */}
       <View className="mt-2">
         <Text className="text-[13px] text-[#112D4E]">
           Hiển thị phòng có giá từ{" "}

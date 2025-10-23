@@ -5,10 +5,10 @@ import MapView from "react-native-maps";
 import rooms from "@/constants/data/rooms";
 
 const { height } = Dimensions.get("window");
-export const SNAP_POINTS = [0.15, 0.5, 0.95];
+export const SNAP_POINTS = [0.15, 0.5, 0.85];
 
 export function useRoomMapLogic() {
-  const insets = useSafeAreaInsets(); 
+  const insets = useSafeAreaInsets();
   const mapRef = useRef<MapView>(null);
   const flatListRef = useRef<any>(null);
   const [selectedRoom, setSelectedRoom] = useState<string | null>(null);
@@ -16,10 +16,8 @@ export function useRoomMapLogic() {
   const [isVisible, setIsVisible] = useState(true);
   const [isMapReady, setIsMapReady] = useState(false);
 
-  // chiều cao khả dụng = chiều cao thật - header - padding top
   const availableHeight = height - insets.top - 60;
   const modalHeight = useRef(new Animated.Value(availableHeight * SNAP_POINTS[snapIndex])).current;
-
   const markersAnim = useRef(rooms.map(() => new Animated.Value(0))).current;
 
   const panResponder = useRef(
@@ -87,6 +85,7 @@ export function useRoomMapLogic() {
         400
       );
       setIsVisible(true);
+      
       setSnapIndex(1);
       Animated.spring(modalHeight, {
         toValue: availableHeight * SNAP_POINTS[1],

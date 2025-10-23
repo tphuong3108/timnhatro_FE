@@ -1,19 +1,31 @@
 import React, { useState } from "react";
-import { View, Text, TouchableOpacity, Alert, SafeAreaView, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Alert,
+  SafeAreaView,
+  ScrollView,
+  ActivityIndicator,
+} from "react-native";
 import { TextInput } from "react-native-paper";
 import { useRouter } from "expo-router";
 import Logo from "../../assets/images/logodoc.svg";
 import { Ionicons } from "@expo/vector-icons";
 import apiClient from "../../utils/apiClient";
+import InputField from "../../components/InputField";
 
 export default function ChangePassword() {
   const router = useRouter();
+
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
   const [showOld, setShowOld] = useState(false);
   const [showNew, setShowNew] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+
   const [loading, setLoading] = useState(false);
 
   const handleChangePassword = async () => {
@@ -44,24 +56,25 @@ export default function ChangePassword() {
   return (
     <SafeAreaView className="flex-1 bg-white">
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-        <View className="flex-1 bg-white px-6 pt-12">
+        <View className="flex-1 bg-white px-6 pt-12 pb-10">
+          {/* Logo */}
           <View className="items-center mb-4">
-            <Logo width={260} height={260} />
+            <Logo width={240} height={240} />
           </View>
 
-          <Text className="text-3xl font-inter text-center text-[#3F72AF] mb-2 font-bold">
+          <Text className="text-3xl font-bold text-[#3F72AF] text-center mb-2">
             ĐỔI MẬT KHẨU
           </Text>
           <Text className="text-gray-500 text-center mb-8">
             Cập nhật mật khẩu để bảo vệ tài khoản của bạn
           </Text>
 
-          <TextInput
+          {/* Mật khẩu hiện tại */}
+          <InputField
             label="Mật khẩu hiện tại"
-            mode="outlined"
-            secureTextEntry={!showOld}
             value={oldPassword}
             onChangeText={setOldPassword}
+            secureTextEntry={!showOld}
             right={
               <TextInput.Icon
                 icon={() => (
@@ -74,15 +87,14 @@ export default function ChangePassword() {
                 onPress={() => setShowOld(!showOld)}
               />
             }
-            style={{ marginBottom: 16, backgroundColor: "white" }}
           />
 
-          <TextInput
+          {/* Mật khẩu mới */}
+          <InputField
             label="Mật khẩu mới"
-            mode="outlined"
-            secureTextEntry={!showNew}
             value={newPassword}
             onChangeText={setNewPassword}
+            secureTextEntry={!showNew}
             right={
               <TextInput.Icon
                 icon={() => (
@@ -95,15 +107,14 @@ export default function ChangePassword() {
                 onPress={() => setShowNew(!showNew)}
               />
             }
-            style={{ marginBottom: 16, backgroundColor: "white" }}
           />
 
-          <TextInput
+          {/* Xác nhận mật khẩu mới */}
+          <InputField
             label="Xác nhận mật khẩu mới"
-            mode="outlined"
-            secureTextEntry={!showConfirm}
             value={confirmPassword}
             onChangeText={setConfirmPassword}
+            secureTextEntry={!showConfirm}
             right={
               <TextInput.Icon
                 icon={() => (
@@ -116,17 +127,22 @@ export default function ChangePassword() {
                 onPress={() => setShowConfirm(!showConfirm)}
               />
             }
-            style={{ marginBottom: 24, backgroundColor: "white" }}
           />
 
+          {/* Nút xác nhận */}
           <TouchableOpacity
-            className="bg-[#3F72AF] py-3 rounded-full"
+            className="bg-[#3F72AF] py-3 rounded-full mt-4"
             onPress={handleChangePassword}
             disabled={loading}
+            activeOpacity={0.8}
           >
-            <Text className="text-white font-inter text-center text-lg">
-              {loading ? "Đang xử lý..." : "XÁC NHẬN"}
-            </Text>
+            {loading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text className="text-white font-semibold text-center text-lg">
+                XÁC NHẬN
+              </Text>
+            )}
           </TouchableOpacity>
         </View>
       </ScrollView>

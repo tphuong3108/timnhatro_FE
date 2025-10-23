@@ -10,14 +10,14 @@ import {
   TouchableOpacity,
   View,
   Alert,
+  ActivityIndicator,
 } from "react-native";
-import { TextInput } from "react-native-paper";
 import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
 import AppleIcon from "../../assets/images/apple.svg";
 import FacebookIcon from "../../assets/images/facebook.svg";
 import GoogleIcon from "../../assets/images/google.svg";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import apiClient from "../../utils/apiClient";
+import InputField from "../../components/InputField";
 
 export default function Register() {
   const router = useRouter();
@@ -54,8 +54,7 @@ export default function Register() {
 
     try {
       setLoading(true);
-
-      const res = await apiClient.post("/users/register", {
+      await apiClient.post("/users/register", {
         firstName,
         lastName,
         phone,
@@ -64,7 +63,7 @@ export default function Register() {
         email,
       });
 
-      Alert.alert("OTP đã được gửi!", "Vui lòng kiểm tra email để lấy mã OTP.", [
+      Alert.alert("🎉 OTP đã được gửi!", "Vui lòng kiểm tra email để lấy mã OTP.", [
         {
           text: "OK",
           onPress: () => {
@@ -109,6 +108,7 @@ export default function Register() {
           }}
           showsVerticalScrollIndicator={false}
         >
+          {/* Tiêu đề */}
           <View className="items-center mt-8 mb-4">
             <Text
               className="font-bold text-[#3F72AF]"
@@ -128,109 +128,64 @@ export default function Register() {
             </Text>
           </View>
 
+          {/* Form */}
           <View>
-            <TextInput
-              label="Họ"
-              mode="outlined"
-              value={firstName}
-              onChangeText={setFirstName}
-              style={{
-                marginBottom: RFValue(12),
-                backgroundColor: "white",
-                fontSize: RFValue(14),
-              }}
-            />
-            <TextInput
-              label="Tên"
-              mode="outlined"
-              value={lastName}
-              onChangeText={setLastName}
-              style={{
-                marginBottom: RFValue(12),
-                backgroundColor: "white",
-                fontSize: RFValue(14),
-              }}
-            />
-            <TextInput
+            <InputField label="Họ" value={firstName} onChangeText={setFirstName} />
+            <InputField label="Tên" value={lastName} onChangeText={setLastName} />
+            <InputField
               label="Email"
-              mode="outlined"
               value={email}
               onChangeText={setEmail}
               keyboardType="email-address"
-              style={{
-                marginBottom: RFValue(12),
-                backgroundColor: "white",
-                fontSize: RFValue(14),
-              }}
             />
-            <TextInput
+            <InputField
               label="Số điện thoại"
-              mode="outlined"
               value={phone}
               onChangeText={setPhone}
               keyboardType="phone-pad"
-              style={{
-                marginBottom: RFValue(12),
-                backgroundColor: "white",
-                fontSize: RFValue(14),
-              }}
             />
-            <TextInput
+
+            <InputField
               label="Mật khẩu"
-              mode="outlined"
               value={password}
               onChangeText={setPassword}
               secureTextEntry={!passwordVisible}
               right={
-                <TextInput.Icon
-                  icon={() => (
-                    <Ionicons
-                      name={passwordVisible ? "eye-outline" : "eye-off-outline"}
-                      size={RFValue(18)}
-                      color="gray"
-                    />
-                  )}
-                  onPress={() => setPasswordVisible(!passwordVisible)}
-                />
+                <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)}>
+                  <Ionicons
+                    name={passwordVisible ? "eye-outline" : "eye-off-outline"}
+                    size={RFValue(20)}
+                    color="gray"
+                  />
+                </TouchableOpacity>
               }
-              style={{
-                marginBottom: RFValue(12),
-                backgroundColor: "white",
-                fontSize: RFValue(14),
-              }}
             />
-            <TextInput
+
+            <InputField
               label="Xác thực mật khẩu"
-              mode="outlined"
               value={confirmPassword}
               onChangeText={setConfirmPassword}
               secureTextEntry={!confirmPasswordVisible}
               right={
-                <TextInput.Icon
-                  icon={() => (
-                    <Ionicons
-                      name={
-                        confirmPasswordVisible ? "eye-outline" : "eye-off-outline"
-                      }
-                      size={RFValue(18)}
-                      color="gray"
-                    />
-                  )}
+                <TouchableOpacity
                   onPress={() =>
                     setConfirmPasswordVisible(!confirmPasswordVisible)
                   }
-                />
+                >
+                  <Ionicons
+                    name={confirmPasswordVisible ? "eye-outline" : "eye-off-outline"}
+                    size={RFValue(20)}
+                    color="gray"
+                  />
+                </TouchableOpacity>
               }
-              style={{
-                marginBottom: RFValue(16),
-                backgroundColor: "white",
-                fontSize: RFValue(14),
-              }}
             />
 
+            {/* Checkbox điều khoản */}
             <TouchableOpacity
               onPress={() => setAgree(!agree)}
               className="flex-row items-center mb-5"
+              activeOpacity={0.8}
             >
               <View
                 className="border border-gray-400 rounded items-center justify-center"
@@ -252,6 +207,7 @@ export default function Register() {
               </Text>
             </TouchableOpacity>
 
+            {/* Nút đăng ký */}
             <TouchableOpacity
               className="bg-[#3F72AF] rounded-full"
               style={{
@@ -260,15 +216,21 @@ export default function Register() {
               }}
               onPress={handleRegister}
               disabled={loading}
+              activeOpacity={0.8}
             >
-              <Text
-                className="text-white text-center font-medium"
-                style={{ fontSize: RFPercentage(2.2) }}
-              >
-                {loading ? "Đang gửi OTP..." : "ĐĂNG KÝ"}
-              </Text>
+              {loading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text
+                  className="text-white text-center font-medium"
+                  style={{ fontSize: RFPercentage(2.2) }}
+                >
+                  ĐĂNG KÝ
+                </Text>
+              )}
             </TouchableOpacity>
 
+            {/* Link đăng nhập */}
             <TouchableOpacity onPress={() => router.push("/auth/login")}>
               <Text
                 className="text-center text-gray-600"
@@ -284,6 +246,7 @@ export default function Register() {
               </Text>
             </TouchableOpacity>
 
+            {/* Divider */}
             <View className="flex-row items-center mb-6">
               <View className="flex-1 h-px bg-gray-300" />
               <Text
@@ -295,6 +258,7 @@ export default function Register() {
               <View className="flex-1 h-px bg-gray-300" />
             </View>
 
+            {/* Mạng xã hội */}
             <View className="flex-row justify-between px-6 gap-6 mb-6">
               <TouchableOpacity
                 className="flex-1 border border-[#3F72AF] rounded-lg items-center justify-center"
