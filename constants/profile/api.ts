@@ -1,4 +1,4 @@
-import apiClient from "@/utils/apiClient";
+import apiClient from "@/services/apiClient";
 
 export const profileApi = {
   getProfile: () => apiClient.get("/users/profile"),

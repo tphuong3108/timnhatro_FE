@@ -22,7 +22,7 @@ export default function MapSection({ room, loadingLoc, openDirections }: any) {
 
   return (
     <View className="px-5 py-5 border-t border-gray-200">
-      <Text className="text-lg font-semibold text-[#112D4E] mb-3">
+      <Text className="text-xl font-semibold text-[#3F72AF] mb-3">
         Vị trí trên bản đồ
       </Text>
 

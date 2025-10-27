@@ -56,7 +56,7 @@ const AmenityItem = ({ item, index }: { item: any; index: number }) => {
   return (
     <Animated.View
       style={animatedStyle}
-      className="w-[31%] h-[85px] bg-white rounded-2xl mb-3 items-center justify-center border border-gray-300"
+      className="w-[31%] h-[85px] bg-white text-[#3F72AF] rounded-2xl mb-3 items-center justify-center border border-gray-300"
     >
       {item.type === "Ionicons" ? (
         <Ionicons name={item.icon as any} size={28} color={item.color} />
@@ -70,7 +70,7 @@ const AmenityItem = ({ item, index }: { item: any; index: number }) => {
       <Text
         numberOfLines={2}
         ellipsizeMode="tail"
-        className="text-gray-700 text-center text-[12px] mt-1 font-medium px-1"
+        className="text-[#3F72AF] text-center text-[12px] mt-1 font-medium px-1"
       >
         {item.name}
       </Text>
@@ -91,10 +91,10 @@ export default function AmenitiesList({ room }: any) {
       entering={FadeInUp.duration(600)}
       className="px-5 py-5 border-t border-gray-200"
     >
-      <Text className="text-lg font-semibold text-[#112D4E] mb-1">
+      <Text className="text-xl font-semibold text-[#3F72AF] mb-3">
         🏠 Tiện ích chỗ trọ
       </Text>
-      <Text className="text-gray-500 text-[13px] mb-4">
+      <Text className="text-gray-700 text-[14px] mb-4">
         Các tiện ích sẵn có giúp bạn sinh hoạt thoải mái và thuận tiện hơn.
       </Text>
 

@@ -51,7 +51,7 @@ export default function RoomCarousel({
   return (
     <View className="mt-2">
       <Animated.FlatList
-        data={rooms}
+        data={Array.isArray(rooms) ? rooms : []}
         horizontal
         showsHorizontalScrollIndicator={false}
         decelerationRate="fast"
@@ -117,7 +117,7 @@ export default function RoomCarousel({
                     <View className="flex-row items-center mt-1">
                       <Ionicons name="eye-outline" size={14} color="#D1D5DB" />
                       <Text className="text-gray-300 text-[12px] ml-2">
-                        {item.views.toLocaleString()}
+                          {(item?.views ?? 0).toLocaleString()}
                       </Text>
                     </View>
                   </View>

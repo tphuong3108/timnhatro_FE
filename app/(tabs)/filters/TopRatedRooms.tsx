@@ -8,7 +8,7 @@ export default function TopRatedRooms() {
   const topRooms = rooms
     .filter((room) => room.avgRating >= 4.5)
     .sort((a, b) => b.avgRating - a.avgRating)
-    .slice(0, 6); // chỉ lấy top 6 phòng
+    .slice(0, 6); //  lấy top 6 phòng
 
   if (topRooms.length === 0)
     return (

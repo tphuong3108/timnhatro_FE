@@ -1,12 +1,12 @@
+import SearchBar from "@/components/ui/SearchBar";
 import React from "react";
 import { SafeAreaView, ScrollView, View, useWindowDimensions } from "react-native";
-import HomeBanner from "./HomeBanner";
-import SearchBar from "@/components/ui/SearchBar";
-import SectionHeader from "./SectionHeader";
+import AmenitiesList from "./AmenitiesList";
 import CategoryList from "./CategoryList";
+import HomeBanner from "./HomeBanner";
 import NearbyRooms from "./NearbyRooms";
 import RoomCarousel from "./RoomCarousel";
-import AmenitiesList from "./AmenitiesList";
+import SectionHeader from "./SectionHeader";
 
 export default function Home() {
   const { height } = useWindowDimensions();
@@ -15,8 +15,7 @@ export default function Home() {
 
   return (
     <SafeAreaView className="flex-1 bg-white">
-      <ScrollView
-        showsVerticalScrollIndicator={false}
+      <ScrollView nestedScrollEnabled showsVerticalScrollIndicator={false}
         bounces={false}
         overScrollMode="never" 
         contentContainerStyle={{

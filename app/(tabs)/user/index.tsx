@@ -1,21 +1,20 @@
-import React, { useEffect, useState } from "react";
-import {
-  View,
-  ScrollView,
-  ActivityIndicator,
-  Alert,
-  TouchableOpacity,
-  Text,
-} from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
+import React, { useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  Alert,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import ActionButtons from "./ActionButtons";
 import CoverSection from "./CoverSection";
+import Favorites from "./Favorites";
 import InfoSection from "./InfoSection";
 import MyPosts from "./MyPosts";
-import Favorites from "./Favorites";
-import ActionButtons from "./ActionButtons";
-import apiClient from "@/utils/apiClient";
+import apiClient from "@/services/apiClient";
 
 export default function Profile() {
   const router = useRouter();

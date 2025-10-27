@@ -30,7 +30,7 @@ export default function HostReviewForm({ onSubmit }: any) {
     >
     <View className="flex-row items-center mb-2">
       <MaterialCommunityIcons name="pencil-outline" size={20} color="#2d69adff" />
-      <Text className="text-lg font-semibold text-[#112D4E] ml-2">
+      <Text className="text-xl font-semibold text-[#3F72AF] ml-2">
         Gửi cảm nhận về chủ trọ
       </Text>
     </View>

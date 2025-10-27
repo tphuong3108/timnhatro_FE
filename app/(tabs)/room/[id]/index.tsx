@@ -10,6 +10,8 @@ import RatingSection from "./RatingSection";
 import AmenitiesList from "./AmenitiesList";
 import RoomDescription from "./RoomDescription";
 import HostReviewForm from "./HostReviewForm";
+import SectionHeader from "../../home/SectionHeader";
+import NearbyRooms from "../../home/NearbyRooms";
 
 export default function RoomDetailScreen() {
   const {
@@ -73,6 +75,10 @@ export default function RoomDetailScreen() {
             console.log("Đánh giá mới từ người dùng:", review);
           }}
         />
+        <View className="mt-2 px-6 py-12">
+          <SectionHeader title="Phòng xung quanh bạn" />
+          <NearbyRooms />
+        </View>
       </ScrollView>
     </View>
   );

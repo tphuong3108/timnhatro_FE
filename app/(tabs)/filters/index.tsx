@@ -16,7 +16,7 @@ export default function FindRoomIndex() {
       <ScrollView
         className="flex-1 bg-white"
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 80 }}
+        contentContainerStyle={{ paddingBottom: 14 }}
       >
         {/*  Thanh tìm kiếm */}
         <View className="px-5 py-10">
