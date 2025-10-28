@@ -1,7 +1,8 @@
 // index.tsx
+import { profileApi } from "@/services/profileApi";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
+import { useRouter, useFocusEffect } from "expo-router";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -15,7 +16,6 @@ import CoverSection from "./CoverSection";
 import Favorites from "./Favorites";
 import InfoSection from "./InfoSection";
 import MyPosts from "./MyPosts";
-import { profileApi } from "@/services/profileApi"; // ✅ bạn cần file này đúng cấu trúc bên dưới
 
 export default function Profile() {
   const router = useRouter();
@@ -23,7 +23,6 @@ export default function Profile() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"posts" | "favorites">("posts");
 
-  // ✅ Hàm lấy dữ liệu hồ sơ
   const fetchProfile = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
@@ -32,7 +31,6 @@ export default function Profile() {
         return;
       }
 
-      // Gọi API backend /api/profile
       const data = await profileApi.getMyProfile();
       setUser(data);
     } catch (error) {
@@ -47,7 +45,12 @@ export default function Profile() {
     fetchProfile();
   }, []);
 
-  // ✅ Hàm khóa tài khoản (logout & xóa token)
+  useFocusEffect(
+    useCallback(() => {
+      fetchProfile();
+    }, [])
+  );
+
   const handleBanAccount = async () => {
     Alert.alert("Khóa tài khoản", "Bạn chắc chắn muốn khóa tài khoản?", [
       { text: "Hủy", style: "cancel" },
@@ -57,10 +60,16 @@ export default function Profile() {
         onPress: async () => {
           try {
             setLoading(true);
+            await profileApi.banAccount();
             await AsyncStorage.removeItem("token");
-            Alert.alert("Tài khoản đã bị khóa", "Bạn sẽ bị đăng xuất.");
-            router.replace("/auth/login");
-          } catch {
+            Alert.alert("Thành công", "Tài khoản của bạn đã bị khóa.", [
+              { text: "OK", onPress: () => router.replace("/auth/login") },
+            ]);
+          } catch (error: any) {
+            console.log(
+              "Ban account error:",
+              error.response?.data || error.message
+            );
             Alert.alert("Lỗi", "Không thể khóa tài khoản.");
           } finally {
             setLoading(false);
@@ -88,7 +97,6 @@ export default function Profile() {
       <View className="w-full max-w-[700px] self-center px-5">
         <InfoSection user={user} />
 
-        {/* Nút khóa tài khoản */}
         <TouchableOpacity
           onPress={handleBanAccount}
           activeOpacity={0.8}
@@ -99,10 +107,8 @@ export default function Profile() {
           </Text>
         </TouchableOpacity>
 
-        {/* Tabs */}
         <ActionButtons activeTab={activeTab} onChangeTab={setActiveTab} />
 
-        {/* Nội dung tab */}
         <View className="mt-8">
           {activeTab === "posts" ? (
             <MyPosts rooms={user?.myRooms || []} />

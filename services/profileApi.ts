@@ -3,22 +3,26 @@ import apiClient from "./apiClient";
 
 export const profileApi = {
   getMyProfile: async () => {
-    const res = await apiClient.get("/profile");
-    return res.data;
+    const res = await apiClient.get("/me");
+    return res.data.data; 
   },
 
   updateProfile: async (data: any) => {
-    const res = await apiClient.patch("/profile", data);
-    return res.data;
+    const res = await apiClient.patch("/me", data);
+    return res.data.data;
   },
 
-  changePassword: async (data: any) => {
-    const res = await apiClient.put("/users/change-password", data);
-    return res.data;
+  getMyReviews: async () => {
+    const res = await apiClient.get("/me/reviews");
+    return res.data.data;
   },
 
-  deleteAccount: async () => {
-    const res = await apiClient.delete("/users/delete-account");
+  upgradeRole: async () => {
+    const res = await apiClient.patch("/me/upgrade-role");
+    return res.data.data;
+  },
+    banAccount: async () => {
+    const res = await apiClient.put("/users/me/ban");
     return res.data;
   },
 };
