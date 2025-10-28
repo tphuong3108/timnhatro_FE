@@ -1,6 +1,7 @@
 import React from "react";
-import { View, Text, Image, TouchableOpacity } from "react-native";
+import { View, Text, Image, TouchableOpacity, Alert } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import { PostRoom } from "@/constants/data/PostRoom";
 
 interface Props {
@@ -10,8 +11,28 @@ interface Props {
 }
 
 export default function PostCard({ post, onApprove, onReject }: Props) {
+  const router = useRouter();
+
+  const handleApprove = () => {
+    Alert.alert("Xác nhận", "Duyệt bài đăng này?", [
+      { text: "Hủy", style: "cancel" },
+      { text: "Duyệt", onPress: onApprove },
+    ]);
+  };
+
+  const handleReject = () => {
+    Alert.alert("Xác nhận", "Từ chối bài đăng này?", [
+      { text: "Hủy", style: "cancel" },
+      { text: "Từ chối", onPress: onReject },
+    ]);
+  };
+
   return (
-    <View className="bg-white rounded-3xl shadow-sm mb-5 p-4 border border-gray-100">
+    <TouchableOpacity
+      activeOpacity={0.85}
+      onPress={() => router.push(`/room/${post.id}`)} // ✅ điều hướng đến chi tiết phòng
+      className="bg-white rounded-3xl shadow-sm mb-5 p-4 border border-gray-100"
+    >
       {/* Header */}
       <View className="flex-row">
         <Image
@@ -37,7 +58,14 @@ export default function PostCard({ post, onApprove, onReject }: Props) {
       {/* Footer */}
       <View className="flex-row justify-between items-center mt-4 pt-3 border-t border-gray-100">
         {/* Host info */}
-        <View className="flex-row items-center">
+        <TouchableOpacity
+          onPress={(e) => {
+            e.stopPropagation(); // ✅ chặn click card
+            router.push(`/user/${post.host.name}`);
+          }}
+          className="flex-row items-center"
+          activeOpacity={0.8}
+        >
           <Image
             source={{ uri: post.host.avatar }}
             className="w-[28px] h-[28px] rounded-full mr-2"
@@ -45,20 +73,26 @@ export default function PostCard({ post, onApprove, onReject }: Props) {
           <Text className="text-gray-700 text-[13px] font-medium" numberOfLines={1}>
             {post.host.name}
           </Text>
-        </View>
+        </TouchableOpacity>
 
         {/* Status / Actions */}
         {post.status === "pending" ? (
           <View className="flex-row space-x-2">
             <TouchableOpacity
-              onPress={onReject}
+              onPress={(e) => {
+                e.stopPropagation();
+                handleReject();
+              }}
               className="flex-row items-center bg-red-50 px-3 py-1.5 rounded-xl"
             >
               <Ionicons name="close-circle-outline" size={14} color="#EF4444" />
               <Text className="text-red-600 ml-1 text-[13px] font-medium">Từ chối</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={onApprove}
+              onPress={(e) => {
+                e.stopPropagation();
+                handleApprove();
+              }}
               className="flex-row items-center bg-green-50 px-3 py-1.5 rounded-xl"
             >
               <Ionicons name="checkmark-circle-outline" size={14} color="#10B981" />
@@ -86,6 +120,6 @@ export default function PostCard({ post, onApprove, onReject }: Props) {
           </View>
         )}
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }

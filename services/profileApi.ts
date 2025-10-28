@@ -1,21 +1,24 @@
+// src/services/profileApi.ts
 import apiClient from "./apiClient";
 
-export async function getProfile() {
-  const res = await apiClient.get("/me");
-  return res.data;
-}
+export const profileApi = {
+  getMyProfile: async () => {
+    const res = await apiClient.get("/profile");
+    return res.data;
+  },
 
-export async function updateProfile(data: any) {
-  const res = await apiClient.put("/me", data);
-  return res.data;
-}
+  updateProfile: async (data: any) => {
+    const res = await apiClient.patch("/profile", data);
+    return res.data;
+  },
 
-export async function changePassword(data: any) {
-  const res = await apiClient.put("/me/change-password", data);
-  return res.data;
-}
+  changePassword: async (data: any) => {
+    const res = await apiClient.put("/users/change-password", data);
+    return res.data;
+  },
 
-export async function deleteAccount() {
-  const res = await apiClient.delete("/me");
-  return res.data;
-}
+  deleteAccount: async () => {
+    const res = await apiClient.delete("/users/delete-account");
+    return res.data;
+  },
+};

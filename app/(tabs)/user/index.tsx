@@ -1,3 +1,4 @@
+// index.tsx
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
@@ -14,7 +15,7 @@ import CoverSection from "./CoverSection";
 import Favorites from "./Favorites";
 import InfoSection from "./InfoSection";
 import MyPosts from "./MyPosts";
-import apiClient from "@/services/apiClient";
+import { profileApi } from "@/services/profileApi"; // ✅ bạn cần file này đúng cấu trúc bên dưới
 
 export default function Profile() {
   const router = useRouter();
@@ -22,17 +23,20 @@ export default function Profile() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"posts" | "favorites">("posts");
 
+  // ✅ Hàm lấy dữ liệu hồ sơ
   const fetchProfile = async () => {
     try {
-      const mockUser = {
-        fullName: "Nguyễn Văn A",
-        email: "nguyenvana@example.com",
-        phone: "0987654321",
-        avatar: "https://i.pravatar.cc/150?img=3",
-        role: "Người thuê trọ",
-      };
-      setUser(mockUser);
-    } catch {
+      const token = await AsyncStorage.getItem("token");
+      if (!token) {
+        router.replace("/auth/login");
+        return;
+      }
+
+      // Gọi API backend /api/profile
+      const data = await profileApi.getMyProfile();
+      setUser(data);
+    } catch (error) {
+      console.error("Fetch profile error:", error);
       Alert.alert("Lỗi", "Không thể tải hồ sơ người dùng.");
     } finally {
       setLoading(false);
@@ -43,6 +47,7 @@ export default function Profile() {
     fetchProfile();
   }, []);
 
+  // ✅ Hàm khóa tài khoản (logout & xóa token)
   const handleBanAccount = async () => {
     Alert.alert("Khóa tài khoản", "Bạn chắc chắn muốn khóa tài khoản?", [
       { text: "Hủy", style: "cancel" },
@@ -52,7 +57,6 @@ export default function Profile() {
         onPress: async () => {
           try {
             setLoading(true);
-            await apiClient.put("/users/me/ban");
             await AsyncStorage.removeItem("token");
             Alert.alert("Tài khoản đã bị khóa", "Bạn sẽ bị đăng xuất.");
             router.replace("/auth/login");
@@ -80,9 +84,11 @@ export default function Profile() {
       contentContainerStyle={{ paddingBottom: 40 }}
     >
       <CoverSection user={user} />
+
       <View className="w-full max-w-[700px] self-center px-5">
         <InfoSection user={user} />
 
+        {/* Nút khóa tài khoản */}
         <TouchableOpacity
           onPress={handleBanAccount}
           activeOpacity={0.8}
@@ -98,7 +104,11 @@ export default function Profile() {
 
         {/* Nội dung tab */}
         <View className="mt-8">
-          {activeTab === "posts" ? <MyPosts /> : <Favorites />}
+          {activeTab === "posts" ? (
+            <MyPosts rooms={user?.myRooms || []} />
+          ) : (
+            <Favorites favorites={user?.favorites || []} />
+          )}
         </View>
       </View>
     </ScrollView>

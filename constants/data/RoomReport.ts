@@ -12,4 +12,6 @@ export interface RoomReport {
   likes: number;
   rating: number;
   totalReviews: number;
+  reportContent: string;
+  attachments: string[];  
 }

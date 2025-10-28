@@ -1,37 +1,39 @@
 import React, { useState } from "react";
-import { View, Text, TouchableOpacity, ScrollView } from "react-native";
-import RoomReportCard from "./RoomReportCard";
-import { useRoomReportData } from "@/constants/data/useRoomReportData";
+import { View, Text, ScrollView, TouchableOpacity } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { useReviewReportData } from "@/constants/data/useReviewReportData";
+import ReviewReportCard from "./ReviewReportCard";
 
-export default function RoomReportList() {
-  const { rooms, loading } = useRoomReportData();
+
+export default function ReviewReportList() {
+  const { reviews, loading } = useReviewReportData();
   const [filter, setFilter] = useState<"all" | "approved" | "pending" | "rejected">("all");
 
   if (loading) {
     return (
       <View className="flex-1 justify-center items-center py-20">
-        <Text className="text-gray-500">Đang tải báo cáo...</Text>
+        <Text className="text-gray-500">Đang tải báo cáo review...</Text>
       </View>
     );
   }
 
-  // ✅ Lọc danh sách theo trạng thái
-  const filteredRooms =
-    filter === "all" ? rooms : rooms.filter((r) => r.status === filter);
+  const filtered =
+    filter === "all" ? reviews : reviews.filter((r) => r.status === filter);
 
   return (
     <View className="flex-1">
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        className="flex-row mb-5"
-        contentContainerStyle={{
-          justifyContent: "center",
-          alignItems: "center",
-          paddingHorizontal: 4,
-          width: "103%",
-        }}
-      >
+      {/* Bộ lọc */}
+          <ScrollView
+             horizontal
+             showsHorizontalScrollIndicator={false}
+             className="flex-row mb-5"
+             contentContainerStyle={{
+               justifyContent: "center",
+               alignItems: "center",
+               paddingHorizontal: 4,
+               width: "103%",
+             }}
+           >
         {[
           { key: "all", label: "Tất cả" },
           { key: "approved", label: "Đã duyệt" },
@@ -43,8 +45,7 @@ export default function RoomReportList() {
             <TouchableOpacity
               key={tab.key}
               onPress={() => setFilter(tab.key as any)}
-              activeOpacity={0.8}
-              className={`px-5 py-2 mx-1 rounded-full ${
+              className={`px-5 py-2 mr-2 rounded-full ${
                 isActive ? "bg-[#3F72AF]" : "bg-gray-200"
               }`}
             >
@@ -60,9 +61,11 @@ export default function RoomReportList() {
         })}
       </ScrollView>
 
-      {/* ✅ Danh sách báo cáo */}
-      {filteredRooms.length > 0 ? (
-        filteredRooms.map((room) => <RoomReportCard key={room.id} room={room} />)
+      {/* Danh sách */}
+      {filtered.length > 0 ? (
+        filtered.map((review) => (
+          <ReviewReportCard key={review.id} review={review} />
+        ))
       ) : (
         <View className="items-center justify-center mt-10">
           <Text className="text-gray-400">Không có báo cáo nào phù hợp</Text>

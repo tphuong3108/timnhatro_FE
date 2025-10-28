@@ -1,28 +1,81 @@
-import { RoomReport } from "@/constants/data/RoomReport";
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  ScrollView,
+  Alert,
+  Modal,
+  Pressable,
+  Dimensions,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import React from "react";
-import { Image, Text, View } from "react-native";
+import { useRouter } from "expo-router";
+
+const { width, height } = Dimensions.get("window");
+
+interface RoomReport {
+  id: string;
+  name: string;
+  address: string;
+  image: string;
+  reportContent?: string;
+  attachments?: string[];
+  status: "approved" | "pending" | "rejected";
+  host: {
+    name: string;
+    avatar: string;
+  };
+  reporter?: {
+    name: string;
+    avatar: string;
+  };
+}
 
 interface Props {
   room: RoomReport;
+  onApprove?: () => void;
+  onReject?: () => void;
 }
 
-export default function RoomReportCard({ room }: Props) {
+export default function RoomReportCard({ room, onApprove, onReject }: Props) {
+  const router = useRouter();
+  const [showImage, setShowImage] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
+  const handleApprove = () => {
+    Alert.alert("Xác nhận", "Duyệt báo cáo này?", [
+      { text: "Hủy", style: "cancel" },
+      { text: "Duyệt", onPress: onApprove || (() => {}) },
+    ]);
+  };
+
+  const handleReject = () => {
+    Alert.alert("Xác nhận", "Từ chối báo cáo này?", [
+      { text: "Hủy", style: "cancel" },
+      { text: "Từ chối", onPress: onReject || (() => {}) },
+    ]);
+  };
+
   return (
-    <View className="bg-white rounded-3xl p-4 mb-5 border border-gray-100 shadow-sm">
+    <View className="bg-white rounded-3xl shadow-sm mb-5 p-4 border border-gray-100">
       {/* Header */}
-      <View className="flex-row">
-        {/* Ảnh phòng */}
+      <TouchableOpacity
+        onPress={() => router.push(`/room/${room.id}`)}
+        activeOpacity={0.8}
+        className="flex-row"
+      >
         <Image
           source={{ uri: room.image }}
           className="w-[110px] h-[110px] rounded-2xl"
+          resizeMode="cover"
         />
 
-        {/* Nội dung */}
         <View className="flex-1 ml-3 justify-between">
           <View>
             <Text
-              className="font-semibold text-[#112D4E] text-[16px]"
+              className="text-[16px] mt-6 font-semibold text-[#112D4E]"
               numberOfLines={1}
             >
               {room.name}
@@ -30,92 +83,149 @@ export default function RoomReportCard({ room }: Props) {
             <Text className="text-gray-500 text-[13px]" numberOfLines={1}>
               {room.address}
             </Text>
-          </View>
 
-          {/* Thống kê */}
-          <View className="flex-row items-center mt-2 space-x-4">
-            <View className="flex-row items-center">
-              <Ionicons name="eye-outline" size={14} color="#3F72AF" />
-              <Text className="text-gray-600 text-[12px] ml-1">
-                {room.views}
+            {/* Chủ trọ */}
+            <TouchableOpacity
+              onPress={() => router.push(`/user/${room.host.name}`)}
+              activeOpacity={0.8}
+              className="flex-row items-center mt-2"
+            >
+              <Image
+                source={{ uri: room.host.avatar }}
+                className="w-[26px] h-[26px] rounded-full mr-2"
+              />
+              <Text className="text-gray-700 text-[13px]" numberOfLines={1}>
+                Chủ trọ: {room.host.name}
               </Text>
-            </View>
-            <View className="flex-row items-center">
-              <Ionicons name="heart-outline" size={14} color="#E57373" />
-              <Text className="text-gray-600 text-[12px] ml-1">
-                {room.likes}
-              </Text>
-            </View>
-            <View className="flex-row items-center">
-              <Ionicons name="star-outline" size={14} color="#F4B400" />
-              <Text className="text-gray-600 text-[12px] ml-1">
-                {room.rating.toFixed(1)} ({room.totalReviews})
-              </Text>
-            </View>
+            </TouchableOpacity>
           </View>
         </View>
-      </View>
+      </TouchableOpacity>
+
+      {/* Nội dung báo cáo */}
+      {room.reportContent && (
+        <Text className="text-[13px] text-gray-700 mt-3 leading-5">
+          {room.reportContent.length > 150
+            ? room.reportContent.slice(0, 150) + "..."
+            : room.reportContent}
+        </Text>
+      )}
+
+      {/* Người báo cáo */}
+      {room.reporter && (
+        <View className="flex-row items-center mt-3">
+          <Image
+            source={{ uri: room.reporter.avatar }}
+            className="w-[24px] h-[24px] rounded-full mr-2"
+          />
+          <Text className="text-gray-500 text-[13px] italic">
+            Báo cáo bởi: {room.reporter.name}
+          </Text>
+        </View>
+      )}
+
+      {/* Ảnh minh chứng */}
+      {room.attachments && room.attachments.length > 0 && (
+        <View className="mt-4">
+          <Text className="text-gray-500 text-[13px] mb-2 font-medium">
+            Hình ảnh minh chứng
+          </Text>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            className="flex-row"
+            contentContainerStyle={{ paddingRight: 8 }}
+          >
+            {room.attachments.map((uri, idx) => (
+              <TouchableOpacity
+                key={idx}
+                onPress={() => {
+                  setSelectedImage(uri);
+                  setShowImage(true);
+                }}
+                activeOpacity={0.9}
+              >
+                <Image
+                  source={{ uri }}
+                  className="w-24 h-24 rounded-xl mr-2 border border-gray-200"
+                  resizeMode="cover"
+                />
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
+      )}
 
       {/* Footer */}
-      <View className="flex-row justify-between items-center mt-4 pt-3 border-t border-gray-100">
-        {/* Host */}
-        <View className="flex-row items-center">
-          <Image
-            source={{ uri: room.host.avatar }}
-            className="w-[28px] h-[28px] rounded-full mr-2"
-          />
-          <Text
-            className="text-gray-700 text-[13px] font-medium"
-            numberOfLines={1}
-          >
-            {room.host.name}
-          </Text>
-        </View>
-
-        {/* Trạng thái */}
-        <View
-          className={`px-3 py-1.5 rounded-full flex-row items-center ${
-            room.status === "approved"
-              ? "bg-[#E6F6ED]"
-              : room.status === "pending"
-              ? "bg-[#FFF7E6]"
-              : "bg-[#FDE8E8]"
-          }`}
-        >
-          <Ionicons
-            name={
-              room.status === "approved"
-                ? "checkmark-circle"
-                : room.status === "pending"
-                ? "time-outline"
-                : "close-circle"
-            }
-            size={14}
-            color={
-              room.status === "approved"
-                ? "#34D399"
-                : room.status === "pending"
-                ? "#FBBF24"
-                : "#F87171"
-            }
-          />
-          <Text
-            className={`ml-1 text-[12px] font-semibold ${
-              room.status === "approved"
-                ? "text-[#15803D]"
-                : room.status === "pending"
-                ? "text-[#92400E]"
-                : "text-[#B91C1C]"
-            }`}
-          >
-            {room.status === "approved"
-              ? "Đã duyệt"
-              : room.status === "pending"
-              ? "Chờ duyệt"
-              : "Từ chối"}
-          </Text>
-        </View>
+      <View className="flex-row justify-end items-center mt-4 pt-3 border-t border-gray-100">
+        {room.status === "pending" ? (
+          <View className="flex-row space-x-2">
+            <TouchableOpacity
+              onPress={handleReject}
+              className="flex-row items-center bg-red-50 px-3 py-1.5 rounded-xl"
+            >
+              <Ionicons name="close-circle-outline" size={14} color="#EF4444" />
+              <Text className="text-red-600 ml-1 text-[13px] font-medium">
+                Từ chối
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={handleApprove}
+              className="flex-row items-center bg-green-50 px-3 py-1.5 rounded-xl"
+            >
+              <Ionicons
+                name="checkmark-circle-outline"
+                size={14}
+                color="#10B981"
+              />
+              <Text className="text-green-700 ml-1 text-[13px] font-medium">
+                Duyệt
+              </Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <View className="flex-row items-center">
+            <Ionicons
+              name={
+                room.status === "approved"
+                  ? "checkmark-circle"
+                  : "close-circle"
+              }
+              size={16}
+              color={room.status === "approved" ? "#10B981" : "#EF4444"}
+            />
+            <Text
+              className={`ml-1 text-[13px] font-semibold ${
+                room.status === "approved"
+                  ? "text-green-600"
+                  : "text-red-500"
+              }`}
+            >
+              {room.status === "approved" ? "Đã duyệt" : "Đã từ chối"}
+            </Text>
+          </View>
+        )}
       </View>
+
+      {/* Modal xem ảnh full */}
+      <Modal visible={showImage} transparent animationType="fade">
+        <Pressable
+          onPress={() => setShowImage(false)}
+          className="flex-1 bg-black/90 justify-center items-center"
+        >
+          {selectedImage && (
+            <Image
+              source={{ uri: selectedImage }}
+              className="w-full h-full"
+              resizeMode="contain"
+              style={{ width, height }}
+            />
+          )}
+          <Text className="absolute top-14 right-5 text-white text-sm bg-black/60 px-3 py-1 rounded-full">
+            Đóng
+          </Text>
+        </Pressable>
+      </Modal>
     </View>
   );
 }
