@@ -1,8 +1,7 @@
 // index.tsx
-import { profileApi } from "@/services/profileApi";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useRouter, useFocusEffect } from "expo-router";
-import React, { useEffect, useState, useCallback } from "react";
+import { useRouter } from "expo-router";
+import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -16,6 +15,7 @@ import CoverSection from "./CoverSection";
 import Favorites from "./Favorites";
 import InfoSection from "./InfoSection";
 import MyPosts from "./MyPosts";
+import { profileApi } from "@/services/profileApi";
 
 export default function Profile() {
   const router = useRouter();
@@ -41,15 +41,10 @@ export default function Profile() {
     }
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     fetchProfile();
   }, []);
-
-  useFocusEffect(
-    useCallback(() => {
-      fetchProfile();
-    }, [])
-  );
 
   const handleBanAccount = async () => {
     Alert.alert("Khóa tài khoản", "Bạn chắc chắn muốn khóa tài khoản?", [
@@ -60,16 +55,10 @@ export default function Profile() {
         onPress: async () => {
           try {
             setLoading(true);
-            await profileApi.banAccount();
             await AsyncStorage.removeItem("token");
-            Alert.alert("Thành công", "Tài khoản của bạn đã bị khóa.", [
-              { text: "OK", onPress: () => router.replace("/auth/login") },
-            ]);
-          } catch (error: any) {
-            console.log(
-              "Ban account error:",
-              error.response?.data || error.message
-            );
+            Alert.alert("Tài khoản đã bị khóa", "Bạn sẽ bị đăng xuất.");
+            router.replace("/auth/login");
+          } catch {
             Alert.alert("Lỗi", "Không thể khóa tài khoản.");
           } finally {
             setLoading(false);
@@ -93,7 +82,6 @@ export default function Profile() {
       contentContainerStyle={{ paddingBottom: 40 }}
     >
       <CoverSection user={user} />
-
       <View className="w-full max-w-[700px] self-center px-5">
         <InfoSection user={user} />
 

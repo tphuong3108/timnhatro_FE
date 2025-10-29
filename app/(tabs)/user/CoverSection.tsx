@@ -1,72 +1,182 @@
-import * as ImagePicker from "expo-image-picker";
-import { useState } from "react";
-import { View, Image, TouchableOpacity, Alert, Text } from "react-native";
+import React, { useState } from "react";
+import {
+  View,
+  Image,
+  TouchableOpacity,
+  Text,
+  Dimensions,
+  Alert,
+  Modal,
+  Pressable,
+  Platform,
+  ActionSheetIOS,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { profileApi } from "@/services/profileApi";
+import { useRouter } from "expo-router";
+import * as ImagePicker from "expo-image-picker";
 
 export default function CoverSection({ user }: any) {
-  const [uploading, setUploading] = useState(false);
-  const [avatarUri, setAvatarUri] = useState(user?.avatar || "");
+  const screenWidth = Dimensions.get("window").width;
+  const coverHeight = screenWidth * 0.4;
+  const router = useRouter();
+  const [previewVisible, setPreviewVisible] = useState(false);
 
-  const handlePickImage = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 0.8,
-    });
-
-    if (!result.canceled) {
-      const uri = result.assets[0].uri;
-      setAvatarUri(uri);
-      Alert.alert("Ảnh đã chọn", `Đường dẫn: ${uri}`);
-
-      const formData = new FormData();
-      formData.append("avatar", {
-        uri,
-        type: "image/jpeg",
-        name: "avatar.jpg",
-      } as any);
-
-      try {
-        setUploading(true);
-        await profileApi.updateProfile(formData); // backend phải chấp nhận multipart
-        Alert.alert("🎉 Thành công", "Ảnh đại diện đã được cập nhật!");
-      } catch (error: any) {
-        console.error("Upload avatar error:", error.response?.data || error);
-        Alert.alert("Lỗi", "Không thể tải ảnh lên server.");
-      } finally {
-        setUploading(false);
+  // Mở camera
+  const handleCameraPick = async () => {
+    try {
+      const { status } = await ImagePicker.requestCameraPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert("Quyền bị từ chối", "Vui lòng cấp quyền truy cập camera.");
+        return;
       }
+
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+      });
+
+      if (!result.canceled) {
+        const uri = result.assets[0].uri;
+        Alert.alert("Ảnh mới", `Đã chọn: ${uri}`);
+      }
+    } catch (error) {
+      Alert.alert("Lỗi", "Không thể mở camera.");
     }
   };
 
+  // Chọn ảnh từ thư viện
+  const handleLibraryPick = async () => {
+    try {
+      const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (!permission.granted) {
+        Alert.alert("Quyền bị từ chối", "Vui lòng cấp quyền truy cập thư viện ảnh.");
+        return;
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+      });
+
+      if (!result.canceled) {
+        const uri = result.assets[0].uri;
+        Alert.alert("Ảnh đã chọn", `Đường dẫn: ${uri}`);
+      }
+    } catch (error) {
+      Alert.alert("Lỗi", "Không thể chọn ảnh từ thư viện.");
+    }
+  };
+
+  //  Menu chọn ảnh
+  const handlePickImage = () => {
+    if (Platform.OS === "ios") {
+      ActionSheetIOS.showActionSheetWithOptions(
+        {
+          options: ["Huỷ", "Chụp ảnh mới", "Chọn từ thư viện"],
+          cancelButtonIndex: 0,
+        },
+        (buttonIndex) => {
+          if (buttonIndex === 1) handleCameraPick();
+          else if (buttonIndex === 2) handleLibraryPick();
+        }
+      );
+    } else {
+      Alert.alert("Chọn ảnh", "Bạn muốn sử dụng nguồn nào?", [
+        { text: "Chụp ảnh", onPress: handleCameraPick },
+        { text: "Thư viện", onPress: handleLibraryPick },
+        { text: "Huỷ", style: "cancel" },
+      ]);
+    }
+  };
+
+  //  Xem ảnh full nếu có avatar
+  const handleAvatarPress = () => {
+    if (user?.avatar) setPreviewVisible(true);
+    else handlePickImage();
+  };
+
   return (
-    <View className="items-center mt-4">
-      <TouchableOpacity onPress={handlePickImage} activeOpacity={0.8}>
-        <Image
-          source={
-            avatarUri
-              ? { uri: avatarUri }
-              : require("@/assets/images/default-avatar.png")
-          }
-          className="w-28 h-28 rounded-full border-2 border-[#3F72AF]"
-        />
-        <View className="absolute bottom-1 right-2 bg-white rounded-full p-1.5 shadow">
-          <Ionicons name="camera-outline" size={18} color="#3F72AF" />
+    <View className="w-full mb-4">
+      {/* Banner */}
+      <View
+        style={{ height: coverHeight }}
+        className="w-full bg-[#E8EEF5] justify-end items-end px-3 pb-3"
+      />
+
+      <View className="items-center -mt-14">
+        <View className="relative">
+          {/* Ảnh đại diện*/}
+          <TouchableOpacity onPress={handleAvatarPress} activeOpacity={0.9}>
+            <Image
+              source={
+                user?.avatar
+                  ? { uri: user.avatar }
+                  : require("@/assets/images/user.png")
+              }
+              style={{ width: 90, height: 90 }}
+              className="rounded-full border-4 border-white shadow-md"
+              resizeMode="cover"
+            />
+          </TouchableOpacity>
+
+          {/* Nút camera */}
+          <TouchableOpacity
+            onPress={handlePickImage}
+            activeOpacity={0.8}
+            className="absolute bottom-0 right-0 bg-[#3F72AF] p-[6px] rounded-full border-2 border-white"
+          >
+            <Ionicons name="camera-outline" size={14} color="#fff" />
+          </TouchableOpacity>
         </View>
-      </TouchableOpacity>
 
-      <Text className="mt-3 text-2xl font-bold text-[#112D4E]">
-        {user?.fullName}
-      </Text>
-      <Text className="text-gray-500 italic text-center">
-        {user?.bio || "Chưa có tiểu sử"}
-      </Text>
+        {/* Thông tin người dùng */}
+        <View className="w-full flex-row items-center justify-center mt-4">
+          <Text className="text-lg font-bold text-gray-800 text-center ml-12 ">
+            {user?.fullName || "Nguyễn Văn A"}
+          </Text>
 
-      {uploading && (
-        <Text className="text-gray-400 mt-2">Đang tải ảnh lên...</Text>
-      )}
+          <TouchableOpacity
+            onPress={() => router.push("/auth/edit-profile" as any)}
+            activeOpacity={0.8}
+            className="ml-2 bg-[#E8F1FB] px-2 py-[2px] rounded-lg flex-row items-center"
+          >
+            <Ionicons name="create-outline" size={16} color="#3F72AF" />
+            <Text className="text-[#3F72AF] text-[13px] ml-1 font-medium">
+              Sửa
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        <Text className="text-gray-500 text-sm mt-1">
+          {user?.bio || "Người dùng"}
+        </Text>
+      </View>
+
+      {/* xem ảnh đại diện*/}
+      <Modal visible={previewVisible} transparent animationType="fade">
+        <View className="flex-1 bg-black/90 justify-center items-center">
+          <Pressable
+            style={{ position: "absolute", top: 40, right: 20 }}
+            onPress={() => setPreviewVisible(false)}
+          >
+            <Ionicons name="close-circle" size={34} color="#fff" />
+          </Pressable>
+
+          <Image
+            source={{ uri: user?.avatar }}
+            style={{
+              width: "90%",
+              height: "70%",
+              borderRadius: 10,
+              resizeMode: "contain",
+            }}
+          />
+        </View>
+      </Modal>
     </View>
   );
 }

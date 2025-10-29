@@ -1,4 +1,3 @@
-// MyPosts.tsx
 import React from "react";
 import { View, Text, FlatList } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
@@ -27,7 +26,9 @@ export default function MyPosts({ rooms = [] }: MyPostsProps) {
           <PostCard
             item={{
               _id: item._id,
-              title: item.name,
+              id: item.id,
+              slug: item.slug || item.id || item._id,
+              name: item.name,
               address: item.address,
               images: item.images,
             }}

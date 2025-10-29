@@ -1,41 +1,62 @@
 import apiClient from "./apiClient";
 
-export async function getOverview() {
-  const res = await apiClient.get("/admin/overview");
-  return res.data;
-}
+export const adminApi = {
+  getMe: async () => {
+    const res = await apiClient.get("/admin/me");
+    return res.data.data || res.data;
+  },
 
-export async function getTopHosts() {
-  const res = await apiClient.get("/admin/top-hosts");
-  return res.data;
-}
+  getOverviewStats: async () => {
+    const res = await apiClient.get("/admin/stats/overview");
+    return res.data.data || res.data;
+  },
 
-export async function getTopRooms() {
-  const res = await apiClient.get("/admin/top-rooms");
-  return res.data;
-}
+  getDailyStats: async () => {
+    const res = await apiClient.get("/admin/stats/daily");
+    return res.data.data || res.data;
+  },
 
-export async function getLoginStats() {
-  const res = await apiClient.get("/admin/logins");
-  return res.data;
-}
+  getUserMonthlyStats: async () => {
+    const res = await apiClient.get("/admin/stats/monthlyUsers");
+    return res.data.data || res.data;
+  },
 
-export async function getReviews(params?: any) {
-  const res = await apiClient.get("/admin/reviews", { params });
-  return res.data;
-}
+  getPopularRooms: async () => {
+    const res = await apiClient.get("/admin/stats/popular");
+    return res.data.data?.popularRooms || [];
+  },
 
-export async function hideReview(id: string) {
-  const res = await apiClient.put(`/admin/reviews/${id}/hide`);
-  return res.data;
-}
+  getTopViewedRooms: async () => {
+    const res = await apiClient.get("/admin/stats/topViewedRooms");
+    return res.data.data || res.data;
+  },
 
-export async function deleteReview(id: string) {
-  const res = await apiClient.delete(`/admin/reviews/${id}`);
-  return res.data;
-}
+  getTopHosts: async () => {
+    const res = await apiClient.get("/admin/stats/topHosts");
+    return res.data.data || res.data;
+  },
 
-export async function approveRoom(id: string) {
-  const res = await apiClient.put(`/admin/rooms/${id}/approve`);
-  return res.data;
-}
+  getLoginStats: async () => {
+    const res = await apiClient.get("/admin/stats/logins");
+    return res.data.data || res.data;
+  },
+
+  getReportStats: async () => {
+    const res = await apiClient.get("/admin/stats/reports");
+    return res.data.data || res.data;
+  },
+
+  processReports: async () => {
+    const res = await apiClient.post("/admin/stats/processReports");
+    return res.data.data || res.data;
+  },
+  getTopAmenities: async () => {
+    const res = await apiClient.get("/admin/stats/top-amenities");
+    return res.data.data || res.data;
+  },
+  getTopWards: async () => {
+  const res = await apiClient.get("/admin/stats/top-wards");
+  return res.data.data || res.data;
+},
+
+};

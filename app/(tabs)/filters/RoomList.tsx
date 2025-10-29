@@ -31,8 +31,7 @@ export default function RoomList() {
         keyExtractor={(item) => item._id}
         renderItem={({ item }) => <PostCard item={item} />}
         columnWrapperStyle={{ justifyContent: "space-between" }}
-        scrollEnabled={false}
-      />
+        scrollEnabled={false}      />
     </View>
   );
 }

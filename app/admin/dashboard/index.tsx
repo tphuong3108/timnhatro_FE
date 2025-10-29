@@ -1,127 +1,148 @@
-import React from "react";
-import { ScrollView, View } from "react-native";
+import React, { useEffect, useState } from "react";
+import { ScrollView, View, ActivityIndicator, Text } from "react-native";
 import LineChartCard from "./LineChartCard";
 import PieChartCard from "./PieChartCard";
 import StatCard from "./StatCard";
 import TopHostsCard from "./TopHostsCard";
 import TopView from "./TopView";
-import TopRating from "./TopRating";
-import WardBarChartCard from "./WardBarChart";
+import TopRating from "./TopRating"; // ✅ dùng cho popularRooms
 import WardBarChart from "./WardBarChart";
+import { adminApi } from "@/services/adminApi";
 
 export default function AdminDashboard() {
-  const overview = {
-    users: 156,
-    rooms: 7265,
-    views: 3671,
-    logins: 5890,
-    growth: { users: 15.03, rooms: 11.01, views: -0.03, logins: 0.36},
-  };
+  const [loading, setLoading] = useState(true);
+  const [overview, setOverview] = useState<any>(null);
+  const [monthlyUsers, setMonthlyUsers] = useState<any>(null);
+  const [topHosts, setTopHosts] = useState<any[]>([]);
+  const [topViewedRooms, setTopViewedRooms] = useState<any[]>([]);
+  const [popularRooms, setPopularRooms] = useState<any[]>([]); // ✅ Top Rating chính là popularRooms
+  const [topAmenities, setTopAmenities] = useState<any[]>([]);
+  const [topWards, setTopWards] = useState<any[]>([]);
+  const [loginStats, setLoginStats] = useState<any>(null); // ✅ thêm state cho lượt truy cập
 
-  const monthlyUsers = {
-    labels: ["1", "5", "10", "15", "20", "25", "30"],
-    datasets: [
-      { data: [10, 25, 40, 35, 60, 80, 95], color: () => "#80afe8ff" },
-      { data: [5, 15, 30, 28, 50, 65, 70], color: () => "#e2b0c1ff" },
-    ],
-  };
-  const dailyStats = {
-    daily: 8,
-    weekly: 42,
-    monthly: 180,
-  };
+  useEffect(() => {
+    const fetchAll = async () => {
+      try {
+        const [
+          overviewRes,
+          monthlyRes,
+          hostsRes,
+          viewedRes,
+          popularRes,
+          amenitiesRes,
+          wardsRes,
+          loginRes, // ✅ thêm biến nhận kết quả login stats
+        ] = await Promise.all([
+          adminApi.getOverviewStats(),
+          adminApi.getUserMonthlyStats(),
+          adminApi.getTopHosts(),
+          adminApi.getTopViewedRooms(),
+          adminApi.getPopularRooms(), // ✅ dùng cho TopRating
+          adminApi.getTopAmenities(),
+          adminApi.getTopWards(),
+          adminApi.getLoginStats(), // ✅ gọi API lượt truy cập
+        ]);
 
-  const topHosts = [
-    {
-      userId: "1",
-      fullName: "Nguyễn Văn A",
-      avatar: "https://i.pravatar.cc/60",
-      totalRooms: 12,
-      totalLikes: 230,
-      totalViews: 1230,
-    },
-    {
-      userId: "2",
-      fullName: "Nguyễn Văn B",
-      avatar: "https://i.pravatar.cc/61",
-      totalRooms: 10,
-      totalLikes: 150,
-      totalViews: 890,
-    },
-  ];
+        setOverview(overviewRes);
+        setMonthlyUsers(monthlyRes);
+        setTopHosts(hostsRes);
+        setTopViewedRooms(viewedRes);
+        setPopularRooms(popularRes);
+        setTopAmenities(amenitiesRes);
+        setTopWards(wardsRes);
+        setLoginStats(loginRes); // ✅ lưu dữ liệu lượt truy cập
+      } catch (err) {
+        console.error("Lỗi khi tải dữ liệu admin:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const popularRooms = [
-    {
-      name: "Phòng Q.1",
-      image: "https://picsum.photos/300",
-      address: "TP. HCM",
-    },
-    {
-      name: "Phòng Thủ Đức",
-      image: "https://picsum.photos/301",
-      address: "TP. HCM",
-    },
-    {
-      name: "Phòng Bình Thạnh",
-      image: "https://picsum.photos/302",
-      address: "TP. HCM",
-    },
-    {
-      name: "Phòng Gò Vấp",
-      image: "https://picsum.photos/303",
-      address: "TP. HCM",
-    },
-    {
-      name: "Phòng Tân Bình",
-      image: "https://picsum.photos/304",
-      address: "TP. HCM",
-    },
-  ];
+    fetchAll();
+  }, []);
 
-  const amenities = [
-    { name: "Wifi", value: 87 },
-    { name: "Máy lạnh", value: 72 },
-    { name: "Giặt đồ", value: 58 },
-    { name: "Nhà bếp", value: 41 },
-    { name: "Chỗ đậu xe", value: 36 },
-  ];
-
+  if (loading)
+    return (
+      <View className="flex-1 items-center justify-center">
+        <ActivityIndicator size="large" color="#3F72AF" />
+        <Text className="text-[#112D4E] mt-3">Đang tải dữ liệu...</Text>
+      </View>
+    );
 
   return (
     <ScrollView
       className="flex-1 bg-[#F9FAFB] px-3 pt-10"
       showsVerticalScrollIndicator={false}
     >
-      {/* StatCards */}
-      <View className="flex-row flex-wrap justify-between mb-6">
-        <StatCard
-          icon="person-add"
-          label="Người dùng (tuần)"
-          value={overview.users}
-          change={overview.growth.users}
-        />
-        <StatCard
-          icon="home"
-          label="Phòng mới (tuần)"
-          value={overview.rooms}
-          change={overview.growth.rooms}
-        />
-        <StatCard icon="log-in" label="Lượt truy cập" value={overview.logins} />
-        <StatCard
-          icon="eye"
-          label="Lượt xem (phòng mới)"
-          value={overview.views}
-          change={overview.growth.views}
-        />
-      </View>
+      {/* === Thống kê tổng quan === */}
+      {overview && (
+        <View className="flex-row flex-wrap justify-between mb-6">
+          <StatCard
+            icon="person-add"
+            label="Người dùng (tuần)"
+            value={overview.users}
+            change={overview.growth?.users}
+          />
+          <StatCard
+            icon="home"
+            label="Phòng mới (tuần)"
+            value={overview.rooms}
+            change={overview.growth?.rooms}
+          />
+          <StatCard
+            icon="log-in"
+            label="Lượt truy cập"
+            value={loginStats?.totalLogins || 0} // ✅ hiển thị lượt truy cập
+          />
+          <StatCard
+            icon="eye"
+            label="Lượt xem (tuần)"
+            value={overview.views}
+            change={overview.growth?.views}
+          />
+        </View>
+      )}
 
-      {/* Charts */}
-      <LineChartCard title="Số liệu người dùng" data={monthlyUsers} />
+      {/* === Biểu đồ người dùng === */}
+      {monthlyUsers && (
+        <LineChartCard
+          title="Tăng trưởng người dùng"
+          data={{
+            labels: monthlyUsers.thisMonth.map((d: any) => d._id),
+            datasets: [
+              {
+                data: monthlyUsers.thisMonth.map((d: any) => d.count),
+                color: () => "#80afe8ff",
+              },
+              {
+                data: monthlyUsers.lastMonth.map((d: any) => d.count),
+                color: () => "#e2b0c1ff",
+              },
+            ],
+          }}
+        />
+      )}
+
+      {/* === Các thống kê khác === */}
       <TopHostsCard data={topHosts} />
-      <TopView data={popularRooms} />
+      <TopView data={topViewedRooms} />
       <TopRating data={popularRooms} />
-      <PieChartCard title="Top 5 tiện ích phổ biến" data={amenities} />
-      <WardBarChart/>
+
+      {/* === Top tiện ích === */}
+      {topAmenities && topAmenities.length > 0 ? (
+        <PieChartCard
+          title="Top 5 tiện ích phổ biến"
+          data={topAmenities.map((item: any) => ({
+            name: item.name,
+            value: item.usageCount,
+          }))}
+        />
+      ) : (
+        <PieChartCard title="Top 5 tiện ích phổ biến" />
+      )}
+
+      {/* === Top khu vực có nhiều phòng nhất === */}
+      <WardBarChart data={topWards} />
     </ScrollView>
   );
 }

@@ -6,7 +6,7 @@ import ChartCardWrapper from "@/components/admin/ChartCardWrapper";
 interface Host {
   userId: string;
   fullName: string;
-  avatar: string;
+  avatar?: string;
   totalRooms: number;
   totalViews: number;
 }
@@ -15,19 +15,28 @@ export default function TopHostsCard({ data }: { data: Host[] }) {
   const { width } = useWindowDimensions();
   const isSmall = width < 360;
 
-  const displayedData =
-    data.length < 5
-      ? [
-          ...data,
-          ...Array(5 - data.length).fill({
-            userId: Math.random().toString(),
-            fullName: "Chưa có",
-            avatar: "https://via.placeholder.com/60x60.png?text=?",
-            totalRooms: 0,
-            totalViews: 0,
-          }),
-        ]
-      : data.slice(0, 5);
+  // ✅ Nếu không có data thì hiển thị "Chưa có dữ liệu"
+  if (!data || data.length === 0) {
+    return (
+      <ChartCardWrapper height={110} style={{ padding: 15 }}>
+        <Text className="text-[16px] font-semibold text-[#112D4E] mb-2">
+          Top 5 chủ phòng hoạt động tích cực
+        </Text>
+        <Text className="text-gray-400 text-[13px]">Chưa có dữ liệu</Text>
+      </ChartCardWrapper>
+    );
+  }
+
+  // ✅ Luôn hiển thị những host có sẵn (tối đa 5)
+  const displayedData = data
+    .slice(0, 5)
+    .map((item) => ({
+      ...item,
+      avatar:
+        item.avatar && item.avatar.trim() !== ""
+          ? item.avatar
+          : "https://cdn-icons-png.flaticon.com/512/149/149071.png", // avatar giả
+    }));
 
   return (
     <ChartCardWrapper height={isSmall ? 110 : 150} style={{ padding: 15 }}>
@@ -38,7 +47,7 @@ export default function TopHostsCard({ data }: { data: Host[] }) {
       <FlatList
         horizontal
         data={displayedData}
-        keyExtractor={(item) => item.userId}
+        keyExtractor={(item, index) => item.userId || `host-${index}`}
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{
           paddingVertical: 4,
@@ -65,14 +74,14 @@ export default function TopHostsCard({ data }: { data: Host[] }) {
               }`}
               numberOfLines={1}
             >
-              {item.fullName}
+              {item.fullName || "Chưa có tên"}
             </Text>
 
-            {/* Nhà + Mắt (phòng + lượt xem) */}
+            {/* Nhà + Mắt */}
             <View className="flex-row items-center mt-[2px]">
               <Ionicons name="home" size={11} color="#3F72AF" />
               <Text className="text-gray-500 text-[11px] ml-[2px]">
-                {item.totalRooms}
+                {item.totalRooms || 0}
               </Text>
 
               <MaterialCommunityIcons
@@ -82,7 +91,7 @@ export default function TopHostsCard({ data }: { data: Host[] }) {
                 style={{ marginLeft: 8 }}
               />
               <Text className="text-gray-400 text-[11px] ml-[2px]">
-                {item.totalViews}
+                {item.totalViews || 0}
               </Text>
             </View>
           </View>

@@ -3,20 +3,27 @@ import { View, Text, useWindowDimensions } from "react-native";
 import { BarChart } from "react-native-chart-kit";
 import ChartCardWrapper from "@/components/admin/ChartCardWrapper";
 
-export default function WardBarChart() {
+// 🧩 Định nghĩa kiểu props để tránh lỗi TS2322
+interface WardBarChartProps {
+  data?: { wardName: string; totalRooms: number }[];
+}
+
+export default function WardBarChart({ data = [] }: WardBarChartProps) {
   const { width } = useWindowDimensions();
   const chartWidth = width * 0.9;
   const chartHeight = width < 380 ? 220 : 200;
 
-  const wardData = [
-    { ward: "Quận 1", totalRooms: 35 },
-    { ward: "Thủ Đức", totalRooms: 28 },
-    { ward: "Bình Thạnh", totalRooms: 42 },
-    { ward: "Gò Vấp", totalRooms: 31 },
-    { ward: "Tân Bình", totalRooms: 26 },
-    { ward: "Phú Nhuận", totalRooms: 22 },
-    { ward: "Quận Bình Tân", totalRooms: 14 },
-  ];
+  // Nếu không có dữ liệu từ BE thì fallback dữ liệu mẫu
+  const wardData =
+    data.length > 0
+      ? data
+      : [
+          { wardName: "Quận 1", totalRooms: 35 },
+          { wardName: "Thủ Đức", totalRooms: 28 },
+          { wardName: "Bình Thạnh", totalRooms: 42 },
+          { wardName: "Gò Vấp", totalRooms: 31 },
+          { wardName: "Tân Bình", totalRooms: 26 },
+        ];
 
   const displayedData = wardData.slice(0, 5);
 
@@ -25,7 +32,7 @@ export default function WardBarChart() {
   };
 
   const chartData = {
-    labels: displayedData.map((item) => formatLabel(item.ward)),
+    labels: displayedData.map((item) => formatLabel(item.wardName)),
     datasets: [
       {
         data: displayedData.map((item) => item.totalRooms),

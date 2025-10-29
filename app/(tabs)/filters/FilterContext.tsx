@@ -1,19 +1,22 @@
-import React, { createContext, useContext, useState, ReactNode } from "react";
-import rooms, { Room } from "@/constants/data/rooms";
+import { roomApi } from "@/services/roomApi";
+import React, { createContext, ReactNode, useContext, useState } from "react";
 
 type Filters = {
-  area: string;
-  roomType: string;
+  area: string;     
+  ward: string;        
+  roomType: string;   
   amenities: string[];
-  minPrice: number;
-  maxPrice: number;
+  minPrice: number;    
+  maxPrice: number;  
+  rating: number;     
+  totalRatings: number; 
 };
 
 type FilterContextType = {
   filters: Filters;
   setFilters: React.Dispatch<React.SetStateAction<Filters>>;
-  filteredRooms: Room[];
-  applyFilters: () => void;
+  filteredRooms: any[];
+  applyFilters: () => Promise<void>;
   resetFilters: () => void;
 };
 
@@ -22,42 +25,64 @@ const FilterContext = createContext<FilterContextType | undefined>(undefined);
 export function FilterProvider({ children }: { children: ReactNode }) {
   const [filters, setFilters] = useState<Filters>({
     area: "",
+    ward: "",
     roomType: "",
     amenities: [],
     minPrice: 0,
     maxPrice: 10000000,
+    rating: 0,
+    totalRatings: 0,
   });
 
-  const [filteredRooms, setFilteredRooms] = useState<Room[]>(rooms);
+  const [filteredRooms, setFilteredRooms] = useState<any[]>([]);
 
-  const applyFilters = () => {
-    let results = rooms.filter((r) => {
-      const inArea =
-        !filters.area || r.address?.toLowerCase().includes(filters.area.toLowerCase());
-      const inType =
-        !filters.roomType || r.name?.toLowerCase().includes(filters.roomType.toLowerCase());
-      const inAmenities =
-        filters.amenities.length === 0 ||
-        filters.amenities.every((a) =>
-          r.amenities?.some((b) => b.toLowerCase().includes(a.toLowerCase()))
-        );
-      const inPrice = r.price >= filters.minPrice && r.price <= filters.maxPrice;
+  const applyFilters = async () => {
+    try {
+      const params: any = {};
 
-      return inArea && inType && inAmenities && inPrice;
-    });
+      if (filters.roomType.trim()) params.name = filters.roomType.trim();
+      if (filters.area.trim()) params.address = filters.area.trim();
+      if (filters.ward.trim()) params.ward = filters.ward.trim();
 
-    setFilteredRooms(results);
+      //  giá
+      if (filters.minPrice > 0) params.priceMin = Number(filters.minPrice);
+      if (filters.maxPrice && filters.maxPrice < 10000000)
+        params.priceMax = Number(filters.maxPrice);
+
+      //  tiện ích
+      if (filters.amenities.length > 0)
+        params.amenity = filters.amenities.join(",");
+
+      //  Lọc theo sao
+      if (filters.rating > 0)
+        params.avgRating = Number(filters.rating);
+
+      //  Lọc theo tổng số đánh giá (nếu có)
+      if (filters.totalRatings > 0)
+        params.totalRatings = Number(filters.totalRatings);
+
+      console.log(" Sending search params:", params);
+
+      const res = await roomApi.searchRooms(params);
+      setFilteredRooms(res || []);
+    } catch (error: any) {
+      console.error(" Lỗi khi lọc phòng:", error.response?.data || error.message);
+      setFilteredRooms([]);
+    }
   };
 
   const resetFilters = () => {
     setFilters({
       area: "",
+      ward: "",
       roomType: "",
       amenities: [],
       minPrice: 0,
       maxPrice: 10000000,
+      rating: 0,
+      totalRatings: 0,
     });
-    setFilteredRooms(rooms);
+    setFilteredRooms([]);
   };
 
   return (

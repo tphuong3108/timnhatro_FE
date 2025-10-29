@@ -18,8 +18,8 @@ export function RoomMap({
         style={StyleSheet.absoluteFillObject}
         onMapReady={() => setIsMapReady(true)}
         initialRegion={{
-          latitude: 11.94,
-          longitude: 108.45,
+          latitude: 10.7769,
+          longitude: 106.7009,
           latitudeDelta: 0.05,
           longitudeDelta: 0.05,
         }}
@@ -33,17 +33,41 @@ export function RoomMap({
           maximumZ={19}
           zIndex={-1}
         />
+
         {rooms.map((room: any, i: number) => {
+          if (!markersAnim[i]) return null;
+
           const scale = markersAnim[i].interpolate({
             inputRange: [0, 1],
             outputRange: [1, 1.4],
           });
-          const opacity = markersAnim[i].interpolate({
-            inputRange: [0, 1],
-            outputRange: [0.7, 1],
-          });
 
-          const translateY = selectedRoom === room._id ? -120 : 0;
+          const handleMarkerPress = () => {
+            // ✅ Fix TypeScript warning: khai báo kiểu rõ ràng
+            markersAnim.forEach((a: Animated.Value, index: number) => {
+              Animated.timing(a, {
+                toValue: index === i ? 1 : 0,
+                duration: 300,
+                useNativeDriver: true,
+              }).start();
+            });
+
+            scrollToCard(room._id);
+
+            // ✅ Giữ animation nhún marker được chọn
+            Animated.sequence([
+              Animated.spring(markersAnim[i], {
+                toValue: 1.6,
+                useNativeDriver: true,
+              }),
+              Animated.spring(markersAnim[i], {
+                toValue: 1.4,
+                friction: 4,
+                tension: 80,
+                useNativeDriver: true,
+              }),
+            ]).start();
+          };
 
           return (
             <Marker
@@ -52,13 +76,13 @@ export function RoomMap({
                 latitude: room.latitude,
                 longitude: room.longitude,
               }}
-              onPress={() => scrollToCard(room._id)}
-              centerOffset={{ x: 0, y: -25 }} 
+              onPress={handleMarkerPress}
+              centerOffset={{ x: 0, y: -15 }}
+              tracksViewChanges={false}
             >
               <Animated.View
                 style={{
-                  transform: [{ scale }, { translateY }],
-                  opacity,
+                  transform: [{ scale }],
                   alignItems: "center",
                   justifyContent: "center",
                 }}
@@ -75,7 +99,7 @@ export function RoomMap({
                         : "text-[#3F72AF]"
                     }`}
                   >
-                    {room.price.toLocaleString("vi-VN")} ₫
+                    {room.price?.toLocaleString("vi-VN") ?? "0"} ₫
                   </Text>
                 </View>
               </Animated.View>

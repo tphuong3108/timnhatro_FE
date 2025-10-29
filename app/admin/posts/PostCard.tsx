@@ -1,125 +1,99 @@
 import React from "react";
-import { View, Text, Image, TouchableOpacity, Alert } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
-import { PostRoom } from "@/constants/data/PostRoom";
 
-interface Props {
-  post: PostRoom;
-  onApprove: () => void;
-  onReject: () => void;
+interface PostCardProps {
+  post: {
+    id: string;
+    name: string;
+    address: string;
+    image?: string;
+    createdAt: string;
+    host?: { name: string; avatar?: string };
+    status?: string;
+  };
+  onApprove?: () => void;
+  onDelete?: () => void;
 }
 
-export default function PostCard({ post, onApprove, onReject }: Props) {
-  const router = useRouter();
-
-  const handleApprove = () => {
-    Alert.alert("Xác nhận", "Duyệt bài đăng này?", [
-      { text: "Hủy", style: "cancel" },
-      { text: "Duyệt", onPress: onApprove },
-    ]);
-  };
-
-  const handleReject = () => {
-    Alert.alert("Xác nhận", "Từ chối bài đăng này?", [
-      { text: "Hủy", style: "cancel" },
-      { text: "Từ chối", onPress: onReject },
-    ]);
-  };
-
+export default function PostCard({ post, onApprove, onDelete }: PostCardProps) {
   return (
-    <TouchableOpacity
-      activeOpacity={0.85}
-      onPress={() => router.push(`/room/${post.id}`)} // ✅ điều hướng đến chi tiết phòng
-      className="bg-white rounded-3xl shadow-sm mb-5 p-4 border border-gray-100"
-    >
-      {/* Header */}
-      <View className="flex-row">
-        <Image
-          source={{ uri: post.image }}
-          className="w-[110px] h-[110px] rounded-2xl"
-        />
+    <View className="bg-white rounded-2xl shadow-md mb-4 overflow-hidden">
+      {/* Ảnh phòng */}
+      <Image
+        source={{
+          uri:
+            post.image ||
+            "https://via.placeholder.com/300x200.png?text=No+Image",
+        }}
+        className="w-full h-[160px]"
+      />
 
-        <View className="flex-1 ml-3 justify-between">
-          <View>
-            <Text className="text-[16px] font-semibold text-[#112D4E]" numberOfLines={1}>
-              {post.name}
-            </Text>
-            <Text className="text-gray-500 text-[13px]" numberOfLines={1}>
-              {post.address}
-            </Text>
-            <Text className="text-gray-400 text-[12px] mt-1">
-              Ngày đăng: {post.createdAt}
-            </Text>
-          </View>
+      {/* Thông tin chi tiết */}
+      <View className="p-4">
+        <Text
+          className="text-[15px] font-semibold text-[#112D4E]"
+          numberOfLines={1}
+        >
+          {post.name}
+        </Text>
+        <Text className="text-gray-500 text-[13px]" numberOfLines={1}>
+          {post.address}
+        </Text>
+
+        {/* Thông tin chủ phòng */}
+        <View className="flex-row items-center mt-2">
+          <Image
+            source={{
+              uri:
+                post.host?.avatar ||
+                "https://cdn-icons-png.flaticon.com/512/149/149071.png",
+            }}
+            className="w-7 h-7 rounded-full mr-2"
+          />
+          <Text className="text-[13px] text-gray-600">
+            {post.host?.name || "Chủ phòng"}
+          </Text>
+        </View>
+
+        {/* Trạng thái */}
+        <View className="flex-row items-center mt-2">
+          <Ionicons name="time-outline" size={14} color="#3F72AF" />
+          <Text className="text-[12px] text-gray-400 ml-1">
+            Ngày đăng: {post.createdAt}
+          </Text>
+        </View>
+
+        {/* Hành động */}
+        <View className="flex-row justify-between mt-4">
+          {/* Nút duyệt */}
+          {post.status !== "approved" ? (
+            <TouchableOpacity
+              onPress={onApprove}
+              className="bg-[#3F72AF] px-3 py-1 rounded-lg"
+            >
+              <Text className="text-white text-[13px] font-medium">
+                Duyệt
+              </Text>
+            </TouchableOpacity>
+          ) : (
+            <View className="flex-row items-center">
+              <Ionicons name="checkmark-circle" size={18} color="#22C55E" />
+              <Text className="text-[13px] text-green-600 ml-1">Đã duyệt</Text>
+            </View>
+          )}
+
+          {/* Icon xóa mềm */}
+          <TouchableOpacity onPress={onDelete}>
+            <Ionicons name="trash-outline" size={20} color="#EF4444" />
+          </TouchableOpacity>
         </View>
       </View>
-
-      {/* Footer */}
-      <View className="flex-row justify-between items-center mt-4 pt-3 border-t border-gray-100">
-        {/* Host info */}
-        <TouchableOpacity
-          onPress={(e) => {
-            e.stopPropagation(); // ✅ chặn click card
-            router.push(`/user/${post.host.name}`);
-          }}
-          className="flex-row items-center"
-          activeOpacity={0.8}
-        >
-          <Image
-            source={{ uri: post.host.avatar }}
-            className="w-[28px] h-[28px] rounded-full mr-2"
-          />
-          <Text className="text-gray-700 text-[13px] font-medium" numberOfLines={1}>
-            {post.host.name}
-          </Text>
-        </TouchableOpacity>
-
-        {/* Status / Actions */}
-        {post.status === "pending" ? (
-          <View className="flex-row space-x-2">
-            <TouchableOpacity
-              onPress={(e) => {
-                e.stopPropagation();
-                handleReject();
-              }}
-              className="flex-row items-center bg-red-50 px-3 py-1.5 rounded-xl"
-            >
-              <Ionicons name="close-circle-outline" size={14} color="#EF4444" />
-              <Text className="text-red-600 ml-1 text-[13px] font-medium">Từ chối</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={(e) => {
-                e.stopPropagation();
-                handleApprove();
-              }}
-              className="flex-row items-center bg-green-50 px-3 py-1.5 rounded-xl"
-            >
-              <Ionicons name="checkmark-circle-outline" size={14} color="#10B981" />
-              <Text className="text-green-700 ml-1 text-[13px] font-medium">Duyệt</Text>
-            </TouchableOpacity>
-          </View>
-        ) : (
-          <View className="flex-row items-center">
-            <Ionicons
-              name={
-                post.status === "approved"
-                  ? "checkmark-circle"
-                  : "close-circle"
-              }
-              size={16}
-              color={post.status === "approved" ? "#10B981" : "#EF4444"}
-            />
-            <Text
-              className={`ml-1 text-[13px] font-semibold ${
-                post.status === "approved" ? "text-green-600" : "text-red-500"
-              }`}
-            >
-              {post.status === "approved" ? "Đã duyệt" : "Đã từ chối"}
-            </Text>
-          </View>
-        )}
-      </View>
-    </TouchableOpacity>
+    </View>
   );
 }

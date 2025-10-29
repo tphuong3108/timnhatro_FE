@@ -1,21 +1,12 @@
 import apiClient from "./apiClient";
 
+// Lấy tất cả tiện ích
 export async function getAllAmenities() {
   const res = await apiClient.get("/amenities");
-  return res.data;
-}
-
-export async function createAmenity(data: any) {
-  const res = await apiClient.post("/amenities", data);
-  return res.data;
-}
-
-export async function updateAmenity(id: string, data: any) {
-  const res = await apiClient.put(`/amenities/${id}`, data);
-  return res.data;
-}
-
-export async function deleteAmenity(id: string) {
-  const res = await apiClient.delete(`/amenities/${id}`);
-  return res.data;
+  const amenities = Array.isArray(res.data)
+    ? res.data
+    : Array.isArray(res.data?.data)
+    ? res.data.data
+    : [];
+  return amenities;
 }

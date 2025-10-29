@@ -63,7 +63,7 @@ export default function UserProfile() {
 
         {/* Nội dung */}
         <View className="mt-8">
-          {activeTab === "posts" ? <MyPosts /> : <Favorites />}
+          {activeTab === "posts" ? <MyPosts /> : <Favorites favorites={[]} />}
         </View>
       </View>
     </Animated.ScrollView>

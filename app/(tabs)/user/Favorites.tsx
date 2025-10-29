@@ -1,8 +1,7 @@
-// Favorites.tsx
-import React from "react";
-import { View, Text, FlatList } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 import PostCard from "@/components/ui/PostCard";
+import { Ionicons } from "@expo/vector-icons";
+import React from "react";
+import { FlatList, Text, View } from "react-native";
 
 interface FavoritesProps {
   favorites?: any[];
@@ -27,7 +26,9 @@ export default function Favorites({ favorites = [] }: FavoritesProps) {
           <PostCard
             item={{
               _id: item._id,
-              title: item.name,
+              id: item.id,
+              slug: item.slug || item.id || item._id,
+              name: item.name,
               address: item.address,
               images: item.images,
             }}

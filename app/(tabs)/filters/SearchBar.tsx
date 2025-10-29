@@ -24,9 +24,6 @@ export default function SearchBar() {
         returnKeyType="search"
         onSubmitEditing={handleSearch}
       />
-      <TouchableOpacity onPress={handleSearch}>
-        <Ionicons name="arrow-forward-circle" size={22} color="#3F72AF" />
-      </TouchableOpacity>
     </View>
   );
 }

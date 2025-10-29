@@ -17,12 +17,18 @@ export const profileApi = {
     return res.data.data;
   },
 
-  upgradeRole: async () => {
-    const res = await apiClient.patch("/me/upgrade-role");
+  upgradeRole: async (payload: { revert: boolean }) => {
+    const res = await apiClient.patch("/me/upgrade-role", payload);
     return res.data.data;
   },
-    banAccount: async () => {
+
+  banAccount: async () => {
     const res = await apiClient.put("/users/me/ban");
     return res.data;
+  },
+
+  getPublicProfile: async (id: string) => {
+    const res = await apiClient.get(`/profile/${id}`);
+    return res.data.data;
   },
 };

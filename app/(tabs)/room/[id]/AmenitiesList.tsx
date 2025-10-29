@@ -10,7 +10,7 @@ import Animated, {
   FadeInUp,
 } from "react-native-reanimated";
 
-// Hiệu ứng hiện dần từng tiện ích
+// Hiệu ứng
 function useRippleAnimation(index: number) {
   const scale = useSharedValue(0.85);
   const opacity = useSharedValue(0);
@@ -24,9 +24,8 @@ function useRippleAnimation(index: number) {
       });
       opacity.value = withTiming(1, { duration: 350 });
     }, delay);
-
     return () => clearTimeout(timeout);
-  }, [index, opacity, scale]);
+  }, [index]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
@@ -36,27 +35,27 @@ function useRippleAnimation(index: number) {
   return animatedStyle;
 }
 
-// Danh sách tiện ích
-const allAmenities = [
-  { icon: "wifi-outline", name: "Wi-Fi miễn phí", color: "#3F72AF", type: "Ionicons" },
-  { icon: "tv-outline", name: "TV", color: "#3F72AF", type: "Ionicons" },
-  { icon: "snowflake", name: "Điều hòa", color: "#3F72AF", type: "Material" },
-  { icon: "washing-machine", name: "Máy giặt", color: "#3F72AF", type: "Material" },
-  { icon: "stove", name: "Khu bếp", color: "#3F72AF", type: "Material" },
-  { icon: "fridge-outline", name: "Tủ lạnh", color: "#3F72AF", type: "Material" },
-  { icon: "car-outline", name: "Chỗ để xe", color: "#3F72AF", type: "Ionicons" },
-  { icon: "smoke-detector", name: "Máy báo khói", color: "#3F72AF", type: "Material" },
-  { icon: "shield-account", name: "An ninh", color: "#3F72AF", type: "Material" },
+const iconMapping = [
+  { keyword: "wifi", icon: "wifi-outline", type: "Ionicons" },
+  { keyword: "tv", icon: "tv-outline", type: "Ionicons" },
+  { keyword: "điều hòa", icon: "snowflake", type: "Material" },
+  { keyword: "máy giặt", icon: "washing-machine", type: "Material" },
+  { keyword: "bếp", icon: "stove", type: "Material" },
+  { keyword: "tủ lạnh", icon: "fridge-outline", type: "Material" },
+  { keyword: "xe", icon: "car-outline", type: "Ionicons" },
+  { keyword: "khói", icon: "smoke-detector", type: "Material" },
+  { keyword: "an ninh", icon: "shield-account", type: "Material" },
+  { keyword: "sơ cứu", icon: "medical-bag", type: "Material" },
+  { keyword: "chữa cháy", icon: "fire-extinguisher", type: "Material" },
 ];
 
-// Component con hiển thị từng tiện ích
 const AmenityItem = ({ item, index }: { item: any; index: number }) => {
   const animatedStyle = useRippleAnimation(index);
 
   return (
     <Animated.View
       style={animatedStyle}
-      className="w-[31%] h-[85px] bg-white text-[#3F72AF] rounded-2xl mb-3 items-center justify-center border border-gray-300"
+      className="w-[31%] h-[85px] bg-white rounded-2xl mb-3 items-center justify-center border border-gray-300"
     >
       {item.type === "Ionicons" ? (
         <Ionicons name={item.icon as any} size={28} color={item.color} />
@@ -78,13 +77,25 @@ const AmenityItem = ({ item, index }: { item: any; index: number }) => {
   );
 };
 
-// Component chính
-export default function AmenitiesList({ room }: any) {
-  const filteredAmenities = allAmenities.filter((a) =>
-    room?.amenities?.includes(a.name)
-  );
+export default function AmenitiesList({ amenities }: { amenities: any[] }) {
+  const validAmenities = Array.isArray(amenities) ? amenities : [];
 
-  if (!filteredAmenities || filteredAmenities.length === 0) return null;
+  const enrichedAmenities = validAmenities.map((a: any) => {
+    const match = iconMapping.find((i) =>
+      a.name?.toLowerCase().includes(i.keyword)
+    );
+    return {
+      ...a,
+      icon: match?.icon || "checkmark-circle",
+      type: match?.type || "Ionicons",
+      color: "#3F72AF",
+    };
+  });
+
+  if (!enrichedAmenities.length) {
+    console.log("⚠️ Không có tiện ích để hiển thị:", amenities);
+    return null;
+  }
 
   return (
     <Animated.View
@@ -99,16 +110,11 @@ export default function AmenitiesList({ room }: any) {
       </Text>
 
       <FlatList
-        data={filteredAmenities}
+        data={enrichedAmenities}
         numColumns={3}
-        keyExtractor={(_, i) => i.toString()}
-        columnWrapperStyle={{
-          justifyContent: "flex-start",
-          gap: 12,
-        }}
-        contentContainerStyle={{
-          justifyContent: "center",
-        }}
+        keyExtractor={(item) => item._id}
+        columnWrapperStyle={{ justifyContent: "flex-start", gap: 12 }}
+        contentContainerStyle={{ justifyContent: "center" }}
         scrollEnabled={false}
         renderItem={({ item, index }) => (
           <AmenityItem item={item} index={index} />
@@ -117,3 +123,5 @@ export default function AmenitiesList({ room }: any) {
     </Animated.View>
   );
 }
+
+

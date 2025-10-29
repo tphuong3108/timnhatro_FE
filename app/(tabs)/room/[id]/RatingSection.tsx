@@ -4,11 +4,14 @@ import { Ionicons } from "@expo/vector-icons";
 import Animated, { FadeInUp } from "react-native-reanimated";
 import { useRouter } from "expo-router";
 
-export default function RatingSection({ room }: any) {
+interface RatingSectionProps {
+  room: any;
+}
+
+export default function RatingSection({ room }: RatingSectionProps) {
   const [showAll, setShowAll] = useState(false);
   const router = useRouter();
 
-  //dữ liệu xếp hạng tổng thể
   const ratingStats = useMemo(() => {
     const counts = [0, 0, 0, 0, 0];
     const reviews = room.reviews || [];
@@ -30,19 +33,16 @@ export default function RatingSection({ room }: any) {
       entering={FadeInUp.duration(600)}
       className="px-5 py-5 bg-white mx-4 mt-3 mb-5 rounded-2xl p-4 shadow shadow-black/10"
     >
-      {/*Tổng lượt đánh giá */}
+      {/* Tổng lượt đánh giá */}
       <View className="flex-row items-center mb-3">
         <Ionicons name="chatbubbles-outline" size={20} color="#3F72AF" />
         <Text className="text-lg font-semibold text-[#112D4E] ml-2">
-          {room.totalRatings} lượt đánh giá
+          {room.totalRatings || ratingStats.total} lượt đánh giá
         </Text>
       </View>
 
-      {/*Xếp hạng tổng thể */}
-      <Animated.View
-        entering={FadeInUp.delay(150).duration(500)}
-        className="mb-4"
-      >
+      {/* Xếp hạng tổng thể */}
+      <Animated.View entering={FadeInUp.delay(150).duration(500)} className="mb-4">
         <View className="flex-row items-center mb-2">
           <Ionicons name="stats-chart-outline" size={20} color="#3F72AF" />
           <Text className="text-base font-medium text-[#112D4E] ml-2">
@@ -70,54 +70,70 @@ export default function RatingSection({ room }: any) {
         })}
       </Animated.View>
 
-      {/*Danh sách đánh giá */}
+      {/* Danh sách đánh giá */}
       <ScrollView nestedScrollEnabled showsVerticalScrollIndicator={false}>
-        {displayedReviews.map((r: any, i: number) => (
-          <Animated.View
-            key={i}
-            entering={FadeInUp.delay(300 + i * 150).duration(400)}
-            className="flex-row mb-4 border-b border-gray-100 pb-3"
-          >
-            <TouchableOpacity
-              onPress={() =>
-                router.push({
-                  pathname: "/user/[id]",
-                  params: { id: r.user._id || "unknown" },
-                })
-              }
+        {displayedReviews.map((r: any, i: number) => {
+          const user = r.userId || {};
+          const avatar =
+            user.avatar ||
+            "https://cdn-icons-png.flaticon.com/512/3177/3177440.png";
+          const name =
+            user.name ||
+            `${user.firstName || ""} ${user.lastName || ""}`.trim() ||
+            "Người dùng ẩn danh";
+          const date = r.createdAt
+            ? new Date(r.createdAt).toLocaleDateString("vi-VN")
+            : "Không xác định";
+
+          return (
+            <Animated.View
+              key={i}
+              entering={FadeInUp.delay(300 + i * 150).duration(400)}
+              className="flex-row mb-4 border-b border-gray-100 pb-3"
             >
-              <Image
-                source={{ uri: r.user.avatar }}
-                className="w-10 h-10 rounded-full mr-3"
-              />
-            </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() =>
+                  router.push({
+                    pathname: "/user/[id]",
+                    params: { id: user._id || "unknown" },
+                  })
+                }
+              >
+                <Image
+                  source={{ uri: avatar }}
+                  className="w-10 h-10 rounded-full mr-3"
+                />
+              </TouchableOpacity>
 
-            <View className="flex-1">
-              <Text className="font-semibold text-[#112D4E] text-[15px]">
-                {r.user.name}
-              </Text>
-              <Text className="text-gray-500 text-[12px] mb-1">{r.date}</Text>
+              <View className="flex-1">
+                <Text className="font-semibold text-[#112D4E] text-[15px]">
+                  {name}
+                </Text>
+                <Text className="text-gray-500 text-[12px] mb-1">{date}</Text>
 
-              {/* Rating sao */}
-              <View className="flex-row items-center mb-1">
-                {Array.from({ length: 5 }).map((_, idx) => (
-                  <Ionicons
-                    key={idx}
-                    name={idx < r.rating ? "star" : "star-outline"}
-                    size={14}
-                    color="#FFD700"
-                  />
-                ))}
+                {/* Rating sao */}
+                <View className="flex-row items-center mb-1">
+                  {Array.from({ length: 5 }).map((_, idx) => (
+                    <Ionicons
+                      key={idx}
+                      name={idx < r.rating ? "star" : "star-outline"}
+                      size={14}
+                      color="#FFD700"
+                    />
+                  ))}
+                </View>
+
+                {/* Comment */}
+                <Text className="text-gray-700 text-[13px]">
+                  {r.comment || "Không có nội dung đánh giá."}
+                </Text>
               </View>
-
-              {/* Comment */}
-              <Text className="text-gray-700 text-[13px]">{r.comment}</Text>
-            </View>
-          </Animated.View>
-        ))}
+            </Animated.View>
+          );
+        })}
       </ScrollView>
 
-      {/*  Nút xem thêm */}
+      {/* Nút xem thêm */}
       {room.reviews.length > 3 && (
         <TouchableOpacity
           onPress={() => setShowAll(!showAll)}

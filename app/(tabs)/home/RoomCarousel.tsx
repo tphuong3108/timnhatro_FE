@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   ImageBackground,
 } from "react-native";
-import { Ionicons, MaterialIcons } from "@expo/vector-icons"; 
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 
 const CARD_WIDTH = 180;
@@ -43,7 +43,7 @@ const featuredRooms = [
 export default function RoomCarousel({
   rooms = featuredRooms,
 }: {
-  rooms?: typeof featuredRooms;
+  rooms?: typeof featuredRooms | any[];
 }) {
   const router = useRouter();
   const scrollX = useRef(new Animated.Value(0)).current;
@@ -57,7 +57,7 @@ export default function RoomCarousel({
         decelerationRate="fast"
         snapToInterval={CARD_WIDTH + SPACING}
         snapToAlignment="center"
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.id || item._id}
         contentContainerStyle={{
           paddingHorizontal: 20,
         }}
@@ -79,6 +79,21 @@ export default function RoomCarousel({
             extrapolate: "clamp",
           });
 
+          // ✅ chọn ảnh hiển thị (ưu tiên từ backend)
+          const displayImage =
+            item.image ||
+            item.images?.[0] ||
+            "https://via.placeholder.com/300x200.png?text=No+Image";
+
+          // ✅ lấy giá tiền (hỗ trợ cả chuỗi hoặc số)
+          const displayPrice =
+            typeof item.price === "number"
+              ? `${item.price.toLocaleString("vi-VN")}đ / tháng`
+              : item.price || "—";
+
+          // ✅ lượt xem từ BE (viewCount) hoặc local (views)
+          const displayViews = item.viewCount ?? item.views ?? 0;
+
           return (
             <Animated.View
               className="rounded-2xl overflow-hidden"
@@ -91,10 +106,14 @@ export default function RoomCarousel({
               <TouchableOpacity
                 activeOpacity={0.9}
                 className="flex-1 rounded-2xl overflow-hidden shadow-md"
-                onPress={() => router.push(`/room/${item.id}` as any)}
+                onPress={() =>
+                  router.push(
+                    `/room/${item.slug || item.id || item._id}` as any
+                  )
+                }
               >
                 <ImageBackground
-                  source={{ uri: item.image }}
+                  source={{ uri: displayImage }}
                   resizeMode="cover"
                   className="flex-1 justify-end"
                 >
@@ -108,16 +127,22 @@ export default function RoomCarousel({
                     >
                       {item.name}
                     </Text>
+
                     <View className="flex-row items-center space-x-1 mt-1">
-                      <MaterialIcons name="attach-money" size={15} color="white" />
+                      <MaterialIcons
+                        name="attach-money"
+                        size={15}
+                        color="white"
+                      />
                       <Text className="text-gray-100 text-[12px]">
-                        {item.price}
+                        {displayPrice}
                       </Text>
                     </View>
+
                     <View className="flex-row items-center mt-1">
                       <Ionicons name="eye-outline" size={14} color="#D1D5DB" />
                       <Text className="text-gray-300 text-[12px] ml-2">
-                          {(item?.views ?? 0).toLocaleString()}
+                        {displayViews.toLocaleString()}
                       </Text>
                     </View>
                   </View>

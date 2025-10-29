@@ -1,11 +1,15 @@
 // context/AuthContext.tsx
 import React, { createContext, useContext, useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import apiClient from "@/services/apiClient";
 
 interface User {
-  id?: number;
+  _id?: string;
   email?: string;
-  role?: "user" | "admin";
+  firstName?: string;
+  lastName?: string;
+  avatar?: string;
+  role?: "tenant" | "host" | "admin";
 }
 
 interface AuthContextProps {
@@ -13,6 +17,7 @@ interface AuthContextProps {
   loading: boolean;
   setUser: React.Dispatch<React.SetStateAction<User | null>>;
   logout: () => Promise<void>;
+  login: (token: string, userData: User) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextProps>({
@@ -20,6 +25,7 @@ const AuthContext = createContext<AuthContextProps>({
   loading: true,
   setUser: () => {},
   logout: async () => {},
+  login: async () => {},
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
@@ -30,11 +36,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const loadUser = async () => {
       try {
         const token = await AsyncStorage.getItem("token");
-        if (!token) {
-          setUser(null);
+        const storedUser = await AsyncStorage.getItem("user");
+        if (token && storedUser) {
+          const parsedUser = JSON.parse(storedUser);
+          setUser(parsedUser);
+
+          apiClient.defaults.headers.Authorization = `Bearer ${token}`;
         } else {
-          setUser({ email: "user@example.com", role: "user" });
+          setUser(null);
         }
+      } catch (error) {
+        console.log("❌ Lỗi khi load user:", error);
+        setUser(null);
       } finally {
         setLoading(false);
       }
@@ -42,14 +55,23 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     loadUser();
   }, []);
 
-  // logout
+  const login = async (token: string, userData: User) => {
+    await AsyncStorage.setItem("token", token);
+    await AsyncStorage.setItem("user", JSON.stringify(userData));
+    apiClient.defaults.headers.Authorization = `Bearer ${token}`;
+    setUser(userData);
+  };
+
+  // ✅ Hàm logout: xóa token + user
   const logout = async () => {
     await AsyncStorage.removeItem("token");
+    await AsyncStorage.removeItem("user");
     setUser(null);
+    delete apiClient.defaults.headers.Authorization;
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, setUser, logout }}>
+    <AuthContext.Provider value={{ user, loading, setUser, logout, login }}>
       {children}
     </AuthContext.Provider>
   );
