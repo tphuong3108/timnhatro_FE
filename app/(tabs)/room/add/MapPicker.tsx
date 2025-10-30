@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { View, Text, TouchableOpacity, ActivityIndicator } from "react-native";
-import MapView, { Marker, UrlTile } from "react-native-maps";
+import MapView, { Marker, UrlTile, AnimatedRegion } from "react-native-maps";
 import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
 
 export default function MapPicker({
@@ -9,16 +9,31 @@ export default function MapPicker({
   getCurrentLocation,
   loadingLocation,
 }: any) {
+  const mapRef = useRef<MapView>(null);
+
+  // 👇 Tự động di chuyển đến marker khi nó thay đổi
+  useEffect(() => {
+    if (marker && mapRef.current) {
+      mapRef.current.animateToRegion({
+        latitude: marker.latitude,
+        longitude: marker.longitude,
+        latitudeDelta: 0.01,
+        longitudeDelta: 0.01,
+      });
+    }
+  }, [marker]);
+
   return (
     <View className="mb-5">
       <Text className="text-[#3F72AF] font-semibold mb-2">Chọn vị trí trên bản đồ</Text>
       <View className="h-64 w-full rounded-xl overflow-hidden border border-gray-300">
         <MapView
+          ref={mapRef}
           style={{ flex: 1 }}
           onPress={handleMapPress}
           initialRegion={{
-            latitude: marker?.latitude || 11.94,
-            longitude: marker?.longitude || 108.45,
+            latitude: marker?.latitude || 10.762622,
+            longitude: marker?.longitude || 106.660172,
             latitudeDelta: 0.05,
             longitudeDelta: 0.05,
           }}
@@ -38,20 +53,19 @@ export default function MapPicker({
         </Text>
       )}
 
-    <TouchableOpacity
-      onPress={getCurrentLocation}
-      className="flex-row items-center justify-center mt-4 bg-[#B9D7EA] py-3 rounded-xl w-[90%] self-center"
-    >
-      {loadingLocation ? (
-        <ActivityIndicator color="#3F72AF" />
-      ) : (
-        <>
-          <Ionicons name="locate-outline" size={20} color="#3F72AF" />
-          <Text className="text-[#3F72AF] ml-2 font-bold">Dùng vị trí hiện tại</Text>
-        </>
-      )}
-    </TouchableOpacity>
-
+      <TouchableOpacity
+        onPress={getCurrentLocation}
+        className="flex-row items-center justify-center mt-4 bg-[#B9D7EA] py-3 rounded-xl w-[90%] self-center"
+      >
+        {loadingLocation ? (
+          <ActivityIndicator color="#3F72AF" />
+        ) : (
+          <>
+            <Ionicons name="locate-outline" size={20} color="#3F72AF" />
+            <Text className="text-[#3F72AF] ml-2 font-bold">Dùng vị trí hiện tại</Text>
+          </>
+        )}
+      </TouchableOpacity>
     </View>
   );
 }

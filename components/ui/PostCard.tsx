@@ -4,6 +4,7 @@ import { useRouter } from "expo-router";
 
 interface RoomCardProps {
   item: {
+    slug: string | undefined;
     id?: string;
     _id?: string;
     title?: string;
@@ -39,7 +40,7 @@ export default function PostCard({ item, isFavorite }: RoomCardProps) {
       <TouchableOpacity
         activeOpacity={0.9}
         style={{ flex: 1 }}
-        onPress={() => router.push(`/room/${item.id || item._id}` as any)}
+        onPress={() => router.push(`/room/${item.slug}` as any)}
       >
         <ImageBackground
           source={{ uri: imageUri }}

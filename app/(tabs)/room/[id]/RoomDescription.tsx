@@ -33,7 +33,7 @@ export default function RoomDescription({ room }: any) {
           size={22}
           color="#3F72AF"
         />
-        <Text className="text-lg font-semibold text-[#112D4E] ml-2">
+        <Text className="text-xl font-semibold text-[#3F72AF] ml-2">
           Mô tả chỗ trọ
         </Text>
       </View>

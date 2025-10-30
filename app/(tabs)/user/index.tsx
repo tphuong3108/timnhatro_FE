@@ -1,21 +1,21 @@
-import React, { useEffect, useState } from "react";
-import {
-  View,
-  ScrollView,
-  ActivityIndicator,
-  Alert,
-  TouchableOpacity,
-  Text,
-} from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+// index.tsx
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
+import React, { useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  Alert,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import ActionButtons from "./ActionButtons";
 import CoverSection from "./CoverSection";
+import Favorites from "./Favorites";
 import InfoSection from "./InfoSection";
 import MyPosts from "./MyPosts";
-import Favorites from "./Favorites";
-import ActionButtons from "./ActionButtons";
-import apiClient from "@/utils/apiClient";
+import { profileApi } from "@/services/profileApi";
 
 export default function Profile() {
   const router = useRouter();
@@ -23,17 +23,21 @@ export default function Profile() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"posts" | "favorites">("posts");
 
+  // ✅ Đây là profile của chính chủ
+  const isOwner = true;
+
   const fetchProfile = async () => {
     try {
-      const mockUser = {
-        fullName: "Nguyễn Văn A",
-        email: "nguyenvana@example.com",
-        phone: "0987654321",
-        avatar: "https://i.pravatar.cc/150?img=3",
-        role: "Người thuê trọ",
-      };
-      setUser(mockUser);
-    } catch {
+      const token = await AsyncStorage.getItem("token");
+      if (!token) {
+        router.replace("/auth/login");
+        return;
+      }
+
+      const data = await profileApi.getMyProfile();
+      setUser(data);
+    } catch (error) {
+      console.error("Fetch profile error:", error);
       Alert.alert("Lỗi", "Không thể tải hồ sơ người dùng.");
     } finally {
       setLoading(false);
@@ -53,7 +57,6 @@ export default function Profile() {
         onPress: async () => {
           try {
             setLoading(true);
-            await apiClient.put("/users/me/ban");
             await AsyncStorage.removeItem("token");
             Alert.alert("Tài khoản đã bị khóa", "Bạn sẽ bị đăng xuất.");
             router.replace("/auth/login");
@@ -80,7 +83,9 @@ export default function Profile() {
       showsVerticalScrollIndicator={false}
       contentContainerStyle={{ paddingBottom: 40 }}
     >
-      <CoverSection user={user} />
+      {/* ✅ Truyền isOwner = true để hiện camera và nút sửa */}
+      <CoverSection user={user} isOwner={isOwner} />
+
       <View className="w-full max-w-[700px] self-center px-5">
         <InfoSection user={user} />
 
@@ -94,12 +99,14 @@ export default function Profile() {
           </Text>
         </TouchableOpacity>
 
-        {/* Tabs */}
         <ActionButtons activeTab={activeTab} onChangeTab={setActiveTab} />
 
-        {/* Nội dung tab */}
         <View className="mt-8">
-          {activeTab === "posts" ? <MyPosts /> : <Favorites />}
+          {activeTab === "posts" ? (
+            <MyPosts rooms={user?.myRooms || []} />
+          ) : (
+            <Favorites favorites={user?.favorites || []} />
+          )}
         </View>
       </View>
     </ScrollView>

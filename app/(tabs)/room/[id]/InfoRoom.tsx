@@ -4,9 +4,9 @@ import { Ionicons } from "@expo/vector-icons";
 
 export default function InfoRoom({ room }: any) {
   return (
-    <View className="px-5 py-5 bg-white mx-4 -mt-8 rounded-2xl p-4 shadow shadow-black/10">
+    <View className="px-5 py-5 bg-white mx-4 -mt-8 rounded-2xl p-4 shadow shadow-black/10 ">
       {/* Tên phòng */}
-      <Text className="text-2xl font-bold text-[#112D4E] mb-1">
+      <Text className="text-2xl font-bold text-[#3F72AF] mb-1">
         {room.name}
       </Text>
 

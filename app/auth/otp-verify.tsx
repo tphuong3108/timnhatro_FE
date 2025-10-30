@@ -1,9 +1,9 @@
-import { View, Text, TouchableOpacity, Alert, SafeAreaView, ScrollView, ActivityIndicator } from "react-native";
-import { useRouter, useLocalSearchParams } from "expo-router";
-import React, { useState, useEffect } from "react";
-import apiClient from "../../utils/apiClient";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import React, { useEffect, useState } from "react";
+import { ActivityIndicator, Alert, SafeAreaView, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import Logo from "../../assets/images/logodoc.svg";
 import InputField from "../../components/InputField";
+import apiClient from "../../services/apiClient";
 
 export default function OtpVerify() {
   const router = useRouter();

@@ -1,64 +1,49 @@
-import { useRouter } from "expo-router";
 import React from "react";
-import { Alert, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, KeyboardAvoidingView, Platform } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import AddRoomForm from "./AddRoomForm";
-import { useAddRoomLogic } from "./AddRoomLogic";
 import MapPicker from "./MapPicker";
 import MediaPicker from "./MediaPicker";
 import AmenitiesList from "./AmenitiesList";
+import { useAddRoomLogic } from "./AddRoomLogic";
 
 export default function AddRoomScreen() {
-  const router = useRouter();
   const logic = useAddRoomLogic();
 
-  const handleSubmit = () => {
-    const {
-      roomName,
-      price,
-      location,
-      description,
-      marker,
-      media,
-      selectedAmenities,
-    } = logic;
-
-    if (!roomName || !price || !location || !marker) {
-      Alert.alert("Thiếu thông tin", "Vui lòng nhập đầy đủ thông tin và chọn vị trí!");
-      return;
-    }
-
-    const newRoom = {
-      roomName,
-      price,
-      location,
-      description,
-      amenities: selectedAmenities,
-      media,
-      marker,
-    };
-
-    console.log(" Dữ liệu đăng phòng:", newRoom);
-
-    Alert.alert("Thành công", "Phòng của bạn đã được đăng!", [
-      { text: "OK", onPress: () => router.replace("/") },
-    ]);
-  };
-
   return (
-    <View className="flex-1 bg-white">
-      <View className="py-4">
-        <Text className="text-2xl font-semibold text-[#3F72AF] text-center">
-          Đăng phòng
-        </Text>
-      </View>
-
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      className="flex-1 bg-white"
+    >
       <ScrollView
-        className="px-5 pt-2"
+        className="flex-1 px-5 pt-2"
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="always"
       >
-        <AddRoomForm {...logic} />
-        <MapPicker {...logic} />
+        <Text className="text-2xl font-semibold text-[#3F72AF] text-center mb-4">
+          Đăng phòng
+        </Text>
+
+        <AddRoomForm
+          roomName={logic.roomName}
+          setRoomName={logic.setRoomName}
+          price={logic.price}
+          setPrice={logic.setPrice}
+          location={logic.location}
+          setLocation={logic.setLocation}
+          marker={logic.marker}
+          setMarker={logic.setMarker}
+          description={logic.description}
+          setDescription={logic.setDescription}
+        />
+
+        <MapPicker
+          marker={logic.marker}
+          handleMapPress={logic.handleMapPress}
+          getCurrentLocation={logic.getCurrentLocation}
+          loadingLocation={logic.loadingLocation}
+        />
+
         <MediaPicker
           media={logic.media}
           pickMedia={logic.pickMedia}
@@ -72,15 +57,23 @@ export default function AddRoomScreen() {
         />
 
         <TouchableOpacity
-          onPress={handleSubmit}
+          onPress={logic.handleSubmit}
           activeOpacity={0.8}
           className="bg-[#3F72AF] rounded-2xl py-4 mt-8 mb-10 self-center w-[90%]"
+          disabled={logic.loadingSubmit}
         >
-          <Text className="text-white font-semibold text-center text-[16px]">
-            Đăng phòng ngay
-          </Text>
+          {logic.loadingSubmit ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <View className="flex-row items-center justify-center">
+              <Ionicons name="cloud-upload-outline" size={20} color="white" />
+              <Text className="text-white font-semibold text-center text-[16px] ml-2">
+                Đăng phòng ngay
+              </Text>
+            </View>
+          )}
         </TouchableOpacity>
       </ScrollView>
-    </View>
+    </KeyboardAvoidingView>
   );
 }

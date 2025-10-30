@@ -1,5 +1,13 @@
 import React from "react";
-import { TouchableOpacity, FlatList, Animated, Dimensions } from "react-native";
+import {
+  TouchableOpacity,
+  FlatList,
+  Animated,
+  Dimensions,
+  View,
+  Text,
+} from "react-native";
+import { useRouter } from "expo-router";
 import { SNAP_POINTS } from "@/hooks/useRoomMapLogic";
 import { SheetHeader } from "./SheetHeader";
 import { MapRoomCard } from "@/components/MapRoomCard";
@@ -13,8 +21,12 @@ export function RoomBottomSheet({
   modalHeight,
   panResponder,
   setSnapIndex,
+  loadMoreRooms,
+  loadingMore, // ✅ thêm prop
+  hasMore, // ✅ thêm prop
 }: any) {
   const { height } = Dimensions.get("window");
+  const router = useRouter();
 
   return (
     <Animated.View
@@ -30,7 +42,7 @@ export function RoomBottomSheet({
         style={{
           height: modalHeight,
           backgroundColor: "#fff",
-          overflow: "hidden",
+          overflow: "visible", // ✅ đổi từ "hidden" sang "visible"
           paddingTop: 10,
           borderTopLeftRadius: 30,
           borderTopRightRadius: 30,
@@ -60,24 +72,44 @@ export function RoomBottomSheet({
           keyExtractor={(item) => item._id}
           onViewableItemsChanged={onViewableItemsChanged}
           showsVerticalScrollIndicator={false}
+          onEndReached={loadMoreRooms}
+          onEndReachedThreshold={0.3}
           contentContainerStyle={{
-            paddingBottom: 50,
-            paddingHorizontal: 30,
+            paddingBottom: 60,
+            paddingHorizontal: 24,
             paddingTop: 8,
+            flexGrow: 1, // ✅ giúp cuộn mượt & kích hoạt onEndReached chuẩn
           }}
           renderItem={({ item }) => (
             <TouchableOpacity
               activeOpacity={0.95}
-              onPress={() => scrollToCard(item._id)}
-              style={{
-                marginBottom: 20,
-              }}
+              onPress={() => router.push(`/room/${item.slug || item._id}`)}
+              style={{ marginBottom: 16 }}
             >
               <MapRoomCard room={item} />
             </TouchableOpacity>
           )}
+          ListEmptyComponent={
+            <View className="items-center justify-center py-10">
+              <Text className="text-gray-500">Không có phòng nào.</Text>
+            </View>
+          }
+          // ✅ Thêm Footer hiển thị trạng thái tải thêm
+          ListFooterComponent={
+            loadingMore ? (
+              <View className="py-4 items-center">
+                <Text className="text-gray-400">Đang tải thêm...</Text>
+              </View>
+            ) : !hasMore ? (
+              <View className="py-4 items-center">
+                <Text className="text-gray-400">Đã hết dữ liệu</Text>
+              </View>
+            ) : null
+          }
         />
       </Animated.View>
     </Animated.View>
   );
 }
+
+export default RoomBottomSheet;

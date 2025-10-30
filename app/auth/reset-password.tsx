@@ -1,18 +1,18 @@
-import { useRouter, useLocalSearchParams } from "expo-router";
-import React, { useState, useEffect } from "react";
+import { Ionicons } from "@expo/vector-icons";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import React, { useEffect, useState } from "react";
 import {
+  ActivityIndicator,
+  Alert,
   SafeAreaView,
   ScrollView,
-  View,
   Text,
   TouchableOpacity,
-  Alert,
-  ActivityIndicator,
+  View,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import apiClient from "../../utils/apiClient";
 import Logo from "../../assets/images/logodoc.svg";
 import InputField from "../../components/InputField";
+import apiClient from "../../services/apiClient";
 
 export default function ResetPasswordOtp() {
   const router = useRouter();
