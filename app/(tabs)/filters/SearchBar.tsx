@@ -1,11 +1,22 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, TextInput, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useFilter } from "./FilterContext";
+import { useLocalSearchParams } from "expo-router";
 
 export default function SearchBar() {
   const { filters, setFilters, applyFilters } = useFilter();
-  const [search, setSearch] = useState(filters.area);
+  const params = useLocalSearchParams();
+  const [search, setSearch] = useState(filters.area || "");
+
+  useEffect(() => {
+    if (params.q) {
+      const query = String(params.q);
+      setSearch(query);
+      setFilters({ ...filters, area: query });
+      applyFilters();
+    }
+  }, [params.q]);
 
   const handleSearch = () => {
     setFilters({ ...filters, area: search });

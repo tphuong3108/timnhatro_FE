@@ -13,7 +13,7 @@ const categories = [
   {
     id: "2",
     title: "Phòng trọ có gác rộng rãi thoáng mát",
-    image: "https://images.unsplash.com/photo-1595526114035-0f50155e8f7b?auto=format&fit=crop&w=800&q=60",
+    image: "https://i.pinimg.com/736x/38/5b/f1/385bf135d2248704a163b95314da6a12.jpg",
   },
   {
     id: "3",
@@ -33,12 +33,12 @@ const categories = [
   {
     id: "6",
     title: "Phòng gần trường",
-    image: "https://images.unsplash.com/photo-1600585153856-3d4d8e0d6d53?auto=format&fit=crop&w=800&q=60",
+    image: "https://i.pinimg.com/1200x/16/a4/2b/16a42b4be52177dbfc69f2b40576827a.jpg",
   },
   {
     id: "7",
     title: "Phòng mới xây",
-    image: "https://images.unsplash.com/photo-1616628188533-8e0cb4123b4d?auto=format&fit=crop&w=800&q=60",
+    image: "https://i.pinimg.com/736x/38/5b/f1/385bf135d2248704a163b95314da6a12.jpg",
   },
 ];
 

@@ -26,11 +26,11 @@ export const roomApi = {
   },
 
   //  Lấy phòng gần đây
-  getNearbyRooms: async (latitude: number, longitude: number, distance = 1000) => {
+  getNearbyRooms: async (latitude: number, longitude: number, distance = 15000) => {
     const res = await apiClient.get("/rooms/nearby", {
       params: { latitude, longitude, distance },
     });
-    return res.data.data;
+    return res.data?.data ?? res.data ?? [];
   },
 
   //  Lấy chi tiết phòng

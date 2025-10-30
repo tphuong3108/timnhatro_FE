@@ -8,6 +8,21 @@ export default function LineChartCard({ title, data }: any) {
   const chartWidth = width * 0.85;
   const chartHeight = width < 380 ? 180 : 220;
 
+  if (
+    !data ||
+    !data.datasets ||
+    !Array.isArray(data.datasets) ||
+    data.datasets.length === 0
+  ) {
+    return (
+      <ChartCardWrapper>
+        <Text className="text-gray-500 text-center">
+          Không có dữ liệu để hiển thị biểu đồ
+        </Text>
+      </ChartCardWrapper>
+    );
+  }
+
   return (
     <ChartCardWrapper>
       <Text

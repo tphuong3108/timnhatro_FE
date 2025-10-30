@@ -23,6 +23,9 @@ export default function Profile() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"posts" | "favorites">("posts");
 
+  // ✅ Đây là profile của chính chủ
+  const isOwner = true;
+
   const fetchProfile = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
@@ -41,7 +44,6 @@ export default function Profile() {
     }
   };
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     fetchProfile();
   }, []);
@@ -81,7 +83,9 @@ export default function Profile() {
       showsVerticalScrollIndicator={false}
       contentContainerStyle={{ paddingBottom: 40 }}
     >
-      <CoverSection user={user} />
+      {/* ✅ Truyền isOwner = true để hiện camera và nút sửa */}
+      <CoverSection user={user} isOwner={isOwner} />
+
       <View className="w-full max-w-[700px] self-center px-5">
         <InfoSection user={user} />
 

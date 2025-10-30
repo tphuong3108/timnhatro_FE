@@ -28,7 +28,7 @@ export const profileApi = {
   },
 
   getPublicProfile: async (id: string) => {
-    const res = await apiClient.get(`/profile/${id}`);
+    const res = await apiClient.get(`/me/${id}`);
     return res.data.data;
   },
 };

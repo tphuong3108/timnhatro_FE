@@ -43,7 +43,6 @@ export function RoomMap({
           });
 
           const handleMarkerPress = () => {
-            // ✅ Fix TypeScript warning: khai báo kiểu rõ ràng
             markersAnim.forEach((a: Animated.Value, index: number) => {
               Animated.timing(a, {
                 toValue: index === i ? 1 : 0,
@@ -54,7 +53,6 @@ export function RoomMap({
 
             scrollToCard(room._id);
 
-            // ✅ Giữ animation nhún marker được chọn
             Animated.sequence([
               Animated.spring(markersAnim[i], {
                 toValue: 1.6,

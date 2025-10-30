@@ -5,6 +5,7 @@ import { Ionicons } from "@expo/vector-icons";
 interface Props {
   icon: string;
   label: string;
+  title: string;
   value: string | number;
   change?: number;
 }

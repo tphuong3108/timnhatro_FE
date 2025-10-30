@@ -1,3 +1,4 @@
+// app/admin/users/[id].tsx
 import React, { useEffect, useState } from "react";
 import {
   View,
@@ -8,15 +9,15 @@ import {
 import { useLocalSearchParams, useRouter } from "expo-router";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { Ionicons } from "@expo/vector-icons";
-import { profileApi } from "@/services/profileApi";
+import { adminApi } from "@/services/adminApi";
+import InfoSection from "@/app/(tabs)/user/InfoSection";
+import CoverSection from "@/app/(tabs)/user/CoverSection";
+import ActionButtons from "@/app/(tabs)/user/ActionButtons";
+import Favorites from "@/app/(tabs)/user/Favorites";
+import MyPosts from "@/app/(tabs)/user/MyPosts";
 
-import InfoSection from "./InfoSection";
-import ActionButtons from "./ActionButtons";
-import CoverSection from "./CoverSection";
-import MyPosts from "./MyPosts";
-import Favorites from "./Favorites";
 
-export default function UserProfile() {
+export default function AdminUserDetail() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
 
@@ -31,13 +32,11 @@ export default function UserProfile() {
         setLoading(true);
         setError(null);
 
-        console.log("🔍 Fetching public profile for ID:", id);
+        console.log("🔍 Fetching admin user details:", id);
+        const data = await adminApi.getUserDetails(id as string);
 
-        const data = await profileApi.getPublicProfile(id as string);
-
-        console.log("📦 API Response:", data);
-
-        setUser(data);
+        // Dữ liệu backend trả về có dạng { success: true, user: {...} }
+        setUser(data.user || data);
       } catch (err) {
         console.error("❌ Lỗi khi tải thông tin người dùng:", err);
         setError("Không thể tải thông tin người dùng.");
@@ -47,22 +46,23 @@ export default function UserProfile() {
     })();
   }, [id]);
 
-  // 🌀 Đang tải
-  if (loading) {
+  // 🌀 Loading
+  if (loading)
     return (
       <View className="flex-1 justify-center items-center bg-white">
         <ActivityIndicator size="large" color="#3F72AF" />
         <Text className="text-gray-500 mt-2">Đang tải thông tin...</Text>
       </View>
     );
-  }
 
-  // ❌ Lỗi khi tải
-  if (error || !user) {
+  // ❌ Lỗi
+  if (error || !user)
     return (
       <View className="flex-1 justify-center items-center bg-white px-6">
         <Ionicons name="alert-circle-outline" size={48} color="#999" />
-        <Text className="text-gray-600 text-center mt-3">{error || "Không tìm thấy người dùng."}</Text>
+        <Text className="text-gray-600 text-center mt-3">
+          {error || "Không tìm thấy người dùng."}
+        </Text>
         <TouchableOpacity
           onPress={() => router.back()}
           className="mt-5 bg-blue-500 px-5 py-2 rounded-full"
@@ -71,9 +71,8 @@ export default function UserProfile() {
         </TouchableOpacity>
       </View>
     );
-  }
 
-  // ✅ Hiển thị profile
+  // ✅ Hiển thị giống UserProfile
   return (
     <Animated.ScrollView
       entering={FadeInDown.duration(500)}
@@ -82,26 +81,24 @@ export default function UserProfile() {
       contentContainerStyle={{ paddingBottom: 40 }}
     >
       {/* Ảnh bìa + avatar */}
-      <CoverSection user={user} />
+      <CoverSection user={user} isOwner={false} />
 
       {/* Thông tin cá nhân */}
       <View className="w-full max-w-[700px] self-center px-5">
         <InfoSection user={user} />
 
         {/* Tabs */}
-        <ActionButtons activeTab={activeTab} onChangeTab={setActiveTab} hideFavorites={true} />
+        <ActionButtons
+          activeTab={activeTab}
+          onChangeTab={setActiveTab}
+        />
 
         {/* Nội dung */}
         <View className="mt-8">
           {activeTab === "posts" ? (
-            <MyPosts rooms={user?.publicRooms || []} />
+            <MyPosts rooms={user?.rooms || []} />
           ) : (
-            <View className="items-center mt-10">
-              <Ionicons name="lock-closed-outline" size={40} color="#999" />
-              <Text className="text-gray-500 mt-3 text-sm">
-                Danh sách phòng đã lưu được ẩn.
-              </Text>
-            </View>
+            <Favorites favorites={user?.favorites || []} />
           )}
         </View>
       </View>

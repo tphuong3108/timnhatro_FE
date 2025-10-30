@@ -15,7 +15,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
 
-export default function CoverSection({ user }: any) {
+export default function CoverSection({ user, isOwner = false }: any) {
   const screenWidth = Dimensions.get("window").width;
   const coverHeight = screenWidth * 0.4;
   const router = useRouter();
@@ -71,7 +71,7 @@ export default function CoverSection({ user }: any) {
     }
   };
 
-  //  Menu chọn ảnh
+  // Menu chọn ảnh
   const handlePickImage = () => {
     if (Platform.OS === "ios") {
       ActionSheetIOS.showActionSheetWithOptions(
@@ -93,10 +93,10 @@ export default function CoverSection({ user }: any) {
     }
   };
 
-  //  Xem ảnh full nếu có avatar
+  // Xem ảnh full
   const handleAvatarPress = () => {
     if (user?.avatar) setPreviewVisible(true);
-    else handlePickImage();
+    else if (isOwner) handlePickImage();
   };
 
   return (
@@ -109,8 +109,12 @@ export default function CoverSection({ user }: any) {
 
       <View className="items-center -mt-14">
         <View className="relative">
-          {/* Ảnh đại diện*/}
-          <TouchableOpacity onPress={handleAvatarPress} activeOpacity={0.9}>
+          {/* Ảnh đại diện */}
+          <TouchableOpacity
+            onPress={handleAvatarPress}
+            activeOpacity={0.9}
+            disabled={!isOwner && !user?.avatar}
+          >
             <Image
               source={
                 user?.avatar
@@ -123,32 +127,40 @@ export default function CoverSection({ user }: any) {
             />
           </TouchableOpacity>
 
-          {/* Nút camera */}
-          <TouchableOpacity
-            onPress={handlePickImage}
-            activeOpacity={0.8}
-            className="absolute bottom-0 right-0 bg-[#3F72AF] p-[6px] rounded-full border-2 border-white"
-          >
-            <Ionicons name="camera-outline" size={14} color="#fff" />
-          </TouchableOpacity>
+          {/* Nút camera — chỉ hiển thị khi là chính chủ */}
+          {isOwner && (
+            <TouchableOpacity
+              onPress={handlePickImage}
+              activeOpacity={0.8}
+              className="absolute bottom-0 right-0 bg-[#3F72AF] p-[6px] rounded-full border-2 border-white"
+            >
+              <Ionicons name="camera-outline" size={14} color="#fff" />
+            </TouchableOpacity>
+          )}
         </View>
 
         {/* Thông tin người dùng */}
         <View className="w-full flex-row items-center justify-center mt-4">
-          <Text className="text-lg font-bold text-gray-800 text-center ml-12 ">
+          <Text
+            className={`text-lg font-bold text-gray-800 text-center ${
+              isOwner ? "ml-12" : ""
+            }`}
+          >
             {user?.fullName || "Nguyễn Văn A"}
           </Text>
 
-          <TouchableOpacity
-            onPress={() => router.push("/auth/edit-profile" as any)}
-            activeOpacity={0.8}
-            className="ml-2 bg-[#E8F1FB] px-2 py-[2px] rounded-lg flex-row items-center"
-          >
-            <Ionicons name="create-outline" size={16} color="#3F72AF" />
-            <Text className="text-[#3F72AF] text-[13px] ml-1 font-medium">
-              Sửa
-            </Text>
-          </TouchableOpacity>
+          {isOwner && (
+            <TouchableOpacity
+              onPress={() => router.push("/auth/edit-profile" as any)}
+              activeOpacity={0.8}
+              className="ml-2 bg-[#E8F1FB] px-2 py-[2px] rounded-lg flex-row items-center"
+            >
+              <Ionicons name="create-outline" size={16} color="#3F72AF" />
+              <Text className="text-[#3F72AF] text-[13px] ml-1 font-medium">
+                Sửa
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
 
         <Text className="text-gray-500 text-sm mt-1">
@@ -156,7 +168,7 @@ export default function CoverSection({ user }: any) {
         </Text>
       </View>
 
-      {/* xem ảnh đại diện*/}
+      {/* Xem ảnh đại diện */}
       <Modal visible={previewVisible} transparent animationType="fade">
         <View className="flex-1 bg-black/90 justify-center items-center">
           <Pressable

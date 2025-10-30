@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   Animated,
   View,
@@ -6,61 +6,61 @@ import {
   TouchableOpacity,
   ImageBackground,
 } from "react-native";
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { roomApi } from "@/services/roomApi";
 
 const CARD_WIDTH = 180;
 const CARD_HEIGHT = 200;
 const SPACING = 12;
 
-const featuredRooms = [
-  {
-    id: "1",
-    name: "Phòng cao cấp trung tâm thành phố",
-    price: "5.000.000đ / tháng",
-    views: 1240,
-    image:
-      "https://images.unsplash.com/photo-1595526114035-0f50155e8f7b?auto=format&fit=crop&w=800&q=60",
-  },
-  {
-    id: "2",
-    name: "Phòng view Landmark 81 cực đẹp",
-    price: "6.200.000đ / tháng",
-    views: 890,
-    image:
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=60",
-  },
-  {
-    id: "3",
-    name: "Phòng studio đầy đủ tiện nghi",
-    price: "4.500.000đ / tháng",
-    views: 1032,
-    image:
-      "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=800&q=60",
-  },
-];
-
-export default function RoomCarousel({
-  rooms = featuredRooms,
-}: {
-  rooms?: typeof featuredRooms | any[];
-}) {
+export default function RoomCarousel() {
   const router = useRouter();
   const scrollX = useRef(new Animated.Value(0)).current;
+  const [rooms, setRooms] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchHotRooms = async () => {
+      try {
+        const res = await roomApi.getHotRooms();
+        setRooms(res || []);
+      } catch (error) {
+        console.error("❌ Lỗi khi tải top phòng nổi bật:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchHotRooms();
+  }, []);
+
+  if (loading) {
+    return (
+      <View className="py-8 items-center">
+        <Text className="text-gray-400 text-sm">Đang tải phòng nổi bật...</Text>
+      </View>
+    );
+  }
+
+  if (!rooms.length) {
+    return (
+      <View className="py-8 items-center">
+        <Text className="text-gray-400 text-sm">Không có phòng nổi bật.</Text>
+      </View>
+    );
+  }
 
   return (
     <View className="mt-2">
       <Animated.FlatList
-        data={Array.isArray(rooms) ? rooms : []}
+        data={rooms}
         horizontal
         showsHorizontalScrollIndicator={false}
         decelerationRate="fast"
         snapToInterval={CARD_WIDTH + SPACING}
         snapToAlignment="center"
-        keyExtractor={(item) => item.id || item._id}
-        contentContainerStyle={{
-          paddingHorizontal: 20,
-        }}
+        keyExtractor={(item) => item.roomId || item._id}
+        contentContainerStyle={{ paddingHorizontal: 20 }}
         ItemSeparatorComponent={() => <View style={{ width: SPACING }} />}
         onScroll={Animated.event(
           [{ nativeEvent: { contentOffset: { x: scrollX } } }],
@@ -79,20 +79,10 @@ export default function RoomCarousel({
             extrapolate: "clamp",
           });
 
-          // ✅ chọn ảnh hiển thị (ưu tiên từ backend)
-          const displayImage =
+          const imageUri =
             item.image ||
             item.images?.[0] ||
             "https://via.placeholder.com/300x200.png?text=No+Image";
-
-          // ✅ lấy giá tiền (hỗ trợ cả chuỗi hoặc số)
-          const displayPrice =
-            typeof item.price === "number"
-              ? `${item.price.toLocaleString("vi-VN")}đ / tháng`
-              : item.price || "—";
-
-          // ✅ lượt xem từ BE (viewCount) hoặc local (views)
-          const displayViews = item.viewCount ?? item.views ?? 0;
 
           return (
             <Animated.View
@@ -107,19 +97,19 @@ export default function RoomCarousel({
                 activeOpacity={0.9}
                 className="flex-1 rounded-2xl overflow-hidden shadow-md"
                 onPress={() =>
-                  router.push(
-                    `/room/${item.slug || item.id || item._id}` as any
-                  )
+                  router.push(`/room/${item.slug || item.roomId || item._id}`)
                 }
               >
                 <ImageBackground
-                  source={{ uri: displayImage }}
+                  source={{ uri: imageUri }}
                   resizeMode="cover"
                   className="flex-1 justify-end"
                 >
-                  <View className="absolute bottom-0 left-0 right-0 h-[75px] bg-black/35" />
+                  {/* Overlay mờ dưới */}
+                  <View className="absolute bottom-0 left-0 right-0 h-[80px] bg-black/35" />
 
                   <View className="p-3 flex-col space-y-1">
+                    {/* 🔹 Tên phòng */}
                     <Text
                       className="text-white font-semibold text-[15px] leading-tight drop-shadow-md"
                       numberOfLines={1}
@@ -128,23 +118,38 @@ export default function RoomCarousel({
                       {item.name}
                     </Text>
 
-                    <View className="flex-row items-center space-x-1 mt-1">
-                      <MaterialIcons
-                        name="attach-money"
-                        size={15}
-                        color="white"
-                      />
-                      <Text className="text-gray-100 text-[12px]">
-                        {displayPrice}
-                      </Text>
+                    {/* 🔹 Địa chỉ */}
+                    <Text
+                      className="text-gray-200 text-[12px]"
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                    >
+                      {item.address || "—"}
+                    </Text>
+
+                    <View className="flex-row items-center justify-start mt-1">
+                      <View className="flex-row items-center mr-3">
+                        <Ionicons name="star" size={14} color="#FFD700" />
+                        <Text className="text-gray-100 text-[12px] ml-1">
+                          {item.avgRating?.toFixed(1) || 0}
+                        </Text>
+                      </View>
+
+                      <View className="flex-row items-center mr-3">
+                        <Ionicons name="heart-outline" size={14} color="#ff9eb3" />
+                        <Text className="text-gray-100 text-[12px] ml-1">
+                          {item.totalLikes || 0}
+                        </Text>
+                      </View>
+
+                      <View className="flex-row items-center">
+                        <Ionicons name="eye-outline" size={14} color="#9ca3af" />
+                        <Text className="text-gray-100 text-[12px] ml-1">
+                          {item.viewCount || 0}
+                        </Text>
+                      </View>
                     </View>
 
-                    <View className="flex-row items-center mt-1">
-                      <Ionicons name="eye-outline" size={14} color="#D1D5DB" />
-                      <Text className="text-gray-300 text-[12px] ml-2">
-                        {displayViews.toLocaleString()}
-                      </Text>
-                    </View>
                   </View>
                 </ImageBackground>
               </TouchableOpacity>

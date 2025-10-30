@@ -45,16 +45,16 @@ export default function RatingSection({ room }: RatingSectionProps) {
         { text: "Hủy", style: "cancel" },
         {
           text: "Gửi",
-          onPress: async (reason) => {
-            if (!reason || reason.trim().length === 0) return;
-            try {
-              await roomApi.reportReview(reviewId, reason);
-              Alert.alert(" Thành công", "Báo cáo đã được gửi.");
-            } catch (error: any) {
-              console.error(" Lỗi gửi báo cáo:", error);
-              Alert.alert("Lỗi", "Không thể gửi báo cáo. Vui lòng thử lại.");
-            }
-          },
+            onPress: async (reason?: string) => {
+              if (!reason || reason.trim().length === 0) return;
+              try {
+                await roomApi.reportReview(reviewId, reason);
+                Alert.alert("Thành công", "Báo cáo đã được gửi.");
+              } catch (error: any) {
+                console.error("Lỗi gửi báo cáo:", error);
+                Alert.alert("Lỗi", "Không thể gửi báo cáo. Vui lòng thử lại.");
+              }
+            },
         },
       ],
       "plain-text"

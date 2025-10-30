@@ -4,6 +4,7 @@ import { TouchableOpacity, View, Text } from "react-native";
 interface ActionButtonsProps {
   activeTab: "posts" | "favorites";
   onChangeTab: (tab: "posts" | "favorites") => void;
+  hideFavorites?: boolean;
 }
 
 export default function ActionButtons({ activeTab, onChangeTab }: ActionButtonsProps) {

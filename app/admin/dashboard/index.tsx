@@ -81,25 +81,22 @@ export default function AdminDashboard() {
             icon="person-add"
             label="Người dùng (tuần)"
             value={overview.users}
-            change={overview.growth?.users}
-          />
+            change={overview.growth?.users} title={""}          />
           <StatCard
             icon="home"
             label="Phòng mới (tuần)"
             value={overview.rooms}
-            change={overview.growth?.rooms}
-          />
+            change={overview.growth?.rooms} title={""}          />
           <StatCard
             icon="log-in"
             label="Lượt truy cập"
-            value={loginStats?.totalLogins || 0} // ✅ hiển thị lượt truy cập
-          />
+            value={loginStats?.totalLogins || 0}
+            title={""}          />
           <StatCard
             icon="eye"
             label="Lượt xem (tuần)"
             value={overview.views}
-            change={overview.growth?.views}
-          />
+            change={overview.growth?.views} title={""}          />
         </View>
       )}
 

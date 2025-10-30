@@ -5,6 +5,7 @@ interface Props {
   children: React.ReactNode;
   height?: number;
   style?: StyleProp<ViewStyle>;
+  width?: number;
 }
 
 export default function ChartCardWrapper({ children, height, style }: Props) {
