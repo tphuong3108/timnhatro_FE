@@ -77,11 +77,17 @@ export const roomApi = {
     });
     return res.data.data;
   },
+  reportReview: async (reviewId: string, reason: string) => {
+  const res = await apiClient.post(`/reviews/${reviewId}/report`, { reason });
+  return res.data;
+},
+
   //  Lấy dữ liệu phòng cho bản đồ
   getRoomsMapdata: async (params?: any) => {
     const res = await apiClient.get("/rooms/map-data", { params });
     return res.data.data;
   },
+
   approveRoom: async (id: string) => {
     const res = await apiClient.patch(`/rooms/${id}/approve`);
     return res.data.data;

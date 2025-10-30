@@ -1,9 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, ScrollView, TouchableOpacity } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 import { useReviewReportData } from "@/constants/data/useReviewReportData";
 import ReviewReportCard from "./ReviewReportCard";
-
 
 export default function ReviewReportList() {
   const { reviews, loading } = useReviewReportData();
@@ -23,17 +21,17 @@ export default function ReviewReportList() {
   return (
     <View className="flex-1">
       {/* Bộ lọc */}
-          <ScrollView
-             horizontal
-             showsHorizontalScrollIndicator={false}
-             className="flex-row mb-5"
-             contentContainerStyle={{
-               justifyContent: "center",
-               alignItems: "center",
-               paddingHorizontal: 4,
-               width: "103%",
-             }}
-           >
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        className="flex-row mb-5"
+        contentContainerStyle={{
+          justifyContent: "center",
+          alignItems: "center",
+          paddingHorizontal: 4,
+          width: "103%",
+        }}
+      >
         {[
           { key: "all", label: "Tất cả" },
           { key: "approved", label: "Đã duyệt" },
@@ -63,9 +61,15 @@ export default function ReviewReportList() {
 
       {/* Danh sách */}
       {filtered.length > 0 ? (
-        filtered.map((review) => (
-          <ReviewReportCard key={review.id} review={review} />
-        ))
+        filtered
+          .filter((r) => !!r)
+          .map((review) => (
+            <ReviewReportCard
+              key={review.id}
+              review={review}
+              roomSlug={review.roomSlug}
+            />
+          ))
       ) : (
         <View className="items-center justify-center mt-10">
           <Text className="text-gray-400">Không có báo cáo nào phù hợp</Text>

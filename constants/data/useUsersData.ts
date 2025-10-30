@@ -1,48 +1,40 @@
 import { useEffect, useState } from "react";
+import { adminApi } from "@/services/adminApi";
 
-export function useUsersData() {
+export const useUsersData = () => {
   const [users, setUsers] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(true);
 
-  useEffect(() => {
-    const fakeUsers = [
-      {
-        id: "1",
-        fullName: "Nguyễn Phương",
-        email: "phuong@example.com",
-        avatar: "https://i.pravatar.cc/150?img=3",
-        role: "admin",
-        isActive: true,
-      },
-      {
-        id: "2",
-        fullName: "Trần Long",
-        email: "long@example.com",
-        avatar: "https://i.pravatar.cc/150?img=5",
-        role: "host",
-        isActive: true,
-      },
-      {
-        id: "3",
-        fullName: "Minh Anh",
-        email: "anh@example.com",
-        avatar: "https://i.pravatar.cc/150?img=8",
-        role: "user",
-        isActive: false,
-      },
-    ];
+  const fetchUsers = async () => {
+    try {
+      setLoading(true);
+      const res = await adminApi.getAllUsers();
 
-    setTimeout(() => {
-      setUsers(fakeUsers);
+      const mappedUsers = (res || []).map((u: any) => ({
+        ...u,
+        isActive: !u.banned,
+      }));
+
+      setUsers(mappedUsers);
+    } catch (error) {
+      console.error("❌ Lỗi khi tải người dùng:", error);
+    } finally {
       setLoading(false);
-    }, 800);
-  }, []);
-
-  const toggleActive = (id: string) => {
-    setUsers((prev) =>
-      prev.map((u) => (u.id === id ? { ...u, isActive: !u.isActive } : u))
-    );
+    }
   };
 
+  const toggleActive = async (id: string) => {
+    try {
+      await adminApi.toggleUserActive(id);
+      await fetchUsers();
+    } catch (error) {
+      console.error("❌ Lỗi khi cập nhật trạng thái người dùng:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
   return { users, loading, toggleActive };
-}
+};

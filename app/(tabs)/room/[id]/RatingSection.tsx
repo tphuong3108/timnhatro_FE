@@ -1,8 +1,16 @@
 import React, { useState, useMemo } from "react";
-import { View, Text, Image, TouchableOpacity, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  ScrollView,
+  Alert,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Animated, { FadeInUp } from "react-native-reanimated";
 import { useRouter } from "expo-router";
+import { roomApi } from "@/services/roomApi"; // 🔹 Dùng chung apiClient hoặc tạo reviewApi riêng
 
 interface RatingSectionProps {
   room: any;
@@ -28,6 +36,31 @@ export default function RatingSection({ room }: RatingSectionProps) {
 
   const displayedReviews = showAll ? room.reviews : room.reviews.slice(0, 3);
 
+  // 🧩 Gửi báo cáo review
+  const handleReportReview = (reviewId: string) => {
+    Alert.prompt(
+      "Báo cáo đánh giá",
+      "Nhập lý do bạn muốn báo cáo đánh giá này:",
+      [
+        { text: "Hủy", style: "cancel" },
+        {
+          text: "Gửi",
+          onPress: async (reason) => {
+            if (!reason || reason.trim().length === 0) return;
+            try {
+              await roomApi.reportReview(reviewId, reason);
+              Alert.alert(" Thành công", "Báo cáo đã được gửi.");
+            } catch (error: any) {
+              console.error(" Lỗi gửi báo cáo:", error);
+              Alert.alert("Lỗi", "Không thể gửi báo cáo. Vui lòng thử lại.");
+            }
+          },
+        },
+      ],
+      "plain-text"
+    );
+  };
+
   return (
     <Animated.View
       entering={FadeInUp.duration(600)}
@@ -42,7 +75,10 @@ export default function RatingSection({ room }: RatingSectionProps) {
       </View>
 
       {/* Xếp hạng tổng thể */}
-      <Animated.View entering={FadeInUp.delay(150).duration(500)} className="mb-4">
+      <Animated.View
+        entering={FadeInUp.delay(150).duration(500)}
+        className="mb-4"
+      >
         <View className="flex-row items-center mb-2">
           <Ionicons name="stats-chart-outline" size={20} color="#3F72AF" />
           <Text className="text-base font-medium text-[#112D4E] ml-2">
@@ -91,6 +127,7 @@ export default function RatingSection({ room }: RatingSectionProps) {
               entering={FadeInUp.delay(300 + i * 150).duration(400)}
               className="flex-row mb-4 border-b border-gray-100 pb-3"
             >
+              {/* Avatar */}
               <TouchableOpacity
                 onPress={() =>
                   router.push({
@@ -105,6 +142,7 @@ export default function RatingSection({ room }: RatingSectionProps) {
                 />
               </TouchableOpacity>
 
+              {/* Nội dung review */}
               <View className="flex-1">
                 <Text className="font-semibold text-[#112D4E] text-[15px]">
                   {name}
@@ -124,9 +162,25 @@ export default function RatingSection({ room }: RatingSectionProps) {
                 </View>
 
                 {/* Comment */}
-                <Text className="text-gray-700 text-[13px]">
+                <Text className="text-gray-700 text-[13px] mb-2">
                   {r.comment || "Không có nội dung đánh giá."}
                 </Text>
+
+                {/* 🔹 Nút báo cáo */}
+                <TouchableOpacity
+                  onPress={() => handleReportReview(r._id)}
+                  className="flex-row items-center"
+                >
+                  <Ionicons
+                    name="flag-outline"
+                    size={15}
+                    color="#EF4444"
+                    style={{ marginRight: 4 }}
+                  />
+                  <Text className="text-red-500 text-[12px]">
+                    Báo cáo đánh giá
+                  </Text>
+                </TouchableOpacity>
               </View>
             </Animated.View>
           );

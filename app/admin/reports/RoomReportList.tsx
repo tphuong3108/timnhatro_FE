@@ -15,7 +15,6 @@ export default function RoomReportList() {
     );
   }
 
-  // ✅ Lọc danh sách theo trạng thái
   const filteredRooms =
     filter === "all" ? rooms : rooms.filter((r) => r.status === filter);
 
@@ -60,7 +59,6 @@ export default function RoomReportList() {
         })}
       </ScrollView>
 
-      {/* ✅ Danh sách báo cáo */}
       {filteredRooms.length > 0 ? (
         filteredRooms.map((room) => <RoomReportCard key={room.id} room={room} />)
       ) : (
