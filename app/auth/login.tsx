@@ -1,24 +1,24 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Href, useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
+  ActivityIndicator,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  SafeAreaView,
   Text,
   TouchableOpacity,
   View,
-  Platform,
-  KeyboardAvoidingView,
-  SafeAreaView,
-  Alert,
-  ActivityIndicator,
 } from "react-native";
 import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
 import AppleIcon from "../../assets/images/apple.svg";
 import FacebookIcon from "../../assets/images/facebook.svg";
 import GoogleIcon from "../../assets/images/google.svg";
 import Logo from "../../assets/images/logodoc.svg";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import apiClient from "../../utils/apiClient";
 import InputField from "../../components/InputField";
+import apiClient from "@/services/apiClient";
 
 export default function Login() {
   const router = useRouter();
@@ -36,11 +36,21 @@ export default function Login() {
     try {
       setLoading(true);
       const res = await apiClient.post("users/login", { email, password });
-      const { accessToken, user } = res.data;
+      const { accessToken, userData } = res.data;
+      const user = userData || res.data.user; 
 
+      // role admin
+      if (user.role?.toLowerCase() === "admin") {
+        await AsyncStorage.setItem("token", accessToken);
+        await AsyncStorage.setItem("user", JSON.stringify(user));
+        Alert.alert("🎉 Chào Admin!", "Đăng nhập quyền quản trị thành công!");
+        router.replace("/admin/dashboard" as Href);
+        return;
+      }
+
+      // Người dùng
       await AsyncStorage.setItem("token", accessToken);
       await AsyncStorage.setItem("user", JSON.stringify(user));
-
       Alert.alert("🎉 Thành công", "Đăng nhập thành công!");
       router.replace("/home");
     } catch (error: any) {
@@ -53,6 +63,7 @@ export default function Login() {
       setLoading(false);
     }
   };
+
 
   const handleSocialLogin = (provider: string) => {
     Alert.alert("Đang phát triển", `Tính năng đăng nhập bằng ${provider} sắp có!`);

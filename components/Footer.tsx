@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TouchableOpacity, Platform, Dimensions } from "react-native";
+import { View, Text, TouchableOpacity, Dimensions } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter, usePathname } from "expo-router";
 
@@ -45,6 +45,7 @@ export default function Footer({ onTabPress }: FooterProps) {
         ${isWide ? "w-[430px] rounded-t-2xl" : "w-full"}
         h-[75px] px-3`}
       >
+        {/* Cột bên trái */}
         <View className="flex-row flex-1 justify-evenly">
           {tabs.slice(0, 2).map((tab) => (
             <TouchableOpacity
@@ -61,7 +62,7 @@ export default function Footer({ onTabPress }: FooterProps) {
               <Text
                 numberOfLines={1}
                 adjustsFontSizeToFit
-                className={`mt-1 text-[11px] ${
+                className={`mt-1 text-[14px] ${
                   activeTab === tab.key ? "text-[#3F72AF] font-semibold" : "text-gray-500"
                 }`}
               >
@@ -72,6 +73,8 @@ export default function Footer({ onTabPress }: FooterProps) {
         </View>
 
         <View className="w-[65px]" />
+
+        {/* Cột bên phải */}
         <View className="flex-row flex-1 justify-evenly">
           {tabs.slice(2).map((tab) => (
             <TouchableOpacity
@@ -88,7 +91,7 @@ export default function Footer({ onTabPress }: FooterProps) {
               <Text
                 numberOfLines={1}
                 adjustsFontSizeToFit
-                className={`mt-1 text-[11px] ${
+                className={`mt-1 text-[14px] ${
                   activeTab === tab.key ? "text-[#3F72AF] font-semibold" : "text-gray-500"
                 }`}
               >
@@ -99,12 +102,14 @@ export default function Footer({ onTabPress }: FooterProps) {
         </View>
       </View>
 
+      {/* Nút thêm phòng */}
       <TouchableOpacity
         onPress={handleAddRoom}
         activeOpacity={0.9}
-          className="absolute left-1/2 -translate-x-1/2 -top-[10px]
+        className="absolute left-1/2 -translate-x-1/2 -top-[10px]
           w-[60px] h-[60px] rounded-full bg-[#3F72AF]
-          items-center justify-center shadow-lg border-[4px] border-white">
+          items-center justify-center shadow-lg border-[4px] border-white"
+      >
         <Ionicons name="add" size={30} color="white" />
       </TouchableOpacity>
     </View>

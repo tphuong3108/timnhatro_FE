@@ -1,4 +1,4 @@
-import apiClient from "@/utils/apiClient";
+import apiClient from "@/services/apiClient";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { BlurView } from "expo-blur";

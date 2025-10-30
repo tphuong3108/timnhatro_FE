@@ -1,19 +1,19 @@
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-  View,
-  Text,
-  TouchableOpacity,
+  ActivityIndicator,
   Alert,
   SafeAreaView,
   ScrollView,
-  ActivityIndicator,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { TextInput } from "react-native-paper";
-import { useRouter } from "expo-router";
 import Logo from "../../assets/images/logodoc.svg";
-import { Ionicons } from "@expo/vector-icons";
-import apiClient from "../../utils/apiClient";
 import InputField from "../../components/InputField";
+import apiClient from "../../services/apiClient";
 
 export default function ChangePassword() {
   const router = useRouter();

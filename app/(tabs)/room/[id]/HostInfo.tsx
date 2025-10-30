@@ -32,10 +32,10 @@ export default function HostInfo({ room, contactHost }: any) {
 
   return (
     <View className="px-5 py-5 border-t border-gray-200">
-      <Text className="text-lg font-semibold text-[#112D4E] mb-3">Chủ trọ</Text>
+      <Text className="text-xl font-semibold text-[#3F72AF] mb-3">Chủ trọ</Text>
 
       {/* Thông tin chủ trọ */}
-      <View className="flex-row items-center mb-3">
+      <View className="flex-row items-center mb-3 ">
         <TouchableOpacity
           activeOpacity={0.8}
           onPress={() =>
@@ -52,7 +52,7 @@ export default function HostInfo({ room, contactHost }: any) {
         </TouchableOpacity>
 
         <View className="flex-1">
-          <Text className="text-base font-semibold text-[#112D4E]">
+          <Text className="text-base font-semibold text-[#3F72AF]">
             {room.host.fullName}
           </Text>
           {room.host.bio && (

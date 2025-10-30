@@ -1,39 +1,24 @@
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  ScrollView,
-} from "react-native";
+import { View, Text, TextInput, TouchableOpacity, ScrollView, Keyboard } from "react-native";
 
 export default function AddRoomForm({
-  roomName,
-  setRoomName,
-  price,
-  setPrice,
-  location,
-  setLocation,
-  marker,
-  setMarker,
-  description,
-  setDescription,
+  roomName, setRoomName,
+  price, setPrice,
+  location, setLocation,
+  marker, setMarker,
+  description, setDescription,
 }: any) {
   const [suggestions, setSuggestions] = useState<any[]>([]);
 
-  //  Gợi ý vị trí khi nhập
   const fetchSuggestions = async (text: string) => {
     setLocation(text);
     if (text.length < 3) {
       setSuggestions([]);
       return;
     }
-
     try {
       const res = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
-          text
-        )}&addressdetails=1&limit=5`
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(text)}&addressdetails=1&limit=5`
       );
       const data = await res.json();
       setSuggestions(data);
@@ -49,37 +34,42 @@ export default function AddRoomForm({
       longitude: parseFloat(item.lon),
     });
     setSuggestions([]);
+    Keyboard.dismiss();
   };
 
   return (
     <>
-      {/*  Tên phòng */}
       <Text className="text-[#3F72AF] font-semibold mb-1">Tên phòng</Text>
       <TextInput
         value={roomName}
         onChangeText={setRoomName}
         placeholder="VD: Phòng trọ sinh viên gần ĐH Bách Khoa"
+        returnKeyType="done"
+        onSubmitEditing={Keyboard.dismiss}
+        blurOnSubmit
         className="border border-gray-300 rounded-xl px-4 py-3 mb-4 text-[14px]"
       />
 
-      {/*  Giá thuê */}
-      <Text className="text-[#3F72AF] font-semibold mb-1">
-        Giá thuê (VNĐ/tháng)
-      </Text>
+      <Text className="text-[#3F72AF] font-semibold mb-1">Giá thuê (VNĐ/tháng)</Text>
       <TextInput
         value={price}
         onChangeText={setPrice}
         keyboardType="numeric"
         placeholder="VD: 2.500.000"
+        returnKeyType="done"
+        onSubmitEditing={Keyboard.dismiss}
+        blurOnSubmit
         className="border border-gray-300 rounded-xl px-4 py-3 mb-4 text-[14px]"
       />
 
-      {/*  Địa chỉ + gợi ý vị trí */}
       <Text className="text-[#3F72AF] font-semibold mb-1">Địa chỉ</Text>
       <TextInput
         value={location}
         onChangeText={fetchSuggestions}
         placeholder="Nhập địa chỉ hoặc chọn trên bản đồ"
+        returnKeyType="done"
+        onSubmitEditing={Keyboard.dismiss}
+        blurOnSubmit
         className="border border-gray-300 rounded-xl px-4 py-3 text-[14px]"
       />
 
@@ -92,27 +82,25 @@ export default function AddRoomForm({
                 onPress={() => handleSelectSuggestion(item)}
                 className="p-2 border-b border-gray-100"
               >
-                <Text className="text-gray-700 text-[13px]">
-                  {item.display_name}
-                </Text>
+                <Text className="text-gray-700 text-[13px]">{item.display_name}</Text>
               </TouchableOpacity>
             ))}
           </ScrollView>
         </View>
       )}
 
-      {/*  Mô tả */}
-      <Text className="text-[#3F72AF] font-semibold mb-1 mt-4">
-        Mô tả chi tiết
-      </Text>
+      <Text className="text-[#3F72AF] font-semibold mb-1 mt-4">Mô tả chi tiết</Text>
       <TextInput
         value={description}
         onChangeText={setDescription}
         placeholder="VD: Phòng rộng 20m², có gác lửng, gần chợ..."
-        className="border border-gray-300 rounded-xl px-4 py-3 mb-4 text-[14px]"
         multiline
         numberOfLines={5}
         textAlignVertical="top"
+        className="border border-gray-300 rounded-xl px-4 py-3 mb-4 text-[14px]"
+        returnKeyType="done"
+        onSubmitEditing={Keyboard.dismiss}
+        blurOnSubmit
       />
     </>
   );

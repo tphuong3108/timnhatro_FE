@@ -17,8 +17,8 @@ export function SheetHeader({
       </Animated.View>
 
       <View className="px-5 flex-row justify-between items-center mb-3">
-        <Text className="text-[#3F72AF] font-semibold text-lg">
-          {total} chỗ ở trong khu vực này
+        <Text className="text-[#3F72AF] font-semibold text-2xl">
+          Danh sách phòng
         </Text>
       </View>
     </>

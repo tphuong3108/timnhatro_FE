@@ -12,4 +12,5 @@ export const authApi = {
   }) => apiClient.post("/users/register", data),
 
   sendOtp: (email: string) => apiClient.post("/users/send-otp", { email }),
+  
 };

@@ -6,5 +6,5 @@ export const API = {
   LOGIN: `${API_BASE_URL}/users/login`,
   SEND_OTP: `${API_BASE_URL}/users/send-otp`,
   VERIFY_OTP: `${API_BASE_URL}/users/verify-otp`,
-  PROFILE: `${API_BASE_URL}/users/profile`,
+  PROFILE: `${API_BASE_URL}/profile`,
 };

@@ -1,39 +1,99 @@
-import React, { useState } from "react";
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
+import React, { useEffect, useState } from "react";
 import {
-  View,
-  Text,
-  TouchableOpacity,
+  ActivityIndicator,
   Alert,
   SafeAreaView,
   ScrollView,
-  ActivityIndicator,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { TextInput } from "react-native-paper";
-import { useRouter } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { jwtDecode } from "jwt-decode";
 import Logo from "../../assets/images/logodoc.svg";
-import apiClient from "../../utils/apiClient";
 import InputField from "../../components/InputField";
+import apiClient from "@/services/apiClient";
+
+interface DecodedToken {
+  id: string;
+  email: string;
+  role: string;
+  iat?: number;
+  exp?: number;
+}
 
 export default function EditProfile() {
   const router = useRouter();
-
-  const [name, setName] = useState("Nguyễn Văn A");
-  const [email, setEmail] = useState("nguyenvana@example.com");
-  const [phone, setPhone] = useState("0987654321");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [bio, setBio] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
-  const [bio, setBio] = useState("Tôi là sinh viên đang tìm nhà trọ gần trường.");
-  const [loading, setLoading] = useState<"save" | null>(null);
+  const [loading, setLoading] = useState<"fetch" | "save" | null>("fetch");
 
+  // ✅ Lấy email từ token (chỉ khi cần)
+  const loadFromToken = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      if (!token) return;
+      const decoded: DecodedToken = jwtDecode(token);
+      if (decoded?.email) setEmail(decoded.email);
+    } catch (error) {
+      console.log("Token decode error:", error);
+    }
+  };
+  const fetchProfile = async () => {
+    try {
+      const res = await apiClient.get("/me");
+      const data = res.data?.data;
+      console.log("🟢 Extracted data:", data);
+
+      if (!data) throw new Error("Không có dữ liệu người dùng");
+
+      // ✅ Nếu có fullName, tách ra họ & tên
+      if (data.fullName) {
+        const parts = data.fullName.trim().split(" ");
+        const last = parts.pop() || "";
+        const first = parts.join(" ");
+        setFirstName(first);
+        setLastName(last);
+      }
+
+      setEmail(data.email || "");
+      setPhone(data.phone || "");
+      setBio(data.bio || "");
+    } catch (error: any) {
+      console.log("❌ Fetch profile error:", error.response?.data || error.message);
+      Alert.alert("Lỗi", "Không thể tải thông tin người dùng.");
+    } finally {
+      setLoading(null);
+    }
+  };
+
+  // ✅ Đảm bảo token load xong rồi mới lấy profile
+  useEffect(() => {
+    (async () => {
+      await loadFromToken();
+      await new Promise((r) => setTimeout(r, 100)); // tránh đè state
+      await fetchProfile();
+    })();
+  }, []);
+
+  // ✅ Cập nhật thông tin
   const handleSave = async () => {
-    if (!name || !email || !phone) {
+    if (!firstName || !lastName || !email || !phone) {
       return Alert.alert("Thiếu thông tin", "Vui lòng nhập đầy đủ các trường bắt buộc!");
     }
 
     try {
       setLoading("save");
-      await apiClient.put("/users/update-profile", {
-        fullName: name,
+      await apiClient.patch("/me", {
+        firstName,
+        lastName,
         email,
         phone,
         bio,
@@ -49,6 +109,15 @@ export default function EditProfile() {
     }
   };
 
+  // ✅ Hiển thị khi đang load
+  if (loading === "fetch")
+    return (
+      <View className="flex-1 justify-center items-center bg-white">
+        <ActivityIndicator size="large" color="#3F72AF" />
+        <Text className="text-gray-500 mt-3">Đang tải hồ sơ...</Text>
+      </View>
+    );
+
   return (
     <SafeAreaView className="flex-1 bg-white">
       <ScrollView
@@ -56,7 +125,6 @@ export default function EditProfile() {
         showsVerticalScrollIndicator={false}
       >
         <View className="flex-1 bg-white px-6 pt-12 pb-10">
-          {/* Logo */}
           <View className="items-center mb-2">
             <Logo width={200} height={200} />
           </View>
@@ -68,8 +136,11 @@ export default function EditProfile() {
             Cập nhật thông tin cá nhân của bạn
           </Text>
 
-          {/* Họ tên */}
-          <InputField label="Họ và tên" value={name} onChangeText={setName} />
+          {/* Họ */}
+          <InputField label="Họ" value={firstName} onChangeText={setFirstName} />
+
+          {/* Tên */}
+          <InputField label="Tên" value={lastName} onChangeText={setLastName} />
 
           {/* Email */}
           <InputField
@@ -96,7 +167,7 @@ export default function EditProfile() {
             numberOfLines={5}
           />
 
-          {/* Mật khẩu */}
+          {/* Mật khẩu (ẩn) */}
           <InputField
             label="Mật khẩu"
             value="**********"

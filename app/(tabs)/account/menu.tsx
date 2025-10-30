@@ -1,14 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   View,
   Text,
   TouchableOpacity,
   ScrollView,
   ActivityIndicator,
-  Platform,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { useRouter, useFocusEffect } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type MenuItem =
@@ -19,18 +18,27 @@ export default function AccountMenu() {
   const router = useRouter();
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
 
+  const checkLoginStatus = async () => {
+    const token = await AsyncStorage.getItem("token");
+    setIsLoggedIn(!!token);
+  };
+
+  // ✅ Kiểm tra khi app start lại (reset)
   useEffect(() => {
-    const checkLoginStatus = async () => {
-      const token = await AsyncStorage.getItem("token");
-      setIsLoggedIn(!!token);
-    };
     checkLoginStatus();
   }, []);
+
+  // ✅ Kiểm tra lại mỗi khi màn hình focus
+  useFocusEffect(
+    useCallback(() => {
+      checkLoginStatus();
+    }, [])
+  );
 
   const handleLogout = async () => {
     await AsyncStorage.multiRemove(["token", "user"]);
     setIsLoggedIn(false);
-    router.replace("/home");
+    router.replace("/home"); // có thể đổi sang router.push nếu muốn
   };
 
   if (isLoggedIn === null) {
@@ -71,8 +79,8 @@ export default function AccountMenu() {
 
   return (
     <ScrollView
-      className="flex-1 bg-white px-4 pt-6"
-      contentContainerStyle={{ padding: 16, paddingBottom: 50 }}
+      className="flex-1 bg-white px-6 pt-12"
+      contentContainerStyle={{ paddingBottom: 50 }}
       showsVerticalScrollIndicator={false}
     >
       {allItems.map((item, index) => (

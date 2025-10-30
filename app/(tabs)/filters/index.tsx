@@ -1,14 +1,14 @@
-import React from "react";
-import { ScrollView, View, Text } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { FilterProvider } from "./FilterContext";
-import SearchBar from "./SearchBar";
-import FilterSection from "./FilterSection";
-import AmenitiesSelector from "./AmenitiesSelector";
-import RoomList from "./RoomList";
-import TopRatedRooms from "./TopRatedRooms";
+import React from "react";
+import { ScrollView, Text, View } from "react-native";
 import NearbyRooms from "../home/NearbyRooms";
+import AmenitiesSelector from "./AmenitiesSelector";
+import { FilterProvider } from "./FilterContext";
 import FilterFooter from "./FilterFooter";
+import FilterSection from "./FilterSection";
+import RoomList from "./RoomList";
+import SearchBar from "./SearchBar";
+import TopRatedRooms from "./TopRatedRooms";
 
 export default function FindRoomIndex() {
   return (
@@ -16,7 +16,7 @@ export default function FindRoomIndex() {
       <ScrollView
         className="flex-1 bg-white"
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 80 }}
+        contentContainerStyle={{ paddingBottom: 14 }}
       >
         {/*  Thanh tìm kiếm */}
         <View className="px-5 py-10">
@@ -52,7 +52,7 @@ export default function FindRoomIndex() {
           <View className="flex-row items-center mb-6">
             <Ionicons name="star" size={20} color="#FFD700" />
             <Text className="ml-2 text-lg font-semibold text-[#112D4E]">
-              Phòng nổi bật & được đánh giá cao
+              Phòng được đánh giá cao
             </Text>
           </View>
           <TopRatedRooms />

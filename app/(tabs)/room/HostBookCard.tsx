@@ -10,7 +10,6 @@ import {
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { X } from "lucide-react-native";
-import EvilIcons from "@expo/vector-icons/EvilIcons";
 import { useRouter } from "expo-router";
 import { Host } from "@/constants/data/rooms";
 
@@ -18,7 +17,7 @@ export function HostBookCard({ host }: { host: Host }) {
   const [visible, setVisible] = useState(false);
   const [isFlipped, setIsFlipped] = useState(false);
   const flipAnim = useRef(new Animated.Value(0)).current;
-  const router = useRouter(); 
+  const router = useRouter();
 
   const openBook = () => {
     setVisible(true);
@@ -48,7 +47,7 @@ export function HostBookCard({ host }: { host: Host }) {
   });
 
   const handleAvatarPress = () => {
-    closeBook(); 
+    closeBook();
     router.push({
       pathname: "/user/[id]",
       params: { id: host._id },
@@ -57,7 +56,7 @@ export function HostBookCard({ host }: { host: Host }) {
 
   return (
     <>
-      {/* Cuốn sổ nhỏ */}
+      {/* 📘 Cuốn sổ nhỏ */}
       <TouchableOpacity
         onPress={openBook}
         activeOpacity={0.85}
@@ -77,7 +76,7 @@ export function HostBookCard({ host }: { host: Host }) {
         </View>
       </TouchableOpacity>
 
-      {/*  Modal mở sổ */}
+      {/* 📖 Modal mở sổ */}
       <Modal visible={visible} transparent animationType="fade">
         <View className="flex-1 bg-black/40 justify-center items-center">
           <Animated.View
@@ -87,12 +86,18 @@ export function HostBookCard({ host }: { host: Host }) {
             className="w-[85%] bg-white rounded-2xl border border-gray-200 shadow-xl p-6"
           >
             <View style={{ transform: [{ scaleX: -1 }] }}>
-              <TouchableOpacity onPress={closeBook} className="absolute -right-2 -top-2">
+              <TouchableOpacity
+                onPress={closeBook}
+                className="absolute -right-2 -top-2"
+              >
                 <X size={25} color="black" />
               </TouchableOpacity>
 
               <View className="items-center mt-4">
-                <TouchableOpacity onPress={handleAvatarPress} activeOpacity={0.8}>
+                <TouchableOpacity
+                  onPress={handleAvatarPress}
+                  activeOpacity={0.8}
+                >
                   <Image
                     source={{ uri: host.avatar }}
                     className="w-20 h-20 rounded-full mb-2 border border-gray-300"
@@ -102,26 +107,15 @@ export function HostBookCard({ host }: { host: Host }) {
                 <Text className="text-lg font-semibold text-gray-800">
                   {host.fullName}
                 </Text>
-
-                <View className="flex-row items-center mt-1">
-                  <EvilIcons name="star" size={22} color="#3F72AF" />
-                  <Text className="text-gray-500 ml-1">Chủ nhà siêu cấp</Text>
-                </View>
               </View>
 
               {host.email && (
-                <View className="flex-row justify-center items-center mt-2">
+                <View className="flex-row justify-center items-center mt-3">
                   <Feather name="mail" size={16} color="#3F72AF" />
                   <Text className="text-gray-700 text-center ml-2">
                     {host.email}
                   </Text>
                 </View>
-              )}
-
-              {host.bio && (
-                <Text className="text-gray-700 text-center mt-3">
-                  {host.bio}
-                </Text>
               )}
             </View>
           </Animated.View>

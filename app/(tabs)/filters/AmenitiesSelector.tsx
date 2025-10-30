@@ -9,8 +9,10 @@ import Animated, {
   Easing,
   FadeInUp,
 } from "react-native-reanimated";
+import { getAllAmenities } from "@/services/amenityApi";
+import { useFilter } from "./FilterContext";
 
-// 🎞 Hiệu ứng hiện dần từng tiện ích
+// 🌊 Hiệu ứng hiện dần
 function useRippleAnimation(index: number) {
   const scale = useSharedValue(0.85);
   const opacity = useSharedValue(0);
@@ -21,7 +23,6 @@ function useRippleAnimation(index: number) {
       scale.value = withTiming(1, { duration: 400, easing: Easing.out(Easing.exp) });
       opacity.value = withTiming(1, { duration: 350 });
     }, delay);
-
     return () => clearTimeout(timeout);
   }, [index]);
 
@@ -33,30 +34,42 @@ function useRippleAnimation(index: number) {
   return animatedStyle;
 }
 
-const allAmenities = [
-  { icon: "wifi-outline", name: "Wi-Fi miễn phí", color: "#3F72AF", type: "Ionicons" },
-  { icon: "tv-outline", name: "TV", color: "#3F72AF", type: "Ionicons" },
-  { icon: "snowflake", name: "Điều hòa", color: "#3F72AF", type: "Material" },
-  { icon: "washing-machine", name: "Máy giặt", color: "#3F72AF", type: "Material" },
-  { icon: "stove", name: "Khu bếp", color: "#3F72AF", type: "Material" },
-  { icon: "fridge-outline", name: "Tủ lạnh", color: "#3F72AF", type: "Material" },
-  { icon: "car-outline", name: "Chỗ để xe", color: "#3F72AF", type: "Ionicons" },
-  { icon: "smoke-detector", name: "Máy báo khói", color: "#3F72AF", type: "Material" },
-  { icon: "shield-account", name: "An ninh", color: "#3F72AF", type: "Material" },
+// 🎨 Danh sách keyword map sang icon
+const ICON_MAP = [
+  { keywords: ["wifi"], icon: "wifi-outline", type: "Ionicons" },
+  { keywords: ["tivi", "tv"], icon: "tv-outline", type: "Ionicons" },
+  { keywords: ["điều hòa", "máy lạnh"], icon: "snowflake", type: "Material" },
+  { keywords: ["máy giặt"], icon: "washing-machine", type: "Material" },
+  { keywords: ["bếp", "nấu ăn"], icon: "stove", type: "Material" },
+  { keywords: ["tủ lạnh"], icon: "fridge-outline", type: "Material" },
+  { keywords: ["xe", "ô tô"], icon: "car-outline", type: "Ionicons" },
+  { keywords: ["ban công"], icon: "balcony", type: "Material" },
+  { keywords: ["bồn tắm"], icon: "bathtub", type: "Material" },
+  { keywords: ["gym"], icon: "dumbbell", type: "Material" },
+  { keywords: ["hồ bơi", "bể bơi"], icon: "pool", type: "Material" },
+  { keywords: ["khói"], icon: "smoke-detector", type: "Material" },
+  { keywords: ["an ninh"], icon: "shield-account", type: "Material" },
+  { keywords: ["sơ cứu"], icon: "medical-bag", type: "Material" },
+  { keywords: ["chữa cháy"], icon: "fire-extinguisher", type: "Material" },
+  { keywords: ["làm việc"], icon: "briefcase", type: "Material" },
+  { keywords: ["ăn uống"], icon: "silverware-fork-knife", type: "Material" },
 ];
 
-const AmenityItem = ({
-  item,
-  index,
-  isSelected,
-  onPress,
-}: {
-  item: any;
-  index: number;
-  isSelected: boolean;
-  onPress?: () => void;
-}) => {
+function getIconForAmenity(name: string) {
+  const normalized = name.toLowerCase().replace(/[\s\-_/]+/g, "");
+  const found = ICON_MAP.find((i) =>
+    i.keywords.some((kw) => normalized.includes(kw.replace(/[\s\-_/]+/g, "")))
+  );
+
+  return found
+    ? { icon: found.icon, type: found.type }
+    : { icon: "checkmark-circle-outline", type: "Ionicons" };
+}
+
+
+const AmenityItem = ({ item, index, isSelected, onPress }: any) => {
   const animatedStyle = useRippleAnimation(index);
+  const IconComponent = item.type === "Ionicons" ? Ionicons : MaterialCommunityIcons;
 
   return (
     <TouchableOpacity
@@ -69,7 +82,7 @@ const AmenityItem = ({
           animatedStyle,
           {
             height: 85,
-            backgroundColor: "#fff",
+            backgroundColor: isSelected ? "#E8F0FE" : "#fff",
             borderRadius: 16,
             borderWidth: 1,
             borderColor: isSelected ? "#3F72AF" : "#E5E7EB",
@@ -82,11 +95,7 @@ const AmenityItem = ({
           },
         ]}
       >
-        {item.type === "Ionicons" ? (
-          <Ionicons name={item.icon as any} size={26} color={item.color} />
-        ) : (
-          <MaterialCommunityIcons name={item.icon as any} size={26} color={item.color} />
-        )}
+        <IconComponent name={item.icon as any} size={26} color="#3F72AF" />
         <Text
           numberOfLines={2}
           ellipsizeMode="tail"
@@ -106,27 +115,40 @@ const AmenityItem = ({
   );
 };
 
-export default function AmenitiesSelector({ room }: { room?: any }) {
-  const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
+export default function AmenitiesSelector() {
+  const { filters, setFilters } = useFilter();
+  const [amenities, setAmenities] = useState<any[]>([]);
 
-  const toggleAmenity = (name: string) => {
-    setSelectedAmenities((prev) =>
-      prev.includes(name)
-        ? prev.filter((item) => item !== name)
-        : [...prev, name]
-    );
+  useEffect(() => {
+    const fetchAmenities = async () => {
+      try {
+        const data = await getAllAmenities();
+
+        // Gán icon cho từng tiện ích dựa trên tên
+        const mapped = data.map((item: any) => {
+          const { icon, type } = getIconForAmenity(item.name);
+          return { ...item, icon, type };
+        });
+
+        setAmenities(mapped);
+      } catch (error) {
+        console.error("❌ Lỗi khi lấy danh sách tiện ích:", error);
+        setAmenities([]);
+      }
+    };
+    fetchAmenities();
+  }, []);
+
+  const toggleAmenity = (id: string) => {
+    setFilters((prev) => {
+      const updated = prev.amenities.includes(id)
+        ? prev.amenities.filter((a) => a !== id)
+        : [...prev.amenities, id];
+      return { ...prev, amenities: updated };
+    });
   };
 
-  const filteredAmenities =
-    room?.amenities?.length && room.amenities.length > 0
-      ? allAmenities.filter((a) =>
-          room.amenities.some(
-            (b: string) => b.toLowerCase().trim() === a.name.toLowerCase().trim()
-          )
-        )
-      : allAmenities;
-
-  if (!filteredAmenities || filteredAmenities.length === 0) return null;
+  if (!amenities || amenities.length === 0) return null;
 
   return (
     <Animated.View
@@ -138,20 +160,17 @@ export default function AmenitiesSelector({ room }: { room?: any }) {
       }}
     >
       <FlatList
-        data={filteredAmenities}
+        data={amenities}
         numColumns={3}
-        keyExtractor={(_, i) => i.toString()}
-        columnWrapperStyle={{
-          justifyContent: "flex-start",
-          gap: 12,
-        }}
+        keyExtractor={(item, i) => item._id || i.toString()}
+        columnWrapperStyle={{ justifyContent: "flex-start", gap: 12 }}
         scrollEnabled={false}
         renderItem={({ item, index }) => (
           <AmenityItem
             item={item}
             index={index}
-            isSelected={selectedAmenities.includes(item.name)}
-            onPress={() => toggleAmenity(item.name)}
+            isSelected={filters.amenities.includes(item._id)}
+            onPress={() => toggleAmenity(item._id)}
           />
         )}
       />

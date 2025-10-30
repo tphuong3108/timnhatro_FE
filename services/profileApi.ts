@@ -1,0 +1,34 @@
+// src/services/profileApi.ts
+import apiClient from "./apiClient";
+
+export const profileApi = {
+  getMyProfile: async () => {
+    const res = await apiClient.get("/me");
+    return res.data.data; 
+  },
+
+  updateProfile: async (data: any) => {
+    const res = await apiClient.patch("/me", data);
+    return res.data.data;
+  },
+
+  getMyReviews: async () => {
+    const res = await apiClient.get("/me/reviews");
+    return res.data.data;
+  },
+
+  upgradeRole: async (payload: { revert: boolean }) => {
+    const res = await apiClient.patch("/me/upgrade-role", payload);
+    return res.data.data;
+  },
+
+  banAccount: async () => {
+    const res = await apiClient.put("/users/me/ban");
+    return res.data;
+  },
+
+  getPublicProfile: async (id: string) => {
+    const res = await apiClient.get(`/me/${id}`);
+    return res.data.data;
+  },
+};

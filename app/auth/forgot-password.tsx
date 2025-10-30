@@ -1,23 +1,23 @@
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-  SafeAreaView,
+  ActivityIndicator,
+  Alert,
   KeyboardAvoidingView,
   Platform,
+  SafeAreaView,
   ScrollView,
   Text,
   TouchableOpacity,
   View,
-  Alert,
-  ActivityIndicator,
 } from "react-native";
 import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
-import Logo from "../../assets/images/logodoc.svg";
+import AppleIcon from "../../assets/images/apple.svg";
 import FacebookIcon from "../../assets/images/facebook.svg";
 import GoogleIcon from "../../assets/images/google.svg";
-import AppleIcon from "../../assets/images/apple.svg";
-import apiClient from "../../utils/apiClient";
+import Logo from "../../assets/images/logodoc.svg";
 import InputField from "../../components/InputField";
+import apiClient from "../../services/apiClient";
 
 export default function ForgotPassword() {
   const router = useRouter();
