@@ -1,14 +1,11 @@
-import { useState, useEffect } from "react";
-import * as ImagePicker from "expo-image-picker";
-import * as Location from "expo-location";
 import apiClient from "@/services/apiClient";
 import { profileApi } from "@/services/profileApi";
-import Toast from "react-native-toast-message";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
-// 🌤 Cloudinary config (theo BE bạn)
-const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/dmt9ffefy/upload";
-const CLOUDINARY_PRESET = "timnhatro_uploads"; // ⚠️ đổi nếu preset khác trong Cloudinary
+import * as ImagePicker from "expo-image-picker";
+import * as Location from "expo-location";
+import { useEffect, useState } from "react";
+import Toast from "react-native-toast-message";
+import ReactNativeBlobUtil from "react-native-blob-util";
 
 export const useAddRoomLogic = () => {
   const [roomName, setRoomName] = useState("");
@@ -31,6 +28,7 @@ export const useAddRoomLogic = () => {
         Toast.show({ type: "error", text1: "Cần quyền truy cập vị trí!" });
         return;
       }
+
       const loc = await Location.getCurrentPositionAsync({});
       setMarker({
         latitude: loc.coords.latitude,
@@ -39,16 +37,17 @@ export const useAddRoomLogic = () => {
       Toast.show({ type: "info", text1: "Đã chọn vị trí hiện tại!" });
     } catch (err) {
       console.log("❌ Lỗi lấy vị trí:", err);
+      Toast.show({ type: "error", text1: "Không thể lấy vị trí hiện tại!" });
     } finally {
       setLoadingLocation(false);
     }
   };
 
-  // 📸 Chọn ảnh/video
+  // 📸 Chọn ảnh hoặc video
   const pickMedia = async () => {
     try {
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaType.All,
+        mediaTypes: ImagePicker.MediaTypeOptions.All,
         allowsMultipleSelection: true,
         quality: 0.8,
       });
@@ -56,9 +55,11 @@ export const useAddRoomLogic = () => {
       if (!result.canceled) {
         const uris = result.assets.map((a) => a.uri);
         setMedia((prev) => [...prev, ...uris]);
+        console.log("🖼️ Chọn media thành công:", uris);
       }
     } catch (err) {
       console.log("❌ Lỗi chọn media:", err);
+      Toast.show({ type: "error", text1: "Không thể chọn ảnh hoặc video!" });
     }
   };
 
@@ -66,64 +67,36 @@ export const useAddRoomLogic = () => {
     setMedia((prev) => prev.filter((m) => m !== uri));
   };
 
-  // 📤 Upload file lên Cloudinary
-  const uploadToCloudinary = async (uri: string): Promise<string> => {
-    try {
-      const formData = new FormData();
-      const fileType = uri.endsWith(".mp4") ? "video/mp4" : "image/jpeg";
-      formData.append("file", { uri, type: fileType, name: "upload" } as any);
-      formData.append("upload_preset", CLOUDINARY_PRESET);
-
-      const res = await fetch(CLOUDINARY_URL, {
-        method: "POST",
-        body: formData,
-      });
-      const data = await res.json();
-      return data.secure_url;
-    } catch (error) {
-      console.log("❌ Upload lỗi:", error);
-      return uri;
-    }
-  };
-
-  // 🗺️ Chọn marker từ bản đồ
+  // 🗺️ Chọn vị trí thủ công
   const handleMapPress = (e: any) => {
     const { latitude, longitude } = e.nativeEvent.coordinate;
     setMarker({ latitude, longitude });
   };
 
-  // 🔍 Lấy wardId từ BE
+  // 🔍 Lấy wardId theo tên
   const fetchWardIdByName = async (wardName: string): Promise<string | null> => {
     try {
       const res = await apiClient.get(`/wards/name/${encodeURIComponent(wardName)}`);
-      return res.data.data._id;
+      return res.data.data?._id || null;
     } catch {
       console.log("⚠️ Không tìm thấy ward:", wardName);
       return null;
     }
   };
 
-  // 🧠 Nâng quyền khi vào trang
+  // 🧠 Tự động nâng quyền Host khi mở màn
   useEffect(() => {
     const upgradeRole = async () => {
       try {
         const token = await AsyncStorage.getItem("token");
-        if (!token) {
-          console.log("⚠️ Chưa có token, không thể nâng role");
-          return;
-        }
+        if (!token) return;
 
         const profile = await profileApi.getMyProfile();
-        console.log("👤 Role hiện tại:", profile.role);
-
         if (profile.role === "tenant") {
-          const res = await profileApi.upgradeRole({ revert: false });
-          console.log("✅ Nâng quyền thành host:", res);
-          setIsHost(true);
+          await profileApi.upgradeRole({ revert: false });
           Toast.show({ type: "info", text1: "Đã đổi quyền sang Host" });
-        } else {
-          setIsHost(true);
         }
+        setIsHost(true);
       } catch (err) {
         console.log("⚠️ Không thể nâng role:", err);
       }
@@ -131,80 +104,137 @@ export const useAddRoomLogic = () => {
 
     upgradeRole();
 
-    // Khi rời màn hình → revert lại
     return () => {
       if (isHost) {
         profileApi.upgradeRole({ revert: true }).then(() => {
-          console.log("↩️ Revert về tenant");
           Toast.show({ type: "info", text1: "Đã trở lại quyền Tenant" });
         });
       }
     };
   }, [isHost]);
 
-  // 🚀 Gửi dữ liệu đăng phòng
-  const handleSubmit = async () => {
-    if (!roomName || !price || !location || !marker) {
-      Toast.show({ type: "error", text1: "Vui lòng nhập đầy đủ thông tin!" });
-      return;
-    }
+  // 🏠 Cập nhật địa chỉ khi marker thay đổi
+  useEffect(() => {
+    const updateAddressFromMarker = async () => {
+      if (!marker) return;
+      try {
+        const [geo] = await Location.reverseGeocodeAsync({
+          latitude: marker.latitude,
+          longitude: marker.longitude,
+        });
+        if (geo) {
+          const ward = geo.subregion || geo.district || "";
+          const city = geo.city || geo.region || "";
+          const street = geo.name || geo.street || "";
+          const address = `${street} ${ward ? ward + ", " : ""}${city}`;
+          setLocation(address);
+          console.log("📍 Địa chỉ tự động:", address);
+        }
+      } catch (error) {
+        console.log("❌ Lỗi reverse geocoding:", error);
+      }
+    };
+    updateAddressFromMarker();
+  }, [marker]);
 
-    // Tìm phường
+const handleSubmit = async () => {
+  console.log("🖱️ Bấm nút đăng phòng");
+  console.log("🚀 handleSubmit được gọi!");
+
+  if (!roomName || !price || !location || !marker) {
+    Toast.show({ type: "error", text1: "Vui lòng nhập đầy đủ thông tin!" });
+    return;
+  }
+
+  try {
+    setLoadingSubmit(true);
     let wardId: string | null = null;
-    const matchWard = location.match(/Phường\s*([^,]+)/i) || location.match(/P\.\s*([^,]+)/i);
+    const matchWard =
+      location.match(/Phường\s*([^,]+)/i) ||
+      location.match(/P\.\s*([^,]+)/i) ||
+      location.match(/X\.\s*([^,]+)/i) ||
+      location.match(/Xã\s*([^,]+)/i);
+
     if (matchWard && matchWard[1]) {
       wardId = await fetchWardIdByName(matchWard[1].trim());
     }
-
     if (!wardId) {
-      Toast.show({
-        type: "error",
-        text1: "Không tìm thấy phường!",
-        text2: "Hãy nhập đúng định dạng: P. Linh Trung, TP. Thủ Đức",
-      });
+      wardId = "68fece1de79afdce26641857";
+      console.log("⚠️ Không tìm thấy ward, dùng mặc định:", wardId);
+    }
+
+    const token = await AsyncStorage.getItem("token");
+    if (!token) {
+      Toast.show({ type: "error", text1: "Chưa đăng nhập!" });
       return;
     }
 
-    try {
-      setLoadingSubmit(true);
+    const uploadUrl = `${apiClient.defaults.baseURL}/hosts/rooms`;
+    console.log("📡 Gửi request tới:", uploadUrl);
 
-      // Upload media lên Cloudinary
-      const uploadedUrls = await Promise.all(media.map(uploadToCloudinary));
+    // Tạo FormData
+    const formData = new FormData();
+    formData.append("name", roomName);
+    formData.append("address", location);
+    formData.append("price", price);
+    formData.append("description", description);
+    formData.append("ward", wardId || "");
 
-      const payload = {
-        name: roomName,
-        address: location,
-        price: Number(price),
-        description,
-        amenities: selectedAmenities,
-        ward: wardId,
-        location: {
-          type: "Point",
-          coordinates: [marker.longitude, marker.latitude],
-        },
-        images: uploadedUrls.filter((u) => !u.endsWith(".mp4")),
-        videos: uploadedUrls.filter((u) => u.endsWith(".mp4")),
-      };
+    selectedAmenities.forEach((a) => formData.append("amenities", a));
+    formData.append("location[type]", "Point");
+    formData.append("location[coordinates][]", marker.longitude.toString());
+    formData.append("location[coordinates][]", marker.latitude.toString());
 
-      console.log("📦 Dữ liệu đăng phòng:", JSON.stringify(payload, null, 2));
+    // Đảm bảo bạn gửi ảnh đúng cách
+    console.log("📤 Thêm media:", media.length);
+    media.forEach((uri, index) => {
+      const isVideo = uri.endsWith(".mp4");
+      const fileType = isVideo ? "video/mp4" : "image/jpeg";
+      const fileName = uri.split("/").pop() || (isVideo ? `video_${index}.mp4` : `image_${index}.jpg`);
 
-      const res = await apiClient.post("/hosts/rooms", payload);
-      console.log("✅ Kết quả:", res.data);
-      Toast.show({
-        type: "success",
-        text1: "🎉 Đăng phòng thành công!",
-      });
-    } catch (err: any) {
-      console.log("❌ Lỗi đăng phòng:", err.response?.data || err.message);
+      formData.append(isVideo ? "videos" : "images", {
+        uri,
+        type: fileType,
+        name: fileName,
+      } as any);
+    });
+
+    console.log("📦 FormData đã tạo xong:", JSON.stringify(formData));
+
+    // Gửi request tới backend
+    const res = await fetch(uploadUrl, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData,
+    });
+
+    const data = await res.json();
+    console.log("✅ Phản hồi BE:", data);
+
+    if (res.ok) {
+      Toast.show({ type: "success", text1: "🎉 Đăng phòng thành công!" });
+    } else {
       Toast.show({
         type: "error",
-        text1: "Đăng phòng thất bại!",
-        text2: err.response?.data?.message || "Vui lòng thử lại sau.",
+        text1: "Lỗi đăng phòng!",
+        text2: data.message || "Thử lại sau.",
       });
-    } finally {
-      setLoadingSubmit(false);
     }
-  };
+  } catch (err: any) {
+    console.log("❌ Lỗi đăng phòng:", err.message);
+    Toast.show({
+      type: "error",
+      text1: "Đăng phòng thất bại!",
+      text2: err.message || "Vui lòng thử lại sau.",
+    });
+  } finally {
+    setLoadingSubmit(false);
+  }
+};
+
+
 
   return {
     roomName,
