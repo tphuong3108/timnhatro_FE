@@ -5,9 +5,11 @@ import PostCard from "@/components/ui/PostCard";
 
 interface MyPostsProps {
   rooms?: any[];
+  onEdit?: (id: string) => void;
+  onDelete?: (id: string) => void;
 }
 
-export default function MyPosts({ rooms = [] }: MyPostsProps) {
+export default function MyPosts({ rooms = [], onEdit, onDelete }: MyPostsProps) {
   if (rooms.length === 0)
     return (
       <View className="py-10 items-center">
@@ -31,7 +33,9 @@ export default function MyPosts({ rooms = [] }: MyPostsProps) {
               name: item.name,
               address: item.address,
               images: item.images,
+              createdBy: item.createdBy,
             }}
+            onDeleted={() => onDelete?.(item._id)}
           />
         )}
         columnWrapperStyle={{ justifyContent: "space-between" }}
