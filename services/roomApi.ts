@@ -66,12 +66,6 @@ export const roomApi = {
     return res.data.data;
   },
 
-  //  Báo cáo phòng
-  reportRoom: async (id: string, reason: string) => {
-    const res = await apiClient.post(`/rooms/${id}/report`, { reason });
-    return res.data.data;
-  },
-
   createRoom: async (formData: FormData) => {
     const res = await apiClient.post("/hosts/rooms", formData, {
       headers: {
@@ -102,5 +96,9 @@ export const roomApi = {
   deleteRoom: async (id: string) => {
     const res = await apiClient.delete(`/rooms/${id}`);
     return res.data.data;
+  },
+  reportRoom: async (id: string, reason: string) => {
+    const res = await apiClient.post(`/rooms/${id}/report`, { reason });
+    return res.data;
   },
 };

@@ -30,33 +30,33 @@ interface RoomCardProps {
 
 export default function PostCard({ item, onDeleted }: RoomCardProps) {
   const router = useRouter();
-  const imageUri = item.image || item.images?.[0];
-  const roomId = item._id || item.id;
   const [isOwner, setIsOwner] = useState(false);
 
+  // 🧠 Xác định ảnh hiển thị và ID phòng
+  const imageUri =
+    item.image ||
+    item.images?.[0] ||
+    "https://placehold.co/300x200?text=No+Image";
+  const roomId = item._id || item.id;
+  const slugOrId = item.slug || roomId; // fallback nếu slug chưa có
+
+  // 🧩 Kiểm tra quyền sở hữu phòng
   useEffect(() => {
     const checkOwner = async () => {
       try {
         const token = await AsyncStorage.getItem("token");
-        if (!token) {
-          console.log("⚠️ Không có token, không xác định được chủ sở hữu.");
-          return;
-        }
+        if (!token) return;
+
         const decoded: any = jwtDecode(token);
         const createdById =
           typeof item.createdBy === "object"
             ? item.createdBy._id
             : item.createdBy;
 
-        console.log("🧩 Kiểm tra quyền sở hữu:");
-        console.log("   - decoded:", decoded);
-        console.log("   - createdById:", createdById);
-
         if (decoded.id === createdById || decoded._id === createdById) {
-          console.log("✅ Đây là bài đăng của chính user");
           setIsOwner(true);
         } else {
-          console.log("🚫 Không phải chủ bài đăng này");
+          setIsOwner(false);
         }
       } catch (err) {
         console.log("❌ Lỗi decode token:", err);
@@ -65,13 +65,17 @@ export default function PostCard({ item, onDeleted }: RoomCardProps) {
     checkOwner();
   }, [item]);
 
+  // ✏️ Xử lý khi bấm sửa
   const handleEdit = () => {
-    console.log("🟢 Bấm SỬA phòng:", roomId);
-    router.push(`/room/edit/${roomId}` as any);
+    if (!roomId)
+      return Alert.alert("Lỗi", "Không tìm thấy ID phòng để chỉnh sửa.");
+    router.push(`/(tabs)/room/edit/${roomId}`);
   };
 
+  // 🗑️ Xử lý khi bấm xóa
   const handleDelete = async () => {
-    console.log("🟠 Bấm XÓA phòng:", roomId);
+    if (!roomId)
+      return Alert.alert("Lỗi", "Không tìm thấy ID phòng để xóa.");
 
     Alert.alert("🗑️ Xóa phòng", "Bạn có chắc muốn xóa phòng này không?", [
       { text: "Hủy", style: "cancel" },
@@ -82,25 +86,30 @@ export default function PostCard({ item, onDeleted }: RoomCardProps) {
           try {
             const token = await AsyncStorage.getItem("token");
             if (!token) {
-              console.log("❌ Không có token khi xóa phòng");
-              Alert.alert("Lỗi", "Bạn cần đăng nhập lại để xóa phòng.");
+              Alert.alert("Lỗi", "Vui lòng đăng nhập lại để xóa phòng.");
               return;
             }
 
-            const res = await apiClient.delete(`/hosts/rooms/${roomId}`, {
+            await apiClient.delete(`/hosts/rooms/${roomId}`, {
               headers: { Authorization: `Bearer ${token}` },
             });
 
-            console.log("✅ Đã xóa phòng:", res.data);
             Alert.alert("✅ Thành công", "Phòng đã được xóa!");
             onDeleted?.();
           } catch (err: any) {
-            console.log("❌ Lỗi khi xóa phòng:", err?.response?.data || err);
-            Alert.alert("❌ Lỗi", "Không thể xóa phòng, vui lòng thử lại.");
+            console.log("❌ Lỗi xóa phòng:", err?.response?.data || err);
+            Alert.alert("Lỗi", "Không thể xóa phòng, vui lòng thử lại.");
           }
         },
       },
     ]);
+  };
+
+  // 🧭 Xử lý khi bấm xem chi tiết
+  const handleViewDetail = () => {
+    if (!slugOrId)
+      return Alert.alert("Lỗi", "Không tìm thấy phòng để xem chi tiết.");
+    router.push(`/room/${slugOrId}`);
   };
 
   return (
@@ -117,20 +126,15 @@ export default function PostCard({ item, onDeleted }: RoomCardProps) {
         overflow: "hidden",
       }}
     >
-      {/* Xem chi tiết phòng */}
-      <TouchableOpacity
-        activeOpacity={0.9}
-        onPress={() => {
-          console.log("📍 Bấm xem chi tiết:", item.slug);
-          router.push(`/room/${item.slug}` as any);
-        }}
-      >
+      {/* 🖼️ Xem chi tiết phòng */}
+      <TouchableOpacity activeOpacity={0.9} onPress={handleViewDetail}>
         <ImageBackground
           source={{ uri: imageUri }}
           resizeMode="cover"
           style={{ height: 220, justifyContent: "flex-end" }}
         >
           <View style={{ backgroundColor: "rgba(0,0,0,0.45)", padding: 8 }}>
+            {/* 🌟 Tên & nút hành động */}
             <View
               style={{
                 flexDirection: "row",
@@ -147,12 +151,12 @@ export default function PostCard({ item, onDeleted }: RoomCardProps) {
                 }}
                 numberOfLines={1}
               >
-                {item.name || item.title}
+                {item.name || item.title || "Phòng chưa có tên"}
               </Text>
 
               {isOwner && (
                 <View style={{ flexDirection: "row", gap: 8 }}>
-                  {/* Sửa */}
+                  {/* ✏️ Sửa */}
                   <TouchableOpacity
                     onPress={handleEdit}
                     style={{
@@ -164,7 +168,7 @@ export default function PostCard({ item, onDeleted }: RoomCardProps) {
                     <Edit3 size={16} color="#fff" />
                   </TouchableOpacity>
 
-                  {/* Xóa */}
+                  {/* 🗑️ Xóa */}
                   <TouchableOpacity
                     onPress={handleDelete}
                     style={{
@@ -179,6 +183,7 @@ export default function PostCard({ item, onDeleted }: RoomCardProps) {
               )}
             </View>
 
+            {/* 📍 Địa chỉ */}
             <Text
               style={{
                 color: "#ddd",
@@ -187,7 +192,7 @@ export default function PostCard({ item, onDeleted }: RoomCardProps) {
               }}
               numberOfLines={1}
             >
-              {item.address || item.distance}
+              {item.address || item.distance || "Chưa có địa chỉ"}
             </Text>
           </View>
         </ImageBackground>

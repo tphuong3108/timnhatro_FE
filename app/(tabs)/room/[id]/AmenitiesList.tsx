@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { FlatList, Text, TouchableOpacity } from "react-native";
+import { FlatList, View, Text } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import Animated, {
@@ -9,14 +9,14 @@ import Animated, {
   Easing,
   FadeInUp,
 } from "react-native-reanimated";
-import type { Dispatch, SetStateAction } from "react";
 
+// Hiệu ứng
 function useRippleAnimation(index: number) {
   const scale = useSharedValue(0.85);
   const opacity = useSharedValue(0);
 
   useEffect(() => {
-    const delay = index * 80;
+    const delay = index * 100;
     const timeout = setTimeout(() => {
       scale.value = withTiming(1, {
         duration: 400,
@@ -25,7 +25,7 @@ function useRippleAnimation(index: number) {
       opacity.value = withTiming(1, { duration: 350 });
     }, delay);
     return () => clearTimeout(timeout);
-  }, [index, scale, opacity]);
+  }, [index]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
@@ -49,101 +49,78 @@ const iconMapping = [
   { keyword: "chữa cháy", icon: "fire-extinguisher", type: "Material" },
 ];
 
-// ✅ Tách component riêng để gọi hook hợp lệ
-const AmenityItem = ({
-  item,
-  index,
-  isSelected,
-  toggleAmenity,
-}: {
-  item: any;
-  index: number;
-  isSelected: boolean;
-  toggleAmenity: (name: string) => void;
-}) => {
+const AmenityItem = ({ item, index }: { item: any; index: number }) => {
   const animatedStyle = useRippleAnimation(index);
+
   return (
     <Animated.View
-      style={[
-        animatedStyle,
-        {
-          width: "31%",
-          height: 85,
-          borderRadius: 16,
-          marginBottom: 10,
-          justifyContent: "center",
-          alignItems: "center",
-          backgroundColor: isSelected ? "#3F72AF22" : "#fff",
-          borderWidth: 1.5,
-          borderColor: isSelected ? "#3F72AF" : "#ccc",
-        },
-      ]}
+      style={animatedStyle}
+      className="w-[31%] h-[85px] bg-white rounded-2xl mb-3 items-center justify-center border border-gray-300"
     >
-      <TouchableOpacity
-        activeOpacity={0.7}
-        onPress={() => toggleAmenity(item.keyword)}
-        style={{ alignItems: "center", justifyContent: "center" }}
+      {item.type === "Ionicons" ? (
+        <Ionicons name={item.icon as any} size={28} color={item.color} />
+      ) : (
+        <MaterialCommunityIcons
+          name={item.icon as any}
+          size={28}
+          color={item.color}
+        />
+      )}
+      <Text
+        numberOfLines={2}
+        ellipsizeMode="tail"
+        className="text-[#3F72AF] text-center text-[12px] mt-1 font-medium px-1"
       >
-        {item.type === "Ionicons" ? (
-          <Ionicons
-            name={item.icon as any}
-            size={28}
-            color={isSelected ? "#3F72AF" : "#999"}
-          />
-        ) : (
-          <MaterialCommunityIcons
-            name={item.icon as any}
-            size={28}
-            color={isSelected ? "#3F72AF" : "#999"}
-          />
-        )}
-        <Text
-          numberOfLines={2}
-          ellipsizeMode="tail"
-          className={`text-center text-[12px] mt-1 font-medium px-1 ${
-            isSelected ? "text-[#3F72AF]" : "text-gray-600"
-          }`}
-        >
-          {item.keyword}
-        </Text>
-      </TouchableOpacity>
+        {item.name}
+      </Text>
     </Animated.View>
   );
 };
 
-// ✅ Component chính
-export default function AmenitiesList({
-  selected,
-  setSelected,
-}: {
-  selected: string[];
-  setSelected: Dispatch<SetStateAction<string[]>>;
-}) {
-  const toggleAmenity = (name: string) => {
-    setSelected((prev: string[]) =>
-      prev.includes(name)
-        ? prev.filter((n: string) => n !== name)
-        : [...prev, name]
+export default function AmenitiesList({ amenities }: { amenities: any[] }) {
+  const validAmenities = Array.isArray(amenities) ? amenities : [];
+
+  const enrichedAmenities = validAmenities.map((a: any) => {
+    const match = iconMapping.find((i) =>
+      a.name?.toLowerCase().includes(i.keyword)
     );
-  };
+    return {
+      ...a,
+      icon: match?.icon || "checkmark-circle",
+      type: match?.type || "Ionicons",
+      color: "#3F72AF",
+    };
+  });
+
+  if (!enrichedAmenities.length) {
+    console.log("⚠️ Không có tiện ích để hiển thị:", amenities);
+    return null;
+  }
 
   return (
-    <Animated.View entering={FadeInUp.duration(600)} className="px-5 py-4">
+    <Animated.View
+      entering={FadeInUp.duration(600)}
+      className="px-5 py-5 border-t border-gray-200"
+    >
+      <Text className="text-xl font-semibold text-[#3F72AF] mb-3">
+        🏠 Tiện ích chỗ trọ
+      </Text>
+      <Text className="text-gray-700 text-[14px] mb-4">
+        Các tiện ích sẵn có giúp bạn sinh hoạt thoải mái và thuận tiện hơn.
+      </Text>
+
       <FlatList
-        data={iconMapping}
+        data={enrichedAmenities}
         numColumns={3}
-        keyExtractor={(item) => item.keyword}
+        keyExtractor={(item) => item._id}
         columnWrapperStyle={{ justifyContent: "flex-start", gap: 12 }}
+        contentContainerStyle={{ justifyContent: "center" }}
         scrollEnabled={false}
         renderItem={({ item, index }) => (
-          <AmenityItem
-            item={item}
-            index={index}
-            isSelected={selected.includes(item.keyword)}
-            toggleAmenity={toggleAmenity}
-          />
+          <AmenityItem item={item} index={index} />
         )}
       />
     </Animated.View>
   );
 }
+

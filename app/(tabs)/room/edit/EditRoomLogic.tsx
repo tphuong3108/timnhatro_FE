@@ -1,112 +1,171 @@
-import { useEffect, useState } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useState, useEffect, useRef } from "react";
 import apiClient from "@/services/apiClient";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as ImagePicker from "expo-image-picker";
+import * as Location from "expo-location";
 
 export default function useEditRoomLogic(roomId: string) {
   const [roomData, setRoomData] = useState<any>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
+  const [loadingLocation, setLoadingLocation] = useState(false);
 
-  // Lấy dữ liệu phòng theo ID
+  const didFetchRef = useRef(false);
+
   const fetchRoomData = async () => {
+    if (didFetchRef.current || !roomId) return;
+    didFetchRef.current = true;
+
     try {
-      console.log("📡 Gọi API lấy dữ liệu phòng:", roomId);
+      setLoading(true);
       const token = await AsyncStorage.getItem("token");
-
-      if (!token) {
-        console.log("⚠️ Không có token, không thể fetch room.");
-        setError("Bạn cần đăng nhập lại.");
-        return;
-      }
-
       const res = await apiClient.get(`/hosts/rooms/${roomId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      const data = res.data?.data || res.data;
-      console.log("✅ API trả về:", data);
+      const data = res.data.data;
 
-      if (!data) {
-        console.log("⚠️ Không có dữ liệu phòng trả về từ API");
-        setRoomData(null);
-        return;
+      let marker = undefined;
+      if (data.location) {
+        if (data.location.latitude && data.location.longitude) {
+          marker = {
+            latitude: data.location.latitude,
+            longitude: data.location.longitude,
+          };
+        } else if (
+          Array.isArray(data.location.coordinates) &&
+          data.location.coordinates.length === 2
+        ) {
+          marker = {
+            latitude: data.location.coordinates[1],
+            longitude: data.location.coordinates[0],
+          };
+        }
       }
 
-      // 🔧 Chuẩn hóa dữ liệu để tránh lỗi .map(undefined)
-      const normalizedData = {
+      setRoomData({
         ...data,
-        images: Array.isArray(data.images) ? data.images : [],
-        videos: Array.isArray(data.videos) ? data.videos : [],
-        amenities: Array.isArray(data.amenities) ? data.amenities : [],
-        coordinates:
-          data.coordinates ||
-          data.location?.coordinates || { latitude: 0, longitude: 0 },
-      };
+        marker,
+      });
 
-      console.log("🧩 Dữ liệu sau chuẩn hóa:", normalizedData);
-
-      setRoomData(normalizedData);
-      setError(null);
-    } catch (err: any) {
-      console.log("❌ Lỗi khi fetch room:", err?.response?.data || err);
-      setError("Không thể tải dữ liệu phòng.");
+      setSelectedAmenities(data.amenities?.map((a: any) => a._id || a) || []);
+    } catch (err) {
+      console.log("❌ Lỗi fetch room:", err);
+      setError("Không thể tải dữ liệu phòng");
     } finally {
       setLoading(false);
     }
   };
 
-  // Gọi fetch khi roomId thay đổi
   useEffect(() => {
-    if (roomId) {
-      console.log("🚀 useEffect chạy với roomId:", roomId);
-      fetchRoomData();
-    } else {
-      console.log("⚠️ roomId rỗng, không fetch.");
-    }
+    fetchRoomData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roomId]);
 
-  // Hàm cập nhật phòng
+  // 💾 Cập nhật phòng
   const handleUpdateRoom = async (updatedData: any) => {
     try {
-      console.log("📤 Gửi dữ liệu cập nhật:", updatedData);
       const token = await AsyncStorage.getItem("token");
+      if (!token) {
+        setError("Bạn cần đăng nhập lại.");
+        return { success: false, error: "No token" };
+      }
 
-      if (!token) throw new Error("Chưa đăng nhập");
+      const payload = {
+        ...updatedData,
+        amenities: selectedAmenities,
+        location: updatedData.location || roomData?.location,
+      };
 
-      const formData = new FormData();
-
-      Object.entries(updatedData).forEach(([key, value]) => {
-        if (Array.isArray(value)) {
-          value.forEach((v, index) => {
-            if (typeof v === "object" && v?.uri) {
-              formData.append(`${key}[${index}]`, {
-                uri: v.uri,
-                type: v.type || "image/jpeg",
-                name: v.fileName || `media_${index}.jpg`,
-              } as any);
-            } else {
-              formData.append(`${key}[${index}]`, v);
-            }
-          });
-        } else {
-          formData.append(key, String(value));
-        }
+      const res = await apiClient.patch(`/hosts/rooms/${roomId}`, payload, {
+        headers: { Authorization: `Bearer ${token}` },
       });
 
-      const res = await apiClient.patch(`/hosts/rooms/${roomId}`, formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "multipart/form-data",
-        },
-      });
-
-      console.log("✅ Cập nhật thành công:", res.data);
       return { success: true, data: res.data };
-    } catch (err: any) {
-      console.log("❌ Lỗi khi cập nhật phòng:", err?.response?.data || err);
+    } catch (err) {
+      console.log("❌ Lỗi update phòng:", err);
       return { success: false, error: err };
     }
   };
 
-  return { roomData, setRoomData, loading, error, handleUpdateRoom };
+  const pickMedia = async () => {
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.All,
+        allowsMultipleSelection: true,
+        quality: 0.8,
+      });
+
+      if (!result.canceled) {
+        const newImages = result.assets.map((asset) => asset.uri);
+
+        setRoomData((prev: any) => ({
+          ...prev,
+          images: Array.from(new Set([...(prev?.images || []), ...newImages])),
+        }));
+      }
+    } catch (err) {
+      console.log("❌ Lỗi chọn ảnh:", err);
+    }
+  };
+
+  // 🗑️ Xóa ảnh
+  const removeMedia = (uri: string) => {
+    setRoomData((prev: any) => ({
+      ...prev,
+      images: prev?.images?.filter((img: string) => img !== uri),
+    }));
+  };
+
+  // 🗺️ Khi bấm trên bản đồ
+  const handleMapPress = (event: any) => {
+    const { latitude, longitude } = event.nativeEvent.coordinate;
+    setRoomData((prev: any) => ({
+      ...prev,
+      marker: { latitude, longitude },
+      location: { latitude, longitude },
+    }));
+  };
+
+  // 📍 Lấy vị trí hiện tại
+  const getCurrentLocation = async () => {
+    try {
+      setLoadingLocation(true);
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        setError("Quyền truy cập vị trí bị từ chối");
+        return;
+      }
+
+      const location = await Location.getCurrentPositionAsync({});
+      const { latitude, longitude } = location.coords;
+
+      setRoomData((prev: any) => ({
+        ...prev,
+        marker: { latitude, longitude },
+        location: { latitude, longitude },
+      }));
+    } catch (err) {
+      console.log("❌ Lỗi lấy vị trí:", err);
+      setError("Không thể lấy vị trí hiện tại");
+    } finally {
+      setLoadingLocation(false);
+    }
+  };
+
+  return {
+    roomData,
+    setRoomData,
+    loading,
+    error,
+    handleUpdateRoom,
+    selectedAmenities,
+    setSelectedAmenities,
+    pickMedia,
+    removeMedia,
+    handleMapPress,
+    getCurrentLocation,
+    loadingLocation,
+  };
 }

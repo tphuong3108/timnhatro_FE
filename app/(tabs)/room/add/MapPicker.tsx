@@ -1,17 +1,23 @@
 import React, { useEffect, useRef } from "react";
 import { View, Text, TouchableOpacity, ActivityIndicator } from "react-native";
-import MapView, { Marker, UrlTile, AnimatedRegion } from "react-native-maps";
+import MapView, { Marker, UrlTile } from "react-native-maps";
 import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
+
+interface MapPickerProps {
+  marker?: { latitude: number; longitude: number };
+  handleMapPress: (event: any) => void;
+  getCurrentLocation: () => void;
+  loadingLocation: boolean;
+}
 
 export default function MapPicker({
   marker,
   handleMapPress,
   getCurrentLocation,
   loadingLocation,
-}: any) {
+}: MapPickerProps) {
   const mapRef = useRef<MapView>(null);
 
-  // 👇 Tự động di chuyển đến marker khi nó thay đổi
   useEffect(() => {
     if (marker && mapRef.current) {
       mapRef.current.animateToRegion({
@@ -26,6 +32,7 @@ export default function MapPicker({
   return (
     <View className="mb-5">
       <Text className="text-[#3F72AF] font-semibold mb-2">Chọn vị trí trên bản đồ</Text>
+
       <View className="h-64 w-full rounded-xl overflow-hidden border border-gray-300">
         <MapView
           ref={mapRef}
@@ -55,6 +62,7 @@ export default function MapPicker({
 
       <TouchableOpacity
         onPress={getCurrentLocation}
+        activeOpacity={0.8}
         className="flex-row items-center justify-center mt-4 bg-[#B9D7EA] py-3 rounded-xl w-[90%] self-center"
       >
         {loadingLocation ? (

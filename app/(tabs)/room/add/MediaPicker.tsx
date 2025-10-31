@@ -1,9 +1,27 @@
 import React, { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
-import { Image, Text, TouchableOpacity, View, Modal, Pressable } from "react-native";
+import {
+  Image,
+  Text,
+  TouchableOpacity,
+  View,
+  Modal,
+  Pressable,
+  ScrollView,
+} from "react-native";
 import { Video, ResizeMode } from "expo-av";
 
-export default function MediaPicker({ media, pickMedia, removeMedia }: any) {
+interface MediaPickerProps {
+  media: string[];
+  pickMedia: () => void;
+  removeMedia: (uri: string) => void;
+}
+
+export default function MediaPicker({
+  media,
+  pickMedia,
+  removeMedia,
+}: MediaPickerProps) {
   const [previewVisible, setPreviewVisible] = useState(false);
   const [currentUri, setCurrentUri] = useState<string | null>(null);
   const [isVideo, setIsVideo] = useState(false);
@@ -15,11 +33,15 @@ export default function MediaPicker({ media, pickMedia, removeMedia }: any) {
   };
 
   return (
-    <View className="mb-4">
+    <View className="mb-5">
       <Text className="text-[#3F72AF] font-semibold mb-2">Ảnh / Video</Text>
 
-      <View className="flex-row flex-wrap gap-3">
-        {media.map((uri: string, i: number) => {
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={{ flexDirection: "row", gap: 10 }}
+      >
+        {media?.map((uri, i) => {
           const isVid = uri.toLowerCase().endsWith(".mp4") || uri.toLowerCase().endsWith(".mov");
 
           return (
@@ -40,7 +62,7 @@ export default function MediaPicker({ media, pickMedia, removeMedia }: any) {
 
               {/* Nút xóa */}
               <TouchableOpacity
-                onPress={() => removeMedia(i)}
+                onPress={() => removeMedia(uri)}
                 className="absolute top-1 right-1 bg-black/50 rounded-full p-1"
               >
                 <Ionicons name="close" size={16} color="white" />
@@ -49,7 +71,7 @@ export default function MediaPicker({ media, pickMedia, removeMedia }: any) {
           );
         })}
 
-        {/* Nút thêm */}
+        {/* Nút thêm ảnh/video */}
         <TouchableOpacity
           onPress={pickMedia}
           className="w-[90px] h-[90px] border border-dashed border-gray-400 items-center justify-center rounded-xl"
@@ -57,9 +79,9 @@ export default function MediaPicker({ media, pickMedia, removeMedia }: any) {
           <Ionicons name="add-outline" size={28} color="#3F72AF" />
           <Text className="text-[12px] text-[#3F72AF]">Thêm</Text>
         </TouchableOpacity>
-      </View>
+      </ScrollView>
 
-      {/* Modal preview */}
+      {/* Modal xem trước */}
       <Modal visible={previewVisible} transparent animationType="fade">
         <View className="flex-1 bg-black/90 items-center justify-center">
           {currentUri &&

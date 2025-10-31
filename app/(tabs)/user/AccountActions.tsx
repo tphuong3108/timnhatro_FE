@@ -1,8 +1,9 @@
 import apiClient from "@/services/apiClient";
+import { hostApi } from "@/services/hostApi";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -14,7 +15,23 @@ import {
 export default function AccountActions() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [user, setUser] = useState<any>(null);
 
+  // 🧭 Lấy thông tin người dùng
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        // Ưu tiên gọi hostApi.getMe (nếu là host)
+        const res = await hostApi.getMe();
+        setUser(res);
+      } catch (err) {
+        console.log("❌ Không thể lấy thông tin người dùng:", err);
+      }
+    };
+    fetchUser();
+  }, []);
+
+  // 🚪 Đăng xuất
   const handleLogout = async () => {
     Alert.alert("Đăng xuất", "Bạn có chắc muốn đăng xuất không?", [
       { text: "Hủy", style: "cancel" },
