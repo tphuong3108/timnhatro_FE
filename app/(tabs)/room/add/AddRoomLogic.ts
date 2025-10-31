@@ -5,7 +5,9 @@ import * as ImagePicker from "expo-image-picker";
 import * as Location from "expo-location";
 import { useEffect, useState } from "react";
 import Toast from "react-native-toast-message";
-import ReactNativeBlobUtil from "react-native-blob-util";
+import * as FileSystem from "expo-file-system/legacy";
+import { router } from "expo-router";
+import { Alert } from "react-native";
 
 export const useAddRoomLogic = () => {
   const [roomName, setRoomName] = useState("");
@@ -76,7 +78,7 @@ export const useAddRoomLogic = () => {
   // 🔍 Lấy wardId theo tên
   const fetchWardIdByName = async (wardName: string): Promise<string | null> => {
     try {
-      const res = await apiClient.get(`/wards/name/${encodeURIComponent(wardName)}`);
+      const res = await apiClient.get(`/wards/name/${name}`)
       return res.data.data?._id || null;
     } catch {
       console.log("⚠️ Không tìm thấy ward:", wardName);
@@ -113,7 +115,6 @@ export const useAddRoomLogic = () => {
     };
   }, [isHost]);
 
-  // 🏠 Cập nhật địa chỉ khi marker thay đổi
   useEffect(() => {
     const updateAddressFromMarker = async () => {
       if (!marker) return;
@@ -137,10 +138,10 @@ export const useAddRoomLogic = () => {
     updateAddressFromMarker();
   }, [marker]);
 
-const handleSubmit = async () => {
-  console.log("🖱️ Bấm nút đăng phòng");
-  console.log("🚀 handleSubmit được gọi!");
 
+
+const handleSubmit = async () => {
+  console.log("🚀 handleSubmit được gọi!");
   if (!roomName || !price || !location || !marker) {
     Toast.show({ type: "error", text1: "Vui lòng nhập đầy đủ thông tin!" });
     return;
@@ -148,21 +149,6 @@ const handleSubmit = async () => {
 
   try {
     setLoadingSubmit(true);
-    let wardId: string | null = null;
-    const matchWard =
-      location.match(/Phường\s*([^,]+)/i) ||
-      location.match(/P\.\s*([^,]+)/i) ||
-      location.match(/X\.\s*([^,]+)/i) ||
-      location.match(/Xã\s*([^,]+)/i);
-
-    if (matchWard && matchWard[1]) {
-      wardId = await fetchWardIdByName(matchWard[1].trim());
-    }
-    if (!wardId) {
-      wardId = "68fece1de79afdce26641857";
-      console.log("⚠️ Không tìm thấy ward, dùng mặc định:", wardId);
-    }
-
     const token = await AsyncStorage.getItem("token");
     if (!token) {
       Toast.show({ type: "error", text1: "Chưa đăng nhập!" });
@@ -170,57 +156,61 @@ const handleSubmit = async () => {
     }
 
     const uploadUrl = `${apiClient.defaults.baseURL}/hosts/rooms`;
-    console.log("📡 Gửi request tới:", uploadUrl);
 
-    // Tạo FormData
-    const formData = new FormData();
-    formData.append("name", roomName);
-    formData.append("address", location);
-    formData.append("price", price);
-    formData.append("description", description);
-    formData.append("ward", wardId || "");
+    // 📸 Chuyển ảnh sang base64
+    const base64Images: string[] = [];
+    for (const uri of media) {
+      try {
+        const base64 = await FileSystem.readAsStringAsync(uri, { encoding: "base64" });
+        base64Images.push(`data:image/jpeg;base64,${base64}`);
+      } catch (err) {
+        console.log("❌ Lỗi đọc file:", err);
+      }
+    }
 
-    selectedAmenities.forEach((a) => formData.append("amenities", a));
-    formData.append("location[type]", "Point");
-    formData.append("location[coordinates][]", marker.longitude.toString());
-    formData.append("location[coordinates][]", marker.latitude.toString());
+    const body = {
+      name: roomName,
+      address: location,
+      price,
+      description,
+      ward: "68fece1de79afdce26641857",
+      amenities: selectedAmenities,
+      location: {
+        type: "Point",
+        coordinates: [marker.longitude, marker.latitude],
+      },
+      images: base64Images,
+    };
 
-    // Đảm bảo bạn gửi ảnh đúng cách
-    console.log("📤 Thêm media:", media.length);
-    media.forEach((uri, index) => {
-      const isVideo = uri.endsWith(".mp4");
-      const fileType = isVideo ? "video/mp4" : "image/jpeg";
-      const fileName = uri.split("/").pop() || (isVideo ? `video_${index}.mp4` : `image_${index}.jpg`);
-
-      formData.append(isVideo ? "videos" : "images", {
-        uri,
-        type: fileType,
-        name: fileName,
-      } as any);
-    });
-
-    console.log("📦 FormData đã tạo xong:", JSON.stringify(formData));
-
-    // Gửi request tới backend
     const res = await fetch(uploadUrl, {
       method: "POST",
       headers: {
+        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: formData,
+      body: JSON.stringify(body),
     });
 
     const data = await res.json();
     console.log("✅ Phản hồi BE:", data);
-
-    if (res.ok) {
-      Toast.show({ type: "success", text1: "🎉 Đăng phòng thành công!" });
-    } else {
-      Toast.show({
-        type: "error",
-        text1: "Lỗi đăng phòng!",
-        text2: data.message || "Thử lại sau.",
-      });
+      if (res.ok) {
+      Alert.alert("🎉 Thành công", "Phòng của bạn đã được gửi, vui lòng chờ admin duyệt.",
+        [
+          {
+            text: "OK",
+            onPress: () => {
+              setRoomName("");
+              setPrice("");
+              setDescription("");
+              setMedia([]);
+              setSelectedAmenities([]);
+              setMarker(null);
+              setLocation("");
+              router.push("/(tabs)/home");
+            },
+          },
+        ]
+      );
     }
   } catch (err: any) {
     console.log("❌ Lỗi đăng phòng:", err.message);
@@ -233,9 +223,6 @@ const handleSubmit = async () => {
     setLoadingSubmit(false);
   }
 };
-
-
-
   return {
     roomName,
     setRoomName,
