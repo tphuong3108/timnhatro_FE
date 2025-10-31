@@ -17,7 +17,7 @@ export default function TopView({ data }: any) {
           Phòng có lượt xem cao
         </Text>
 
-        <RoomCarousel />
+        <RoomCarousel rooms={data} />
       </View>
     </ChartCardWrapper>
   );

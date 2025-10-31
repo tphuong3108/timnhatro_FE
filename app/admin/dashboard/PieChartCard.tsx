@@ -1,43 +1,21 @@
+import ChartCardWrapper from "@/components/admin/ChartCardWrapper";
 import React from "react";
 import { View, Text, useWindowDimensions } from "react-native";
 import { PieChart } from "react-native-chart-kit";
-import ChartCardWrapper from "@/components/admin/ChartCardWrapper";
 
 export default function PieChartCard({ title, data }: any) {
   const { width } = useWindowDimensions();
-  const chartWidth = width * 0.85;
-  const chartHeight = 200;
+  const chartWidth = width * 0.9;
 
-  // ✅ Nếu data không hợp lệ hoặc rỗng
-  if (!Array.isArray(data) || data.length === 0) {
-    return (
-      <ChartCardWrapper>
-        <Text className="text-gray-500 text-center">
-          Không có dữ liệu để hiển thị
-        </Text>
-      </ChartCardWrapper>
-    );
-  }
-
-  // ✅ Loại bỏ NaN / undefined / null
-  const safeData = data
-    .filter((item) => Number.isFinite(item.population))
-    .map((item) => ({
-      ...item,
-      population: item.population ?? 0,
-    }));
-
-  // ✅ Nếu tất cả đều = 0 thì không vẽ chart
-  const total = safeData.reduce((sum, i) => sum + i.population, 0);
-  if (total === 0) {
-    return (
-      <ChartCardWrapper>
-        <Text className="text-gray-500 text-center">
-          Chưa có dữ liệu tăng trưởng
-        </Text>
-      </ChartCardWrapper>
-    );
-  }
+  const chartData = data.map((item: any, i: number) => ({
+    name: item.name,
+    population: item.value,
+    color:
+      item.color ||
+    ["#A7C7E7", "#FFDAB9", "#B2E0B2", "#C5E1F9", "#F7A8B8"][i % 5],
+    legendFontColor: "#444",
+    legendFontSize: 13,
+  }));
 
   return (
     <ChartCardWrapper>
@@ -51,21 +29,18 @@ export default function PieChartCard({ title, data }: any) {
       >
         {title}
       </Text>
-
       <View style={{ alignItems: "center" }}>
         <PieChart
-          data={safeData}
+          data={chartData}
           width={chartWidth}
-          height={chartHeight}
+          height={width < 380 ? 180 : 210}
           accessor="population"
           backgroundColor="transparent"
           paddingLeft="10"
-          hasLegend={true}
+          hasLegend
           chartConfig={{
-            color: (opacity = 1) => `rgba(63, 114, 175, ${opacity})`,
-            labelColor: () => "#3F72AF",
+            color: (opacity = 1) => `rgba(17, 45, 78, ${opacity})`,
           }}
-          absolute
         />
       </View>
     </ChartCardWrapper>

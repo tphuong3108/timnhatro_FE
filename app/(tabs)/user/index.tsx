@@ -16,6 +16,7 @@ import Favorites from "./Favorites";
 import InfoSection from "./InfoSection";
 import MyPosts from "./MyPosts";
 import { profileApi } from "@/services/profileApi";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function Profile() {
   const router = useRouter();
@@ -99,6 +100,17 @@ export default function Profile() {
           </Text>
         </TouchableOpacity>
 
+          {user?.role?.toLowerCase() === "host" && (
+            <TouchableOpacity
+              onPress={() => router.push("/(tabs)/user/HomeStatsScreen")}
+              className="border border-[#3F72AF] py-3 rounded-full flex-row justify-center items-center mt-4"
+            >
+              <Ionicons name="bar-chart-outline" size={20} color="#3F72AF" />
+              <Text className="text-[#3F72AF] font-semibold text-[15px] ml-2">
+                Xem thống kê
+              </Text>
+            </TouchableOpacity>
+          )}
         <ActionButtons activeTab={activeTab} onChangeTab={setActiveTab} />
 
         <View className="mt-8">

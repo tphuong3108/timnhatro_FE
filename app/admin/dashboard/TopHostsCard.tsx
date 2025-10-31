@@ -1,14 +1,6 @@
 import React from "react";
-import {
-  View,
-  Text,
-  Image,
-  FlatList,
-  useWindowDimensions,
-  TouchableOpacity,
-} from "react-native";
+import { View, Text, Image, FlatList, useWindowDimensions } from "react-native";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
 import ChartCardWrapper from "@/components/admin/ChartCardWrapper";
 
 interface Host {
@@ -22,8 +14,8 @@ interface Host {
 export default function TopHostsCard({ data }: { data: Host[] }) {
   const { width } = useWindowDimensions();
   const isSmall = width < 360;
-  const router = useRouter();
 
+  // ✅ Nếu không có data thì hiển thị "Chưa có dữ liệu"
   if (!data || data.length === 0) {
     return (
       <ChartCardWrapper height={110} style={{ padding: 15 }}>
@@ -35,13 +27,16 @@ export default function TopHostsCard({ data }: { data: Host[] }) {
     );
   }
 
-  const displayedData = data.slice(0, 5).map((item) => ({
-    ...item,
-    avatar:
-      item.avatar && item.avatar.trim() !== ""
-        ? item.avatar
-        : "https://cdn-icons-png.flaticon.com/512/149/149071.png",
-  }));
+  // ✅ Luôn hiển thị những host có sẵn (tối đa 5)
+  const displayedData = data
+    .slice(0, 5)
+    .map((item) => ({
+      ...item,
+      avatar:
+        item.avatar && item.avatar.trim() !== ""
+          ? item.avatar
+          : "https://cdn-icons-png.flaticon.com/512/149/149071.png", // avatar giả
+    }));
 
   return (
     <ChartCardWrapper height={isSmall ? 110 : 150} style={{ padding: 15 }}>
@@ -64,21 +59,13 @@ export default function TopHostsCard({ data }: { data: Host[] }) {
               isSmall ? "mr-[10px] w-[80px]" : "mr-[14px] w-[90px]"
             }`}
           >
-            {/* ✅ Avatar bấm để mở trang admin/user/[id] */}
-            <TouchableOpacity
-              activeOpacity={0.85}
-              onPress={() => {
-                console.log("🧭 Admin đang xem profile của:", item.fullName);
-                router.push(`/admin/users/${item.userId}` as any);
-              }}
-            >
-              <Image
-                source={{ uri: item.avatar }}
-                className={`rounded-full mb-1 ${
-                  isSmall ? "w-[46px] h-[46px]" : "w-[58px] h-[58px]"
-                }`}
-              />
-            </TouchableOpacity>
+            {/* Avatar */}
+            <Image
+              source={{ uri: item.avatar }}
+              className={`rounded-full mb-1 ${
+                isSmall ? "w-[46px] h-[46px]" : "w-[58px] h-[58px]"
+              }`}
+            />
 
             {/* Tên */}
             <Text
