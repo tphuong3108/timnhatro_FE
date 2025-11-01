@@ -26,6 +26,7 @@ interface RoomCardProps {
     createdBy?: { _id: string } | string;
   };
   onDeleted?: () => void;
+  showActions?: boolean;
 }
 
 export default function PostCard({ item, onDeleted }: RoomCardProps) {
@@ -38,7 +39,7 @@ export default function PostCard({ item, onDeleted }: RoomCardProps) {
     item.images?.[0] ||
     "https://placehold.co/300x200?text=No+Image";
   const roomId = item._id || item.id;
-  const slugOrId = item.slug || roomId; // fallback nếu slug chưa có
+  const slugOrId = item.slug || roomId;
 
   // 🧩 Kiểm tra quyền sở hữu phòng
   useEffect(() => {

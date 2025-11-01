@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
-import { View, Text, TouchableOpacity, Dimensions } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { useRouter, usePathname } from "expo-router";
-import Toast from "react-native-toast-message";
 import { profileApi } from "@/services/profileApi";
+import { Ionicons } from "@expo/vector-icons";
+import { usePathname, useRouter } from "expo-router";
+import React, { useEffect, useState } from "react";
+import { Dimensions, Text, TouchableOpacity, View } from "react-native";
+import Toast from "react-native-toast-message";
 
 interface FooterProps {
   onTabPress?: (tab: string) => void;
@@ -32,21 +32,46 @@ export default function Footer({ onTabPress }: FooterProps) {
 
 const handleAddRoom = async () => {
   try {
-    const res = await profileApi.upgradeRole({ revert: false });
-    console.log("Upgrade role response:", res);
+    // 🧠 Lấy thông tin user hiện tại
+    const me = await profileApi.getMyProfile();
+
+    if (me.role === "tenant") {
+      // Tenant thì nâng cấp thành host
+      await profileApi.upgradeRole({ revert: false });
+
+      Toast.show({
+        type: "success",
+        text1: "Đã nâng cấp tài khoản",
+        text2: "Bạn hiện là chủ trọ 🎉",
+      });
+    } else if (me.role === "host") {
+      // Host thì bỏ qua nâng cấp, chuyển luôn
+      router.push("/room/add");
+      return;
+    } else {
+      Toast.show({
+        type: "error",
+        text1: "Không thể đăng phòng",
+        text2: "Chỉ tenant hoặc host mới có thể đăng phòng.",
+      });
+      return;
+    }
+
+    // Sau khi nâng cấp xong → chuyển tới trang thêm phòng
     router.push("/room/add");
   } catch (error: any) {
     console.log("Upgrade role error:", error?.response?.data || error.message);
 
     Toast.show({
       type: "error",
-      text1: "Lỗi khi nâng cấp tài khoản",
+      text1: "Lỗi khi thêm phòng",
       text2:
         error?.response?.data?.message ||
         "Vui lòng thử lại sau hoặc kiểm tra kết nối mạng.",
     });
   }
 };
+
 
   useEffect(() => {
     const foundTab = tabs.find((t) => pathname.startsWith(t.route));

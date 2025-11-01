@@ -4,7 +4,7 @@ import MapView, { Marker, UrlTile } from "react-native-maps";
 import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
 
 interface MapPickerProps {
-  marker?: { latitude: number; longitude: number };
+  marker?: { latitude: number; longitude: number } | null;
   handleMapPress: (event: any) => void;
   getCurrentLocation: () => void;
   loadingLocation: boolean;

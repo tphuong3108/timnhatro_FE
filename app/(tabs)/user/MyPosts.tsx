@@ -36,6 +36,7 @@ export default function MyPosts({ rooms = [], onEdit, onDelete }: MyPostsProps) 
               createdBy: item.createdBy,
             }}
             onDeleted={() => onDelete?.(item._id)}
+            showActions={true}
           />
         )}
         columnWrapperStyle={{ justifyContent: "space-between" }}
