@@ -102,7 +102,7 @@ export default function Profile() {
 
           {user?.role?.toLowerCase() === "host" && (
             <TouchableOpacity
-              onPress={() => router.push("/(tabs)/user/HomeStatsScreen")}
+              onPress={() => router.push("/(tabs)/user/HostStatsScreen")}
               className="border border-[#3F72AF] py-3 rounded-full flex-row justify-center items-center mt-4"
             >
               <Ionicons name="bar-chart-outline" size={20} color="#3F72AF" />

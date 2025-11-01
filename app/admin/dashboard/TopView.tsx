@@ -11,6 +11,7 @@ export default function TopView({ data }: any) {
     <ChartCardWrapper
       height={isSmall ? 230 : 270}
       style={{ paddingHorizontal: 12, paddingVertical: 18 }}
+      
     >
       <View className="flex-col">
         <Text className="text-[16px] font-semibold text-[#112D4E] mb-3">
