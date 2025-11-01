@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from "react";
-import { View, Text, TouchableOpacity, Dimensions } from "react-native";
+import { profileApi } from "@/services/profileApi";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter, usePathname } from "expo-router";
 import Toast from "react-native-toast-message";
