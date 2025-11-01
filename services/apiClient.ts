@@ -3,7 +3,7 @@ import axios from "axios";
 import { Platform } from "react-native";
 
 // IP máy tính 
-const LOCAL_IP = "192.168.1.9";
+const LOCAL_IP = "192.168.102.219";
 const PORT = 5050;
 
 //  Cấu hình chính xác cho mọi môi trường

@@ -16,8 +16,8 @@ export const hostApi = {
     return res.data.data || res.data;
   },
 
-  getMyReviews: async () => {
-    const res = await apiClient.get("/hosts/reviews");
+  getMyReviews: async (page = 1, limit = 5) => {
+    const res = await apiClient.get(`/hosts/reviews?page=${page}&limit=${limit}`);
     return res.data.data || res.data;
   },
 

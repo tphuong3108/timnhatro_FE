@@ -32,7 +32,6 @@ export default function Favorites({ favorites = [] }: FavoritesProps) {
               address: item.address,
               images: item.images,
             }}
-            isFavorite
           />
         )}
         columnWrapperStyle={{ justifyContent: "space-between" }}
