@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { View, Text, TouchableOpacity, Dimensions } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter, usePathname } from "expo-router";
+import Toast from "react-native-toast-message";
+import { profileApi } from "@/services/profileApi";
 
 interface FooterProps {
   onTabPress?: (tab: string) => void;
@@ -28,9 +30,23 @@ export default function Footer({ onTabPress }: FooterProps) {
     onTabPress?.(tab.key);
   };
 
-  const handleAddRoom = () => {
+const handleAddRoom = async () => {
+  try {
+    const res = await profileApi.upgradeRole({ revert: false });
+    console.log("Upgrade role response:", res);
     router.push("/room/add");
-  };
+  } catch (error: any) {
+    console.log("Upgrade role error:", error?.response?.data || error.message);
+
+    Toast.show({
+      type: "error",
+      text1: "Lỗi khi nâng cấp tài khoản",
+      text2:
+        error?.response?.data?.message ||
+        "Vui lòng thử lại sau hoặc kiểm tra kết nối mạng.",
+    });
+  }
+};
 
   useEffect(() => {
     const foundTab = tabs.find((t) => pathname.startsWith(t.route));

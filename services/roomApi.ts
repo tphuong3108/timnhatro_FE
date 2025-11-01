@@ -50,8 +50,7 @@ export const roomApi = {
     const res = await apiClient.patch(`/rooms/${id}`);
     return res.data.data;
   },
-
-  //  Thêm phòng vào danh sách yêu thích
+  
   addToFavorites: async (id: string) => {
     const res = await apiClient.post(`/rooms/${id}/favorite`);
     return res.data.data;
