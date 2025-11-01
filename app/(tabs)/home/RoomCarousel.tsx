@@ -14,15 +14,6 @@ const CARD_WIDTH = 180;
 const CARD_HEIGHT = 200;
 const SPACING = 12;
 
-<<<<<<< Updated upstream
-export default function RoomCarousel() {
-  const router = useRouter();
-  const scrollX = useRef(new Animated.Value(0)).current;
-  const [rooms, setRooms] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-=======
 export default function RoomCarousel({ rooms: propRooms = [] }: any) {
   const router = useRouter();
   const scrollX = useRef(new Animated.Value(0)).current;
@@ -36,51 +27,31 @@ export default function RoomCarousel({ rooms: propRooms = [] }: any) {
       return;
     }
 
->>>>>>> Stashed changes
     const fetchHotRooms = async () => {
       try {
         const res = await roomApi.getHotRooms();
         setRooms(res || []);
       } catch (error) {
-<<<<<<< Updated upstream
-        console.error("❌ Lỗi khi tải top phòng nổi bật:", error);
-=======
         console.error("❌ Lỗi khi tải phòng nổi bật:", error);
->>>>>>> Stashed changes
       } finally {
         setLoading(false);
       }
     };
     fetchHotRooms();
-<<<<<<< Updated upstream
-  }, []);
-=======
   }, [propRooms]);
->>>>>>> Stashed changes
 
   if (loading) {
     return (
       <View className="py-8 items-center">
-<<<<<<< Updated upstream
-        <Text className="text-gray-400 text-sm">Đang tải phòng nổi bật...</Text>
-=======
         <Text className="text-gray-400 text-sm">Đang tải phòng...</Text>
->>>>>>> Stashed changes
       </View>
     );
   }
 
-<<<<<<< Updated upstream
-  if (!rooms.length) {
-    return (
-      <View className="py-8 items-center">
-        <Text className="text-gray-400 text-sm">Không có phòng nổi bật.</Text>
-=======
   if (!rooms || rooms.length === 0) {
     return (
       <View className="py-8 items-center">
         <Text className="text-gray-400 text-sm">Không có phòng hiển thị.</Text>
->>>>>>> Stashed changes
       </View>
     );
   }
@@ -94,11 +65,7 @@ export default function RoomCarousel({ rooms: propRooms = [] }: any) {
         decelerationRate="fast"
         snapToInterval={CARD_WIDTH + SPACING}
         snapToAlignment="center"
-<<<<<<< Updated upstream
-        keyExtractor={(item) => item.roomId || item._id}
-=======
         keyExtractor={(item) => item._id || item.roomId}
->>>>>>> Stashed changes
         contentContainerStyle={{ paddingHorizontal: 20 }}
         ItemSeparatorComponent={() => <View style={{ width: SPACING }} />}
         onScroll={Animated.event(
@@ -166,10 +133,7 @@ export default function RoomCarousel({ rooms: propRooms = [] }: any) {
                       {item.address || "—"}
                     </Text>
 
-<<<<<<< Updated upstream
-=======
                     {/* 🔹 Thông tin thống kê */}
->>>>>>> Stashed changes
                     <View className="flex-row items-center justify-start mt-1">
                       <View className="flex-row items-center mr-3">
                         <Ionicons name="star" size={14} color="#FFD700" />
@@ -192,10 +156,6 @@ export default function RoomCarousel({ rooms: propRooms = [] }: any) {
                         </Text>
                       </View>
                     </View>
-<<<<<<< Updated upstream
-
-=======
->>>>>>> Stashed changes
                   </View>
                 </ImageBackground>
               </TouchableOpacity>
