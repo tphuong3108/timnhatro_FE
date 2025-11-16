@@ -25,13 +25,14 @@ export default function RoomList() {
               Kết quả tìm kiếm ({filteredRooms.length})
           </Text>
         </View>
-      <FlatList
-        data={filteredRooms}
-        numColumns={2}
-        keyExtractor={(item) => item._id}
-        renderItem={({ item }) => <PostCard item={item} />}
-        columnWrapperStyle={{ justifyContent: "space-between" }}
-        scrollEnabled={false}      />
+        <FlatList
+          data={filteredRooms}
+          numColumns={2}
+          keyExtractor={(item) => item._id}
+          renderItem={({ item }) => <PostCard item={item} showActions={false} />}
+          columnWrapperStyle={{ justifyContent: "space-between" }}
+          scrollEnabled={false}
+        />
     </View>
   );
 }

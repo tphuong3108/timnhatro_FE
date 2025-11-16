@@ -51,20 +51,21 @@ export const roomApi = {
     return res.data.data;
   },
   
-  addToFavorites: async (id: string) => {
-    const res = await apiClient.post(`/rooms/${id}/favorite`);
-    return res.data.data;
-  },
   updateRoomStatus: async (id: string, status: string) => {
     const res = await apiClient.patch(`/rooms/${id}/status`, { status });
     return res.data.data;
   },
-  //  Xóa khỏi danh sách yêu thích
-  removeFromFavorites: async (id: string) => {
-    const res = await apiClient.delete(`/rooms/${id}/favorite`);
+
+  addToFavorites: async (slug: string) => {
+    const res = await apiClient.post(`/rooms/slug/${slug}/favorite`);
     return res.data.data;
   },
 
+  removeFromFavorites: async (slug: string) => {
+    const res = await apiClient.delete(`/rooms/slug/${slug}/favorite`);
+    return res.data.data;
+  },
+  
   createRoom: async (formData: FormData) => {
     const res = await apiClient.post("/hosts/rooms", formData, {
       headers: {
@@ -75,12 +76,6 @@ export const roomApi = {
     });
     return res.data;
   },
-
-  reportReview: async (reviewId: string, reason: string) => {
-  const res = await apiClient.post(`/reviews/${reviewId}/report`, { reason });
-  return res.data;
-},
-
   //  Lấy dữ liệu phòng cho bản đồ
   getRoomsMapdata: async (params?: any) => {
     const res = await apiClient.get("/rooms/map-data", { params });
@@ -98,6 +93,15 @@ export const roomApi = {
   },
   reportRoom: async (id: string, reason: string) => {
     const res = await apiClient.post(`/rooms/${id}/report`, { reason });
+    return res.data;
+  },
+  reportReview: async (reviewId: string, reason: string) => {
+    const res = await apiClient.post(`/reviews/${reviewId}/report`, { reason });
+    return res.data;
+  },
+
+  deleteReview: async (reviewId: string) => {
+    const res = await apiClient.delete(`/reviews/${reviewId}`);
     return res.data;
   },
 };
