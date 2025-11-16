@@ -23,7 +23,7 @@ export default function PostCard({ room, onApprove, onReject, onDelete }: PostCa
   return (
     <TouchableOpacity
       activeOpacity={0.9}
-      onPress={() => router.push(`/room/${room.slug || room._id}`)} // ✅ fix: dùng room thay vì item
+      onPress={() => router.push(`/room/${room.slug || room._id}`)} 
       className="bg-white rounded-3xl shadow-sm mb-4 p-4 border border-gray-100"
     >
       {/* Header */}

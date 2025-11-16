@@ -3,7 +3,6 @@ import * as Location from "expo-location";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Alert, Linking, Share } from "react-native";
 import { roomApi } from "@/services/roomApi";
-import apiClient from "@/services/apiClient";
 import { useAuth } from "@/constants/auth/AuthContext";
 
 export function useRoomLogic() {
@@ -14,13 +13,12 @@ export function useRoomLogic() {
   const [room, setRoom] = useState<any>(null);
   const [liked, setLiked] = useState(false);
   const [favorited, setFavorited] = useState(false);
-  const [showMenu, setShowMenu] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);  // Khai báo state cho menu
   const [loadingLoc, setLoadingLoc] = useState(false);
   const [currentImage, setCurrentImage] = useState(1);
   const [userLocation, setUserLocation] = useState<any>(null);
   const [loadingRoom, setLoadingRoom] = useState(true);
 
-  // 🔹 Fetch chi tiết phòng theo SLUG
   useEffect(() => {
     const fetchRoom = async () => {
       if (!id) return;
@@ -30,7 +28,6 @@ export function useRoomLogic() {
 
         const data = await roomApi.getRoomBySlug(id);
 
-        // 🧩 Chuẩn hóa dữ liệu chủ trọ
         const normalizedRoom = {
           ...data,
           host: {
@@ -47,23 +44,9 @@ export function useRoomLogic() {
         };
         setRoom(normalizedRoom);
 
-        // ❤️ Kiểm tra đã like
-        const isLiked = data.likeBy?.some(
-          (u: any) => u._id?.toString() === user?._id?.toString()
-        );
-        setLiked(isLiked);
+        setLiked(!!data.isLiked);
 
-        // 📘 Kiểm tra phòng đã lưu
-        if (user?._id) {
-          const userRes = await apiClient.get("/me");
-          const favorites = userRes.data?.data?.favorites || [];
-          const isFavorited = favorites.some(
-            (fav: any) => fav._id?.toString() === data._id?.toString()
-          );
-          setFavorited(isFavorited);
-        } else {
-          setFavorited(false);
-        }
+        setFavorited(!!data.isFavorited);
       } catch (err) {
         console.warn("❌ Lỗi khi tải phòng:", err);
         Alert.alert("Lỗi", "Không thể tải thông tin phòng này.");
@@ -74,33 +57,21 @@ export function useRoomLogic() {
     };
 
     fetchRoom();
-  }, [id, user?._id]);
+  }, [id, user?._id, router]);
 
-  // 🔁 Làm mới trạng thái like/lưu
+  //  Làm mới trạng thái like/lưu
   const refreshRoomStatus = async () => {
     if (!id) return;
     try {
-      const data = await roomApi.getRoomBySlug(id);
+      const data = await roomApi.getRoomBySlug(id); 
+      setLiked(!!data.isLiked); 
+      setFavorited(!!data.isFavorited);
 
-      const isLiked = data.likeBy?.some(
-        (u: any) => u._id?.toString() === user?._id?.toString()
-      );
-      setLiked(isLiked);
-
-      if (user?._id) {
-        const userRes = await apiClient.get("/me");
-        const favorites = userRes.data?.data?.favorites || [];
-        const isFavorited = favorites.some(
-          (fav: any) => fav._id?.toString() === data._id?.toString()
-        );
-        setFavorited(isFavorited);
-      }
     } catch (err) {
       console.warn("⚠️ Không thể refresh trạng thái phòng:", err);
     }
   };
 
-  // 📍 Lấy vị trí người dùng
   useEffect(() => {
     (async () => {
       try {
@@ -166,7 +137,7 @@ export function useRoomLogic() {
     favorited,
     setFavorited,
     showMenu,
-    setShowMenu,
+    setShowMenu, 
     loadingLoc,
     currentImage,
     handleScroll,
