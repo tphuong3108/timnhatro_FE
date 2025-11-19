@@ -14,7 +14,7 @@ import {
 import { AntDesign, Ionicons } from "@expo/vector-icons";
 import { View, ActivityIndicator, Platform } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-
+import { AuthProvider } from "../contexts/AuthContext";
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
 type RoutePath = "/" | "/(tabs)" | "/auth/login" | "/modal";
@@ -76,6 +76,9 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ThemeProvider value={DefaultTheme}>
+        <AuthProvider>
+
+       
         <Stack
           screenOptions={{
             headerShown: false,
@@ -105,6 +108,7 @@ export default function RootLayout() {
           <Stack.Screen name="modal" />
         </Stack>
         <StatusBar style="auto" />
+        </AuthProvider>
       </ThemeProvider>
     </GestureHandlerRootView>
   );

@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, Image, TouchableOpacity } from "react-native";
 import { MaterialIcons, Feather, Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-
+import { chatService } from "@/services/chatService";
 export default function HostInfo({ room, contactHost }: any) {
   const router = useRouter();
 
@@ -25,10 +25,17 @@ export default function HostInfo({ room, contactHost }: any) {
     return stars;
   };
 
-  const handleChatNow = () => {
-    const chatId = room.host._id;
-    router.push(`/messages/${chatId}`);
-  };
+  const handleChatNow = async () => {
+  try {
+    // Tạo hoặc lấy cuộc chat với chủ trọ
+    const chat = await chatService.createChat(room.host._id);
+
+    // Điều hướng sang màn chat với đúng chatId
+    router.push(`/messages/${chat._id}`);
+  } catch (error) {
+    console.error("Lỗi tạo chat:", error);
+  }
+};
 
   return (
     <View className="px-5 py-5 border-t border-gray-200">

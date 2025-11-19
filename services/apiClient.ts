@@ -3,13 +3,13 @@ import axios from "axios";
 import { Platform } from "react-native";
 
 // IP máy tính 
-const LOCAL_IP = "192.168.1.8";
+const LOCAL_IP = "192.168.1.244";
 const PORT = 5050;
 
 //  Cấu hình chính xác cho mọi môi trường
 const API_BASE_URL =
   Platform.OS === "android"
-    ? `http://10.0.2.2:${PORT}/api` // Android
+    ? `http://${LOCAL_IP}:${PORT}/api` // Android
     : `http://${LOCAL_IP}:${PORT}/api`; // iOS & Web dùng IP LAN
 
 

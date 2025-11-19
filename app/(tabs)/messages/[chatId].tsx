@@ -1,87 +1,178 @@
-import React, { useState, useRef, useEffect } from "react";
-import {
-  View,
-  Text,
-  ScrollView,
-  KeyboardAvoidingView,
-  Platform,
-  Image,
-  TouchableOpacity,
-} from "react-native";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import MessageBubble from "./MessageBubble";
-import MessageInput from "./MessageInput";
-import { Ionicons } from "@expo/vector-icons";
+import React, { useEffect, useState, useCallback, useRef } from "react";
+import { View, FlatList, Text, ActivityIndicator } from "react-native";
+import { useLocalSearchParams } from "expo-router";
+import { useAuth } from "../../../contexts/AuthContext";
+import { socket } from "../../../utils/socket";
+import { messageService } from "../../../services/messageService";
+import MessageInput from "./components/MessageInput";
+import MessageBubble from "./components/MessageBubble";
 
-export default function ChatScreen() {
-  const router = useRouter();
-  const { chatId } = useLocalSearchParams();
-  const scrollViewRef = useRef<ScrollView | null>(null);
+export default function ChatRoomScreen() {
+  const { receiverId: paramReceiverId, chatId: paramChatId,receiverName } =
+    useLocalSearchParams<{ receiverId?: string; chatId?: string,receiverName?: string; }>();
 
-  const [messages, setMessages] = useState([
-    { id: 1, text: "Chào bạn, phòng này còn trống không ạ?", isUser: true },
-    { id: 2, text: "Chào bạn, hiện tại phòng vẫn còn nha!", isUser: false },
-  ]);
-  const [input, setInput] = useState("");
+  const { user } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const [messages, setMessages] = useState<any[]>([]);
+  const [currentChatId, setCurrentChatId] = useState<string | undefined>(
+    paramChatId
+  );
+  
+  const joinedRef = useRef<string | null>(null);
+  const flatListRef = useRef<FlatList>(null);
 
-  const handleSend = () => {
-    if (!input.trim()) return;
-    const newMsg = { id: Date.now(), text: input, isUser: true };
-    setMessages((prev) => [...prev, newMsg]);
-    setInput("");
-  };
+  // Load messages từ server
+  const loadMessages = useCallback(async () => {
+    if (!currentChatId) return;
+    setLoading(true);
+    try {
+      const data = await messageService.getMessages(currentChatId);
+      setMessages(
+        data
+          .map((msg: any) => ({
+            _id: msg._id,
+            text: msg.content,
+            createdAt: new Date(msg.createdAt),
+            user: {
+              _id: msg.sender._id,
+              name: `${msg.sender.firstName ?? ""} ${msg.sender.lastName ?? ""}`,
+              avatar: msg.sender.avatar,
+            },
+          }))
+          // Sắp xếp tin nhắn cũ trên mới dưới
+          .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
+      );
+    } catch (err) {
+      console.error("❌ loadMessages error:", err);
+    } finally {
+      setLoading(false);
+    }
+  }, [currentChatId]);
 
+  // Join/Leave chat room
   useEffect(() => {
-    scrollViewRef.current?.scrollToEnd({ animated: true });
+    if (!currentChatId) return;
+    if (joinedRef.current === currentChatId) return;
+
+    joinedRef.current = currentChatId;
+    socket.emit("joinChat", currentChatId);
+    loadMessages();
+
+    return () => {
+      socket.emit("leaveChat", currentChatId);
+      joinedRef.current = null;
+    };
+  }, [currentChatId, loadMessages]);
+
+  // Lắng nghe tin nhắn realtime từ server
+  useEffect(() => {
+    if (!currentChatId) return;
+
+    const handleReceiveMessage = (msg: any) => {
+      if (msg.chatId !== currentChatId) return;
+
+      setMessages(prev => {
+        const newMsg = {
+          _id: msg._id || Math.random().toString(),
+          text: msg.content,
+          createdAt: new Date(msg.createdAt),
+          user: {
+            _id: msg.sender._id,
+            name: msg.sender.firstName
+              ? `${msg.sender.firstName} ${msg.sender.lastName ?? ""}`
+              : "Người dùng",
+            avatar: msg.sender.avatar,
+          },
+        };
+        const updated = [...prev, newMsg].sort(
+          (a, b) => a.createdAt.getTime() - b.createdAt.getTime()
+        );
+        return updated;
+      });
+    };
+
+    socket.on("receiveMessage", handleReceiveMessage);
+
+    return () => {
+      socket.off("receiveMessage", handleReceiveMessage);
+    };
+  }, [currentChatId]);
+  // tự động kéo xuống khi có tin nhắn mới
+  useEffect(() => {
+    if (messages.length > 0) {
+      flatListRef.current?.scrollToEnd({ animated: true });
+    }
   }, [messages]);
+
+  // Gửi tin nhắn
+  const handleSendMessage = useCallback(async (msgText: string) => {
+  if (!msgText || !paramReceiverId || !user?._id) return;
+  const content = msgText.trim();
+
+  try {
+    // Gửi API để lưu DB
+    const newMsg = await messageService.sendMessage(paramReceiverId, content);
+
+    const activeChatId = newMsg.chatId || currentChatId;
+    if (!currentChatId && newMsg.chatId) setCurrentChatId(newMsg.chatId);
+
+    // Gửi socket
+    if (activeChatId) {
+      socket.emit("sendMessage", {
+        chatId: activeChatId,
+        senderId: user._id,
+        receiverId: paramReceiverId,
+        content,
+      });
+    }
+   
+  } catch (err) {
+    console.error(err);
+  }
+}, [paramReceiverId, currentChatId, user]);
+
+
+  if (loading) {
+    return (
+      <View className="flex-1 items-center justify-center bg-white">
+        <ActivityIndicator size="large" color="#6B9AC4" />
+        <Text className="mt-2 text-gray-600">Đang tải dữ liệu...</Text>
+      </View>
+    );
+  }
+
+  if (!user?._id) {
+    return (
+      <View className="flex-1 items-center justify-center bg-white">
+        <Text className="text-gray-600">Không tìm thấy thông tin người dùng.</Text>
+      </View>
+    );
+  }
 
   return (
     <View className="flex-1 bg-white">
-      <View className="py-3 px-3 border-b border-gray-200 flex-row items-center">
-        <TouchableOpacity onPress={() => router.back()} className="mr-2">
-          <Ionicons name="arrow-back" size={22} color="#3F72AF" />
-        </TouchableOpacity>
-        <Image
-          source={{
-            uri: "https://cdn-icons-png.flaticon.com/512/9131/9131529.png",
-          }}
-          className="w-8 h-8 rounded-full mr-2"
-        />
-        <Text className="text-base font-semibold text-[#3F72AF]">
-          Chủ trọ {chatId}
+      <View className="bg-[#BFD7ED] px-4 py-3 flex-row items-center justify-center border-b border-gray-200">
+        <Text className="text-[16px] font-semibold text-gray-800">
+          {receiverName}
         </Text>
       </View>
-        <KeyboardAvoidingView
-          style={{ flex: 0.97 }}
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
-          keyboardVerticalOffset={Platform.OS === "ios" ? 120 : 80}
-        >
-        <ScrollView
-          ref={scrollViewRef}
-          className="flex-1 px-3 pt-3 pb-2"
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: 10 }}
-        >
-          {messages.map((msg) => (
-            <MessageBubble
-              key={msg.id}
-              text={msg.text}
-              isUser={msg.isUser}
-              avatar={
-                msg.isUser
-                  ? "https://cdn-icons-png.flaticon.com/512/149/149071.png"
-                  : "https://cdn-icons-png.flaticon.com/512/9131/9131529.png"
-              }
-            />
-          ))}
-        </ScrollView>
+      <FlatList
+        ref={flatListRef}
+        data={messages}
+        keyExtractor={(item) => item._id}
+        renderItem={({ item }) => (
+          <MessageBubble
+            text={item.text}
+            isUser={item.user._id === user._id}
+            avatar={item.user.avatar}
+            createdAt={item.createdAt}
+          />
+        )}
+        contentContainerStyle={{ padding: 10, paddingBottom: 80 }}
+      />
 
-        <MessageInput
-          value={input}
-          onChangeText={setInput}
-          onSend={handleSend}
-        />
-      </KeyboardAvoidingView>
+     
+      <MessageInput receiverId={paramReceiverId || ""} onMessageSent={handleSendMessage} />
     </View>
   );
 }
