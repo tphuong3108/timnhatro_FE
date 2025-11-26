@@ -15,7 +15,7 @@ export default function ChatListScreen() {
   const [chats, setChats] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
-  const { user } = useAuth(); // Lấy user hiện tại
+  const { user } = useAuth();
 
   useEffect(() => {
     (async () => {
@@ -57,7 +57,6 @@ export default function ChatListScreen() {
       data={chats}
       keyExtractor={(item) => item._id}
       renderItem={({ item }) => {
-        // Tìm partner (không phải chính user)
         const partner =
           item.participants.find((p: any) => p._id !== user._id) ||
           item.participants[0];
@@ -68,9 +67,10 @@ export default function ChatListScreen() {
               router.push({
                 pathname: "/messages/[chatId]",
                 params: {
-                  chatId: item._id,        // Phòng chat
-                  receiverId: partner._id, // Người nhận thật
-                  receiverName: `${partner.firstName} ${partner.lastName}`
+                  chatId: item._id,
+                  receiverId: partner._id,
+                  receiverName: `${partner.firstName} ${partner.lastName}`,
+                  roomId: item.roomId?._id,
                 },
               });
             }}

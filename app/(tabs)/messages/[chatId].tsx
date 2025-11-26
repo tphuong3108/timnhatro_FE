@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
-import { View, FlatList, Text, ActivityIndicator } from "react-native";
-import { useLocalSearchParams } from "expo-router";
+import { View, FlatList, Text, ActivityIndicator,Image,Pressable  } from "react-native";
+import { useLocalSearchParams,router } from "expo-router";
 import { useAuth } from "../../../contexts/AuthContext";
 import { socket } from "../../../utils/socket";
 import { messageService } from "../../../services/messageService";
@@ -8,25 +8,30 @@ import MessageInput from "./components/MessageInput";
 import MessageBubble from "./components/MessageBubble";
 
 export default function ChatRoomScreen() {
-  const { receiverId: paramReceiverId, chatId: paramChatId,receiverName } =
-    useLocalSearchParams<{ receiverId?: string; chatId?: string,receiverName?: string; }>();
+  const { chatId, receiverId, receiverName } =
+    useLocalSearchParams<{
+      chatId?: string;
+      receiverId?: string;
+      receiverName?: string;
+    }>();
+    const [room, setRoom] = useState<any>(null);
 
   const { user } = useAuth();
-  const [loading, setLoading] = useState(false);
+  const currentChatId = chatId;
+
+  const [loading, setLoading] = useState(true);
   const [messages, setMessages] = useState<any[]>([]);
-  const [currentChatId, setCurrentChatId] = useState<string | undefined>(
-    paramChatId
-  );
-  
+
   const joinedRef = useRef<string | null>(null);
   const flatListRef = useRef<FlatList>(null);
-
-  // Load messages từ server
   const loadMessages = useCallback(async () => {
     if (!currentChatId) return;
-    setLoading(true);
+
     try {
-      const data = await messageService.getMessages(currentChatId);
+      const res = await messageService.getMessages(currentChatId);
+      const data = res.messages || [];
+       setRoom(res.room || null);
+
       setMessages(
         data
           .map((msg: any) => ({
@@ -35,11 +40,12 @@ export default function ChatRoomScreen() {
             createdAt: new Date(msg.createdAt),
             user: {
               _id: msg.sender._id,
-              name: `${msg.sender.firstName ?? ""} ${msg.sender.lastName ?? ""}`,
+              name: `${msg.sender.firstName ?? ""} ${
+                msg.sender.lastName ?? ""
+              }`,
               avatar: msg.sender.avatar,
             },
           }))
-          // Sắp xếp tin nhắn cũ trên mới dưới
           .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
       );
     } catch (err) {
@@ -48,90 +54,80 @@ export default function ChatRoomScreen() {
       setLoading(false);
     }
   }, [currentChatId]);
-
-  // Join/Leave chat room
   useEffect(() => {
     if (!currentChatId) return;
-    if (joinedRef.current === currentChatId) return;
 
-    joinedRef.current = currentChatId;
-    socket.emit("joinChat", currentChatId);
-    loadMessages();
+    if (joinedRef.current !== currentChatId) {
+      joinedRef.current = currentChatId;
+      socket.emit("joinChat", currentChatId);
+      loadMessages();
+    }
 
     return () => {
       socket.emit("leaveChat", currentChatId);
       joinedRef.current = null;
     };
   }, [currentChatId, loadMessages]);
-
-  // Lắng nghe tin nhắn realtime từ server
   useEffect(() => {
-    if (!currentChatId) return;
-
-    const handleReceiveMessage = (msg: any) => {
+    const handleReceive = (msg: any) => {
+      // Chỉ xử lý tin nhắn đúng chat
       if (msg.chatId !== currentChatId) return;
 
-      setMessages(prev => {
-        const newMsg = {
-          _id: msg._id || Math.random().toString(),
-          text: msg.content,
-          createdAt: new Date(msg.createdAt),
-          user: {
-            _id: msg.sender._id,
-            name: msg.sender.firstName
-              ? `${msg.sender.firstName} ${msg.sender.lastName ?? ""}`
-              : "Người dùng",
-            avatar: msg.sender.avatar,
-          },
-        };
-        const updated = [...prev, newMsg].sort(
+      const newMsg = {
+        _id: msg._id || Math.random().toString(),
+        text: msg.content,
+        createdAt: new Date(msg.createdAt),
+        user: {
+          _id: msg.sender._id,
+          name: `${msg.sender.firstName ?? ""} ${
+            msg.sender.lastName ?? ""
+          }`,
+          avatar: msg.sender.avatar,
+        },
+      };
+
+      setMessages((prev) =>
+        [...prev, newMsg].sort(
           (a, b) => a.createdAt.getTime() - b.createdAt.getTime()
-        );
-        return updated;
-      });
+        )
+      );
     };
 
-    socket.on("receiveMessage", handleReceiveMessage);
+    socket.on("receiveMessage", handleReceive);
 
     return () => {
-      socket.off("receiveMessage", handleReceiveMessage);
+      socket.off("receiveMessage", handleReceive);
     };
   }, [currentChatId]);
-  // tự động kéo xuống khi có tin nhắn mới
   useEffect(() => {
     if (messages.length > 0) {
       flatListRef.current?.scrollToEnd({ animated: true });
     }
   }, [messages]);
+  const handleSendMessage = useCallback(
+    async (msgText: string) => {
+      if (!msgText.trim()) return;
+      if (!receiverId || !currentChatId) return;
 
-  // Gửi tin nhắn
-  const handleSendMessage = useCallback(async (msgText: string) => {
-  if (!msgText || !paramReceiverId || !user?._id) return;
-  const content = msgText.trim();
+      try {
+        await messageService.sendMessage({
+          chatId: currentChatId,
+          content: msgText.trim(),
+          images: [],
+        });
 
-  try {
-    // Gửi API để lưu DB
-    const newMsg = await messageService.sendMessage(paramReceiverId, content);
-
-    const activeChatId = newMsg.chatId || currentChatId;
-    if (!currentChatId && newMsg.chatId) setCurrentChatId(newMsg.chatId);
-
-    // Gửi socket
-    if (activeChatId) {
-      socket.emit("sendMessage", {
-        chatId: activeChatId,
-        senderId: user._id,
-        receiverId: paramReceiverId,
-        content,
-      });
-    }
-   
-  } catch (err) {
-    console.error(err);
-  }
-}, [paramReceiverId, currentChatId, user]);
-
-
+        socket.emit("sendMessage", {
+          chatId: currentChatId,
+          senderId: user?._id,
+          receiverId,
+          content: msgText.trim(),
+        });
+      } catch (err) {
+        console.error("sendMessage error:", err);
+      }
+    },
+    [currentChatId, receiverId, user]
+  );
   if (loading) {
     return (
       <View className="flex-1 items-center justify-center bg-white">
@@ -141,21 +137,49 @@ export default function ChatRoomScreen() {
     );
   }
 
-  if (!user?._id) {
-    return (
-      <View className="flex-1 items-center justify-center bg-white">
-        <Text className="text-gray-600">Không tìm thấy thông tin người dùng.</Text>
-      </View>
-    );
-  }
-
   return (
     <View className="flex-1 bg-white">
+      {/* Header */}
       <View className="bg-[#BFD7ED] px-4 py-3 flex-row items-center justify-center border-b border-gray-200">
         <Text className="text-[16px] font-semibold text-gray-800">
           {receiverName}
         </Text>
       </View>
+   {room && (
+  <Pressable
+   onPress={() => router.push(`/room/${room._id}`)}
+
+    className="p-3 border-b border-gray-300 bg-white flex-row"
+  >
+    {/* Ảnh phòng */}
+    <View className="w-[90px] h-[70px] rounded-lg overflow-hidden bg-gray-200">
+      <Image
+        source={{ uri: room.images?.[0] }}
+        style={{ width: "100%", height: "100%" }}
+        resizeMode="cover"
+      />
+    </View>
+
+    {/* Thông tin */}
+    <View className="flex-1 ml-3 justify-center">
+      <Text className="text-[15px] font-semibold text-gray-900">
+        {room.name}
+      </Text>
+
+      <Text className="text-[12px] text-gray-600 mt-0.5" numberOfLines={1}>
+        📍 {room.address}
+      </Text>
+
+      {room.price && (
+        <Text className="text-[14px] font-bold text-[#3B82F6] mt-1">
+          💰 {room.price.toLocaleString()} VNĐ / tháng
+        </Text>
+      )}
+    </View>
+  </Pressable>
+)}
+
+      {/* Messages */}
       <FlatList
         ref={flatListRef}
         data={messages}
@@ -163,7 +187,7 @@ export default function ChatRoomScreen() {
         renderItem={({ item }) => (
           <MessageBubble
             text={item.text}
-            isUser={item.user._id === user._id}
+            isUser={item.user._id === user?._id}
             avatar={item.user.avatar}
             createdAt={item.createdAt}
           />
@@ -171,8 +195,11 @@ export default function ChatRoomScreen() {
         contentContainerStyle={{ padding: 10, paddingBottom: 80 }}
       />
 
-     
-      <MessageInput receiverId={paramReceiverId || ""} onMessageSent={handleSendMessage} />
+      {/* Input */}
+      <MessageInput
+        receiverId={receiverId || ""}
+        onMessageSent={handleSendMessage}
+      />
     </View>
   );
 }
