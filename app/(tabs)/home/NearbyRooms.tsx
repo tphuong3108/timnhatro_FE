@@ -29,22 +29,22 @@ export default function NearbyRooms() {
         console.log("🔄 Bắt đầu tải phòng gần đây...");
         const { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== "granted") {
-          setError("⚠️ Vui lòng bật quyền truy cập vị trí để xem phòng gần bạn");
+          setError(" Vui lòng bật quyền truy cập vị trí để xem phòng gần bạn");
           setLoading(false);
           return;
         }
 
         const location = await Location.getCurrentPositionAsync({});
         const { latitude, longitude } = location.coords;
-        console.log("📍 Vị trí hiện tại của bạn:", { latitude, longitude });
+        console.log(" Vị trí hiện tại của bạn:", { latitude, longitude });
 
         // Gọi API lấy phòng gần đây
         const res = await roomApi.getNearbyRooms(latitude, longitude, 20000);
-        console.log("📦 Dữ liệu trả về từ API getNearbyRooms:", res);
+        console.log(" Dữ liệu trả về từ API getNearbyRooms:", res);
 
         if (Array.isArray(res) && res.length > 0) {
           res.forEach((room, idx) => {
-            console.log(`🏠 Phòng #${idx + 1}:`, {
+            console.log(` Phòng #${idx + 1}:`, {
               id: room._id,
               name: room.name,
               location: room.location,
@@ -56,11 +56,11 @@ export default function NearbyRooms() {
           });
           setRooms(res);
         } else {
-          console.log("⚠️ Không có phòng nào được trả về!");
+          console.log(" Không có phòng nào được trả về!");
           setRooms([]);
         }
       } catch (err) {
-        console.error("❌ Lỗi khi tải phòng gần đây:", err);
+        console.error(" Lỗi khi tải phòng gần đây:", err);
         setError("Đã có lỗi xảy ra khi tải dữ liệu phòng gần đây");
       } finally {
         setLoading(false);
@@ -68,7 +68,7 @@ export default function NearbyRooms() {
     })();
   }, []);
 
-  // ⏳ Loading UI
+  //  Loading UI
   if (loading) {
     return (
       <View className="py-10 items-center">
@@ -78,7 +78,7 @@ export default function NearbyRooms() {
     );
   }
 
-  // ⚠️ Lỗi định vị hoặc API
+  //  Lỗi định vị hoặc API
   if (error) {
     return (
       <View className="py-10 items-center">
@@ -88,7 +88,7 @@ export default function NearbyRooms() {
     );
   }
 
-  // 🚫 Không có phòng nào gần đây
+  //  Không có phòng nào gần đây
   if (!rooms.length) {
     return (
       <View className="py-10 items-center">
@@ -98,7 +98,7 @@ export default function NearbyRooms() {
     );
   }
 
-  // ✅ Hiển thị danh sách phòng
+  //  Hiển thị danh sách phòng
   return (
     <View className="mt-2">
       <Animated.FlatList
@@ -142,14 +142,14 @@ export default function NearbyRooms() {
                   {item.address || item.ward?.name || "—"}
                 </Text>
 
-                {/* 📍 Khoảng cách */}
+                {/*  Khoảng cách */}
                 {item.distance && (
                   <Text className="text-gray-300 text-[12px]">
                     {(item.distance / 1000).toFixed(1)} km
                   </Text>
                 )}
 
-                {/* ⭐ Tim 👁 */}
+                {/*  Tim 👁 */}
                 <View className="flex-row items-center mt-1">
                   <Ionicons name="star" size={14} color="#FFD700" />
                   <Text className="text-gray-100 text-[12px] ml-1">

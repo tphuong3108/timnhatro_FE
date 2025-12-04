@@ -26,14 +26,13 @@ interface RoomCardProps {
     createdBy?: { _id: string } | string;
   };
   onDeleted?: () => void;
-  showActions?: boolean;
+  showActions?: boolean; 
 }
 
-export default function PostCard({ item, onDeleted }: RoomCardProps) {
+export default function PostCard({ item, onDeleted, showActions }: RoomCardProps) {
   const router = useRouter();
   const [isOwner, setIsOwner] = useState(false);
 
-  // 🧠 Xác định ảnh hiển thị và ID phòng
   const imageUri =
     item.image ||
     item.images?.[0] ||
@@ -41,7 +40,6 @@ export default function PostCard({ item, onDeleted }: RoomCardProps) {
   const roomId = item._id || item.id;
   const slugOrId = item.slug || roomId;
 
-  // 🧩 Kiểm tra quyền sở hữu phòng
   useEffect(() => {
     const checkOwner = async () => {
       try {
@@ -60,34 +58,32 @@ export default function PostCard({ item, onDeleted }: RoomCardProps) {
           setIsOwner(false);
         }
       } catch (err) {
-        console.log("❌ Lỗi decode token:", err);
+        console.log("Error decoding token:", err);
       }
     };
     checkOwner();
   }, [item]);
 
-  // ✏️ Xử lý khi bấm sửa
   const handleEdit = () => {
     if (!roomId)
-      return Alert.alert("Lỗi", "Không tìm thấy ID phòng để chỉnh sửa.");
+      return Alert.alert("Error", "Room ID not found for editing.");
     router.push(`/(tabs)/room/edit/${roomId}`);
   };
 
-  // 🗑️ Xử lý khi bấm xóa
   const handleDelete = async () => {
     if (!roomId)
-      return Alert.alert("Lỗi", "Không tìm thấy ID phòng để xóa.");
+      return Alert.alert("Error", "Room ID not found for deletion.");
 
-    Alert.alert("🗑️ Xóa phòng", "Bạn có chắc muốn xóa phòng này không?", [
-      { text: "Hủy", style: "cancel" },
+    Alert.alert("Delete Room", "Are you sure you want to delete this room?", [
+      { text: "Cancel", style: "cancel" },
       {
-        text: "Xóa",
+        text: "Delete",
         style: "destructive",
         onPress: async () => {
           try {
             const token = await AsyncStorage.getItem("token");
             if (!token) {
-              Alert.alert("Lỗi", "Vui lòng đăng nhập lại để xóa phòng.");
+              Alert.alert("Error", "Please log in to delete the room.");
               return;
             }
 
@@ -95,21 +91,21 @@ export default function PostCard({ item, onDeleted }: RoomCardProps) {
               headers: { Authorization: `Bearer ${token}` },
             });
 
-            Alert.alert("✅ Thành công", "Phòng đã được xóa!");
+            Alert.alert("Success", "Room has been deleted!");
             onDeleted?.();
           } catch (err: any) {
-            console.log("❌ Lỗi xóa phòng:", err?.response?.data || err);
-            Alert.alert("Lỗi", "Không thể xóa phòng, vui lòng thử lại.");
+            console.log("Error deleting room:", err?.response?.data || err);
+            Alert.alert("Error", "Could not delete the room, please try again.");
           }
         },
       },
     ]);
   };
 
-  // 🧭 Xử lý khi bấm xem chi tiết
+  // Handle viewing the room details
   const handleViewDetail = () => {
     if (!slugOrId)
-      return Alert.alert("Lỗi", "Không tìm thấy phòng để xem chi tiết.");
+      return Alert.alert("Error", "Room not found for details.");
     router.push(`/room/${slugOrId}`);
   };
 
@@ -127,7 +123,7 @@ export default function PostCard({ item, onDeleted }: RoomCardProps) {
         overflow: "hidden",
       }}
     >
-      {/* 🖼️ Xem chi tiết phòng */}
+      {/* Room detail view */}
       <TouchableOpacity activeOpacity={0.9} onPress={handleViewDetail}>
         <ImageBackground
           source={{ uri: imageUri }}
@@ -135,7 +131,7 @@ export default function PostCard({ item, onDeleted }: RoomCardProps) {
           style={{ height: 220, justifyContent: "flex-end" }}
         >
           <View style={{ backgroundColor: "rgba(0,0,0,0.45)", padding: 8 }}>
-            {/* 🌟 Tên & nút hành động */}
+            {/* Title & Action Buttons */}
             <View
               style={{
                 flexDirection: "row",
@@ -152,12 +148,12 @@ export default function PostCard({ item, onDeleted }: RoomCardProps) {
                 }}
                 numberOfLines={1}
               >
-                {item.name || item.title || "Phòng chưa có tên"}
+                {item.name || item.title || "No Room Name"}
               </Text>
 
-              {isOwner && (
+              {isOwner && showActions && (
                 <View style={{ flexDirection: "row", gap: 8 }}>
-                  {/* ✏️ Sửa */}
+                  {/* Edit Button */}
                   <TouchableOpacity
                     onPress={handleEdit}
                     style={{
@@ -169,7 +165,7 @@ export default function PostCard({ item, onDeleted }: RoomCardProps) {
                     <Edit3 size={16} color="#fff" />
                   </TouchableOpacity>
 
-                  {/* 🗑️ Xóa */}
+                  {/* Delete Button */}
                   <TouchableOpacity
                     onPress={handleDelete}
                     style={{
@@ -184,7 +180,7 @@ export default function PostCard({ item, onDeleted }: RoomCardProps) {
               )}
             </View>
 
-            {/* 📍 Địa chỉ */}
+            {/* Address */}
             <Text
               style={{
                 color: "#ddd",
@@ -193,7 +189,7 @@ export default function PostCard({ item, onDeleted }: RoomCardProps) {
               }}
               numberOfLines={1}
             >
-              {item.address || item.distance || "Chưa có địa chỉ"}
+              {item.address || item.distance || "No address available"}
             </Text>
           </View>
         </ImageBackground>

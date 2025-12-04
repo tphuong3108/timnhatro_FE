@@ -6,29 +6,41 @@ import {
   TouchableOpacity,
   ScrollView,
   Alert,
+  Modal,
+  TextInput
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Animated, { FadeInUp } from "react-native-reanimated";
 import { useRouter } from "expo-router";
-import { roomApi } from "@/services/roomApi"; // 🔹 Dùng chung apiClient hoặc tạo reviewApi riêng
+import { roomApi } from "@/services/roomApi";
+import { useAuth } from "@/constants/auth/AuthContext";
 
 interface RatingSectionProps {
   room: any;
+  refreshRoomStatus?: () => Promise<void>;
 }
 
-export default function RatingSection({ room }: RatingSectionProps) {
+export default function RatingSection({ room, refreshRoomStatus }: RatingSectionProps) {
   const [showAll, setShowAll] = useState(false);
+  const [reportModal, setReportModal] = useState(false);
+  const [reportReason, setReportReason] = useState("");
+  const [selectedReviewId, setSelectedReviewId] = useState<string | null>(null);
+
   const router = useRouter();
+  const { user } = useAuth();
 
   const ratingStats = useMemo(() => {
     const counts = [0, 0, 0, 0, 0];
     const reviews = room.reviews || [];
+
     reviews.forEach((r: any) => {
       const idx = Math.max(0, Math.min(4, Math.round(r.rating) - 1));
       counts[idx] += 1;
     });
+
     const total = reviews.length;
     const percentages = counts.map((c) => (total > 0 ? (c / total) * 100 : 0));
+
     return { counts, percentages, total };
   }, [room.reviews]);
 
@@ -36,29 +48,57 @@ export default function RatingSection({ room }: RatingSectionProps) {
 
   const displayedReviews = showAll ? room.reviews : room.reviews.slice(0, 3);
 
-  // 🧩 Gửi báo cáo review
-  const handleReportReview = (reviewId: string) => {
-    Alert.prompt(
-      "Báo cáo đánh giá",
-      "Nhập lý do bạn muốn báo cáo đánh giá này:",
+  // ⭐⭐⭐ BÁO CÁO REVIEW ⭐⭐⭐
+  const openReportModal = (reviewId: string) => {
+    setSelectedReviewId(reviewId);
+    setReportReason("");
+    setReportModal(true);
+  };
+
+  const sendReport = async () => {
+    if (!reportReason.trim()) {
+      Alert.alert("Lỗi", "Vui lòng nhập lý do báo cáo.");
+      return;
+    }
+
+    try {
+      await roomApi.reportReview(selectedReviewId!, reportReason);
+      setReportModal(false);
+      Alert.alert("Thành công", "Báo cáo của bạn đã được gửi.");
+    } catch (error) {
+      console.log(error);
+      Alert.alert("Lỗi", "Không thể gửi báo cáo.");
+    }
+  };
+
+  // ❌❌ XÓA REVIEW ❌❌
+  const confirmDeleteReview = (reviewId: string) => {
+    Alert.alert(
+      "Xóa đánh giá?",
+      "Bạn chắc chắn muốn xóa đánh giá này?",
       [
         { text: "Hủy", style: "cancel" },
         {
-          text: "Gửi",
-            onPress: async (reason?: string) => {
-              if (!reason || reason.trim().length === 0) return;
-              try {
-                await roomApi.reportReview(reviewId, reason);
-                Alert.alert("Thành công", "Báo cáo đã được gửi.");
-              } catch (error: any) {
-                console.error("Lỗi gửi báo cáo:", error);
-                Alert.alert("Lỗi", "Không thể gửi báo cáo. Vui lòng thử lại.");
-              }
-            },
-        },
-      ],
-      "plain-text"
+          text: "Xóa",
+          style: "destructive",
+          onPress: () => handleDeleteReview(reviewId)
+        }
+      ]
     );
+  };
+
+  const handleDeleteReview = async (reviewId: string) => {
+    try {
+      await roomApi.deleteReview(reviewId);
+      Alert.alert("Đã xóa", "Đánh giá đã được xóa.");
+
+      if (refreshRoomStatus) await refreshRoomStatus();
+      else router.reload();
+
+    } catch (error) {
+      console.log(error);
+      Alert.alert("Lỗi", "Không thể xóa đánh giá.");
+    }
   };
 
   return (
@@ -70,15 +110,12 @@ export default function RatingSection({ room }: RatingSectionProps) {
       <View className="flex-row items-center mb-3">
         <Ionicons name="chatbubbles-outline" size={20} color="#3F72AF" />
         <Text className="text-lg font-semibold text-[#112D4E] ml-2">
-          {room.totalRatings || ratingStats.total} lượt đánh giá
+          {ratingStats.total} lượt đánh giá
         </Text>
       </View>
 
-      {/* Xếp hạng tổng thể */}
-      <Animated.View
-        entering={FadeInUp.delay(150).duration(500)}
-        className="mb-4"
-      >
+      {/* Biểu đồ đánh giá */}
+      <Animated.View entering={FadeInUp.delay(150).duration(500)} className="mb-4">
         <View className="flex-row items-center mb-2">
           <Ionicons name="stats-chart-outline" size={20} color="#3F72AF" />
           <Text className="text-base font-medium text-[#112D4E] ml-2">
@@ -109,14 +146,13 @@ export default function RatingSection({ room }: RatingSectionProps) {
       {/* Danh sách đánh giá */}
       <ScrollView nestedScrollEnabled showsVerticalScrollIndicator={false}>
         {displayedReviews.map((r: any, i: number) => {
-          const user = r.userId || {};
+          const userInfo = r.userId || {};
           const avatar =
-            user.avatar ||
-            "https://cdn-icons-png.flaticon.com/512/3177/3177440.png";
+            userInfo.avatar || "https://cdn-icons-png.flaticon.com/512/3177/3177440.png";
           const name =
-            user.name ||
-            `${user.firstName || ""} ${user.lastName || ""}`.trim() ||
+            `${userInfo.firstName || ""} ${userInfo.lastName || ""}`.trim() ||
             "Người dùng ẩn danh";
+
           const date = r.createdAt
             ? new Date(r.createdAt).toLocaleDateString("vi-VN")
             : "Không xác định";
@@ -128,25 +164,11 @@ export default function RatingSection({ room }: RatingSectionProps) {
               className="flex-row mb-4 border-b border-gray-100 pb-3"
             >
               {/* Avatar */}
-              <TouchableOpacity
-                onPress={() =>
-                  router.push({
-                    pathname: "/user/[id]",
-                    params: { id: user._id || "unknown" },
-                  })
-                }
-              >
-                <Image
-                  source={{ uri: avatar }}
-                  className="w-10 h-10 rounded-full mr-3"
-                />
-              </TouchableOpacity>
+              <Image source={{ uri: avatar }} className="w-10 h-10 rounded-full mr-3" />
 
-              {/* Nội dung review */}
+              {/* Nội dung */}
               <View className="flex-1">
-                <Text className="font-semibold text-[#112D4E] text-[15px]">
-                  {name}
-                </Text>
+                <Text className="font-semibold text-[#112D4E] text-[15px]">{name}</Text>
                 <Text className="text-gray-500 text-[12px] mb-1">{date}</Text>
 
                 {/* Rating sao */}
@@ -166,21 +188,30 @@ export default function RatingSection({ room }: RatingSectionProps) {
                   {r.comment || "Không có nội dung đánh giá."}
                 </Text>
 
-                {/* 🔹 Nút báo cáo */}
-                <TouchableOpacity
-                  onPress={() => handleReportReview(r._id)}
-                  className="flex-row items-center"
-                >
-                  <Ionicons
-                    name="flag-outline"
-                    size={15}
-                    color="#EF4444"
-                    style={{ marginRight: 4 }}
-                  />
-                  <Text className="text-red-500 text-[12px]">
-                    Báo cáo đánh giá
-                  </Text>
-                </TouchableOpacity>
+                {/* —— Nút hành động —— */}
+                <View className="flex-row mt-1">
+
+                  {/* Báo cáo */}
+                  <TouchableOpacity
+                    onPress={() => openReportModal(r._id)}
+                    className="flex-row items-center mr-5"
+                  >
+                    <Ionicons name="flag-outline" size={15} color="#EF4444" />
+                    <Text className="text-red-500 text-[12px] ml-1">Báo cáo</Text>
+                  </TouchableOpacity>
+
+                  {/* Xóa — chỉ chủ review được xóa */}
+                  {user?._id === userInfo._id && (
+                    <TouchableOpacity
+                      onPress={() => confirmDeleteReview(r._id)}
+                      className="flex-row items-center"
+                    >
+                      <Ionicons name="trash-outline" size={15} color="#3F72AF" />
+                      <Text className="text-[#3F72AF] text-[12px] ml-1">Xóa</Text>
+                    </TouchableOpacity>
+                  )}
+
+                </View>
               </View>
             </Animated.View>
           );
@@ -198,6 +229,35 @@ export default function RatingSection({ room }: RatingSectionProps) {
           </Text>
         </TouchableOpacity>
       )}
+
+      {/* MODAL BÁO CÁO REVIEW */}
+      <Modal transparent visible={reportModal} animationType="fade">
+        <View className="flex-1 bg-black/40 justify-center items-center p-6">
+          <View className="bg-white w-full rounded-2xl p-5">
+            <Text className="text-lg font-semibold text-[#112D4E] mb-3">
+              Báo cáo đánh giá
+            </Text>
+
+            <TextInput
+              value={reportReason}
+              onChangeText={setReportReason}
+              placeholder="Nhập lý do..."
+              multiline
+              className="border border-gray-300 p-3 rounded-lg min-h-[100px] text-gray-700"
+            />
+
+            <View className="flex-row justify-end mt-4">
+              <TouchableOpacity onPress={() => setReportModal(false)} className="mr-4">
+                <Text className="text-gray-500 font-medium">Hủy</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity onPress={sendReport}>
+                <Text className="text-red-500 font-semibold">Gửi báo cáo</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </Animated.View>
   );
 }

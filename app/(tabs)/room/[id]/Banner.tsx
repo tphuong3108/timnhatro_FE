@@ -47,48 +47,47 @@ export default function Banner({
     setShowViewer(true);
   };
 
-  //  Thả / bỏ tim phòng
+  //  Like phòng
   const handleLikeRoom = async () => {
     if (!room?._id) return Alert.alert("Lỗi", "Không thể xác định phòng này.");
     try {
       await roomApi.likeRoom(room._id);
       setLiked((prev: boolean) => !prev);
       await refreshRoomStatus?.();
-      console.log(!liked ? "💗 Đã thả tim!" : "💔 Bỏ tim!");
     } catch (error: any) {
-      console.error("❌ Lỗi khi like room:", error);
-      Alert.alert("Lỗi", "Không thể cập nhật trạng thái yêu thích phòng.");
+      console.error(" Lỗi khi like phòng:", error);
+      Alert.alert("Lỗi", "Không thể cập nhật trạng thái thả tim.");
     }
   };
 
-  //  Lưu / bỏ lưu phòng
+  //  Lưu phòng / bỏ lưu
   const handleFavoriteRoom = async () => {
-    if (!room?._id) return Alert.alert("Lỗi", "Không thể xác định phòng này.");
+    if (!room?.slug) return Alert.alert("Lỗi", "Không thể xác định phòng này.");
+
     try {
       if (!favorited) {
-        await roomApi.addToFavorites(room._id);
+        await roomApi.addToFavorites(room.slug);
         setFavorited(true);
-        Alert.alert("Thành công", "Phòng đã được lưu vào danh sách yêu thích.");
+        Alert.alert("Thành công", "Đã lưu phòng vào danh sách yêu thích.");
       } else {
-        await roomApi.removeFromFavorites(room._id);
+        await roomApi.removeFromFavorites(room.slug);
         setFavorited(false);
-        Alert.alert("Thành công", "Phòng đã được xóa khỏi danh sách yêu thích.");
+        Alert.alert("Thành công", "Đã xoá khỏi danh sách yêu thích.");
       }
+
       await refreshRoomStatus?.();
     } catch (error: any) {
-      console.error("❌ Lỗi khi cập nhật Favorites:", error?.response?.data || error);
+      console.error("❌ Lỗi Favorites:", error?.response?.data || error);
       Alert.alert("Lỗi", "Không thể cập nhật danh sách yêu thích.");
     }
   };
 
-  // Báo cáo phòng
   const handleReport = () => {
     setShowMenu(false);
-    if (!room?._id) return Alert.alert("Lỗi", "Không thể xác định phòng này.");
+    if (!room?._id) return Alert.alert("Lỗi", "Không thể xác định phòng.");
     router.push(`/room/ReportRoom?id=${room._id}`);
   };
 
-  //  Cập nhật index khi cuộn
   const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
     const index = Math.round(e.nativeEvent.contentOffset.x / width);
     setCurrentIndex(index);
@@ -97,7 +96,7 @@ export default function Banner({
 
   return (
     <View className="relative">
-      {/* Ảnh & video */}
+      {/* Media */}
       <View style={{ height: width * 0.6 }}>
         <ScrollView
           horizontal
@@ -132,7 +131,7 @@ export default function Banner({
         </ScrollView>
       </View>
 
-      {/* Bộ đếm ảnh / video */}
+      {/* Counter */}
       {mediaItems.length > 1 && (
         <View
           style={{
@@ -151,7 +150,7 @@ export default function Banner({
         </View>
       )}
 
-      {/* Nhóm nút góc phải */}
+      {/* Floating buttons */}
       <View
         style={{
           position: "absolute",
@@ -167,11 +166,7 @@ export default function Banner({
         </TouchableOpacity>
 
         <TouchableOpacity onPress={handleLikeRoom} className="bg-white/80 p-2.5 rounded-full">
-          <Heart
-            size={20}
-            color={liked ? "#E63946" : "#112D4E"}
-            fill={liked ? "#E63946" : "none"}
-          />
+          <Heart size={20} color={liked ? "#E63946" : "#112D4E"} fill={liked ? "#E63946" : "none"} />
         </TouchableOpacity>
 
         <TouchableOpacity onPress={handleFavoriteRoom} className="bg-white/80 p-2.5 rounded-full">
@@ -182,45 +177,32 @@ export default function Banner({
           />
         </TouchableOpacity>
 
-        <TouchableOpacity
-          onPress={() => setShowMenu(true)}
-          className="bg-white/80 p-2.5 rounded-full"
-        >
+        <TouchableOpacity onPress={() => setShowMenu(true)} className="bg-white/80 p-2.5 rounded-full">
           <Ionicons name="ellipsis-vertical" size={20} color="#112D4E" />
         </TouchableOpacity>
       </View>
 
-      {/* Menu báo cáo */}
+      {/* Report modal */}
       <Modal visible={showMenu} transparent animationType="slide" onRequestClose={() => setShowMenu(false)}>
-        <Pressable
-          className="flex-1 bg-black/40 justify-end"
-          onPress={() => setShowMenu(false)}
-        >
+        <Pressable className="flex-1 bg-black/40 justify-end" onPress={() => setShowMenu(false)}>
           <View className="bg-white rounded-t-3xl pt-3 pb-6 px-5" onStartShouldSetResponder={() => true}>
             <View className="self-center w-10 h-1.5 bg-gray-300 rounded-full mb-4" />
 
-            <TouchableOpacity
-              onPress={handleReport}
-              className="py-3.5 border-b border-gray-100 active:bg-gray-50"
-            >
-              <Text className="text-[#E63946] font-semibold text-center text-base">
-                Báo cáo phòng
-              </Text>
+            <TouchableOpacity onPress={handleReport} className="py-3.5 border-b border-gray-100 active:bg-gray-50">
+              <Text className="text-[#E63946] font-semibold text-center text-base">Báo cáo phòng</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               onPress={() => setShowMenu(false)}
               className="py-3.5 mt-2 active:bg-gray-50 rounded-xl"
             >
-              <Text className="text-[#112D4E] font-semibold text-center text-base">
-                Đóng
-              </Text>
+              <Text className="text-[#112D4E] font-semibold text-center text-base">Đóng</Text>
             </TouchableOpacity>
           </View>
         </Pressable>
       </Modal>
 
-      {/* Modal xem ảnh / video phóng to */}
+      {/* Full screen viewer */}
       <Modal visible={showViewer} transparent animationType="fade">
         <View className="bg-black flex-1 justify-center items-center">
           <ScrollView
@@ -236,13 +218,7 @@ export default function Banner({
           >
             {mediaItems.map((item, i) =>
               item.type === "image" ? (
-                <Image
-                  key={i}
-                  source={{ uri: item.uri }}
-                  className="w-full h-full"
-                  resizeMode="contain"
-                  style={{ width, height }}
-                />
+                <Image key={i} source={{ uri: item.uri }} className="w-full h-full" resizeMode="contain" style={{ width, height }} />
               ) : (
                 <Video
                   key={i}
@@ -258,7 +234,7 @@ export default function Banner({
             )}
           </ScrollView>
 
-          {/* Bộ đếm trong viewer */}
+          {/* Viewer counter */}
           {mediaItems.length > 1 && (
             <View
               style={{
@@ -277,7 +253,6 @@ export default function Banner({
             </View>
           )}
 
-          {/* Nút đóng */}
           <Pressable
             className="absolute top-12 right-6 bg-white/80 px-3 py-2 rounded-full"
             onPress={() => setShowViewer(false)}

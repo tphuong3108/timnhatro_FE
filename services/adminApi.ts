@@ -90,5 +90,8 @@ export const adminApi = {
     const res = await apiClient.post("/admin/stats/processReports");
     return res.data.data || res.data;
   },
-
+  getReviewReports: async () => {
+    const res = await apiClient.get("admin/reviews/reports");
+    return res.data.data;
+  },
 };
