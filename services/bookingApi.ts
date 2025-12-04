@@ -4,8 +4,8 @@ import apiClient from "./apiClient";
 export interface CreateBookingDto {
   roomId: string;
   hostId: string;
-  date: string;    // yyyy-mm-dd
-  time: string;    // HH:mm
+  date: string;    
+  time: string;    
   note?: string;
 }
 export interface User {
@@ -30,23 +30,21 @@ export interface Booking {
 }
 
 export const bookingApi = {
-  // 👉 Tạo lịch xem phòng
+
   createBooking: (data: CreateBookingDto) =>
     apiClient.post("/bookings", data),
 
-  // 👉 Kiểm tra user đã đặt lịch phòng này chưa
+
   checkUserBookedRoom: (roomId: string) =>
     apiClient.get(`/bookings/check?roomId=${roomId}`),
 
-  // 👉 Lịch đã đặt của user (tenant)
   getUserBookings: () =>
     apiClient.get<Booking[]>("/bookings/me"),
 
-  // 👉 Lịch cần duyệt của host
+
   getHostBookings: () =>
     apiClient.get<Booking[]>("/bookings/host"),
 
-  // 👉 Approve, decline, cancel
   approveBooking: (id: string) =>
     apiClient.put(`/bookings/${id}/approve`),
 
