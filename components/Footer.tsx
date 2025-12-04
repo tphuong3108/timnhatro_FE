@@ -1,8 +1,9 @@
 import { profileApi } from "@/services/profileApi";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter, usePathname } from "expo-router";
+import { useEffect, useState } from "react";
+import { Dimensions, TouchableOpacity, View, Text } from "react-native";
 import Toast from "react-native-toast-message";
-import { profileApi } from "@/services/profileApi";
 
 interface FooterProps {
   onTabPress?: (tab: string) => void;
