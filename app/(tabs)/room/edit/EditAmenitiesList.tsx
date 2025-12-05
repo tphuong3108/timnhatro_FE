@@ -4,7 +4,6 @@ import { Ionicons } from "@expo/vector-icons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { getAllAmenities } from "@/services/amenityApi";
 
-// 🎨 Map icon theo tên tiện nghi
 const ICON_MAP = [
   { keywords: ["wifi"], icon: "wifi-outline", type: "Ionicons" },
   { keywords: ["tivi", "tv"], icon: "tv-outline", type: "Ionicons" },

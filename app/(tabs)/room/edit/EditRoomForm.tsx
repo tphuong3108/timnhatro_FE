@@ -8,7 +8,7 @@ export default function EditRoomForm({ roomData, setRoomData }: any) {
       <TextInput
         className="border border-gray-300 rounded-xl px-3 py-2 mb-4"
         value={roomData.name}
-        onChangeText={(text) => setRoomData({ ...roomData, name: text })}
+        onChangeText={(text) => setRoomData((prev: any) => ({ ...prev, name: text }))}
       />
 
       <Text className="text-lg font-semibold mb-2 text-gray-700">Giá (VNĐ)</Text>

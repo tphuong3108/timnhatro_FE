@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, ScrollView, Keyboard } from "react-native";
+import { Picker } from "@react-native-picker/picker";
 
 export default function AddRoomForm({
   roomName, setRoomName,
@@ -7,7 +8,13 @@ export default function AddRoomForm({
   location, setLocation,
   marker, setMarker,
   description, setDescription,
+
+  // ⭐ THÊM MỚI
+  selectedWard,
+  setSelectedWard,
+  wards,
 }: any) {
+
   const [suggestions, setSuggestions] = useState<any[]>([]);
 
   const fetchSuggestions = async (text: string) => {
@@ -39,40 +46,49 @@ export default function AddRoomForm({
 
   return (
     <>
+      {/* Tên phòng */}
       <Text className="text-[#3F72AF] font-semibold mb-1">Tên phòng</Text>
       <TextInput
         value={roomName}
         onChangeText={setRoomName}
         placeholder="VD: Phòng trọ sinh viên gần ĐH Bách Khoa"
-        returnKeyType="done"
-        onSubmitEditing={Keyboard.dismiss}
-        blurOnSubmit
         className="border border-gray-300 rounded-xl px-4 py-3 mb-4 text-[14px]"
       />
 
+      {/* Giá phòng */}
       <Text className="text-[#3F72AF] font-semibold mb-1">Giá thuê (VNĐ/tháng)</Text>
       <TextInput
         value={price}
         onChangeText={setPrice}
         keyboardType="numeric"
         placeholder="VD: 2.500.000"
-        returnKeyType="done"
-        onSubmitEditing={Keyboard.dismiss}
-        blurOnSubmit
         className="border border-gray-300 rounded-xl px-4 py-3 mb-4 text-[14px]"
       />
 
+      {/* Địa chỉ */}
       <Text className="text-[#3F72AF] font-semibold mb-1">Địa chỉ</Text>
       <TextInput
         value={location}
         onChangeText={fetchSuggestions}
         placeholder="Nhập địa chỉ hoặc chọn trên bản đồ"
-        returnKeyType="done"
-        onSubmitEditing={Keyboard.dismiss}
-        blurOnSubmit
         className="border border-gray-300 rounded-xl px-4 py-3 text-[14px]"
       />
 
+      {/* ⭐ THÊM PICKER WARD */}
+      <Text className="text-[#3F72AF] font-semibold mb-1 mt-4">Phường</Text>
+      <View className="border border-gray-300 rounded-xl mb-4">
+        <Picker
+          selectedValue={selectedWard}
+          onValueChange={(val) => setSelectedWard(val)}
+        >
+          <Picker.Item label="-- Chọn phường --" value="" />
+          {wards?.map((w: any) => (
+            <Picker.Item key={w._id} label={w.name} value={w._id} />
+          ))}
+        </Picker>
+      </View>
+
+      {/* Gợi ý địa chỉ */}
       {suggestions.length > 0 && (
         <View className="border border-gray-200 rounded-xl mt-1 bg-white shadow-sm max-h-48">
           <ScrollView keyboardShouldPersistTaps="handled">
@@ -89,6 +105,7 @@ export default function AddRoomForm({
         </View>
       )}
 
+      {/* Mô tả */}
       <Text className="text-[#3F72AF] font-semibold mb-1 mt-4">Mô tả chi tiết</Text>
       <TextInput
         value={description}
@@ -96,11 +113,7 @@ export default function AddRoomForm({
         placeholder="VD: Phòng rộng 20m², có gác lửng, gần chợ..."
         multiline
         numberOfLines={5}
-        textAlignVertical="top"
         className="border border-gray-300 rounded-xl px-4 py-3 mb-4 text-[14px]"
-        returnKeyType="done"
-        onSubmitEditing={Keyboard.dismiss}
-        blurOnSubmit
       />
     </>
   );

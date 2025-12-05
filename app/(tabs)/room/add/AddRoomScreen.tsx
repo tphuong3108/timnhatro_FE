@@ -35,6 +35,9 @@ export default function AddRoomScreen() {
           setMarker={logic.setMarker}
           description={logic.description}
           setDescription={logic.setDescription}
+          selectedWard={logic.selectedWard}
+          setSelectedWard={logic.setSelectedWard}
+          wards={logic.wards}
         />
 
         <MapPicker

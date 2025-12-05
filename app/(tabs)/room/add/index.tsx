@@ -55,6 +55,8 @@ export default function AddRoomIndex() {
           setLocation={setLocation}
           description={description}
           setDescription={setDescription}
+          marker={marker}
+          setMarker={setMarker} 
         />
 
         <MapPicker

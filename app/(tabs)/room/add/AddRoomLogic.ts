@@ -20,6 +20,8 @@ export const useAddRoomLogic = () => {
   const [loadingLocation, setLoadingLocation] = useState(false);
   const [loadingSubmit, setLoadingSubmit] = useState(false);
   const [isHost, setIsHost] = useState(false);
+  const [wards, setWards] = useState<any[]>([]);
+  const [selectedWard, setSelectedWard] = useState<string>("");
 
   // 🧭 Lấy vị trí hiện tại
   const getCurrentLocation = async () => {
@@ -85,6 +87,19 @@ export const useAddRoomLogic = () => {
       return null;
     }
   };
+  useEffect(() => {
+  const loadWards = async () => {
+    try {
+      const res = await apiClient.get("/wards");
+      setWards(res.data.data || []);
+    } catch (err) {
+      console.log(" Lỗi load ward:", err);
+    }
+  };
+
+  loadWards();
+}, []);
+
 
   // 🧠 Tự động nâng quyền Host khi mở màn
   useEffect(() => {
@@ -173,7 +188,7 @@ const handleSubmit = async () => {
       address: location,
       price,
       description,
-      ward: "68fece1de79afdce26641857",
+      ward: selectedWard,
       amenities: selectedAmenities,
       location: {
         type: "Point",
@@ -241,6 +256,9 @@ const handleSubmit = async () => {
     removeMedia,
     loadingLocation,
     getCurrentLocation,
+    wards,
+  selectedWard,
+  setSelectedWard,
     loadingSubmit,
     handleSubmit,
     handleMapPress,
