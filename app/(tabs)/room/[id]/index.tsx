@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { ActivityIndicator, ScrollView, Text, View } from "react-native";
+import React, { useState,useEffect } from "react";
+import { ActivityIndicator, ScrollView, Text, View, TouchableOpacity } from "react-native";
 import NearbyRooms from "../../home/NearbyRooms";
 import SectionHeader from "../../home/SectionHeader";
 import AmenitiesList from "./AmenitiesList";
@@ -11,6 +11,9 @@ import MapSection from "./MapSection";
 import RatingSection from "./RatingSection";
 import RoomDescription from "./RoomDescription";
 import { useRoomLogic } from "./RoomLogic";
+import BookingDialog from "../../booking/BookingDialog";
+import { bookingApi } from "../../../../services/bookingApi";
+
 
 export default function RoomDetailScreen() {
   const {
@@ -31,6 +34,26 @@ export default function RoomDetailScreen() {
   } = useRoomLogic();
 
   const [refreshKey, setRefreshKey] = useState<number>(0);
+  const [showBooking, setShowBooking] = useState(false);
+  const [hasBooked, setHasBooked] = useState(false);
+const [checkingBooked, setCheckingBooked] = useState(true);
+
+useEffect(() => {
+  if (!room?._id) return;
+
+  const checkBooking = async () => {
+    try {
+      const res = await bookingApi.checkUserBookedRoom(room._id);
+      setHasBooked(res.data.booked);
+    } catch (err) {
+      console.log("Lỗi kiểm tra booking:", err);
+    } finally {
+      setCheckingBooked(false);
+    }
+  };
+
+  checkBooking();
+}, [room]);
 
   if (loadingRoom || !room) {
     return (
@@ -58,6 +81,28 @@ export default function RoomDetailScreen() {
 
         {/* Thông tin cơ bản */}
         <InfoRoom room={room} />
+      {/* Đặt lịch xem phòng*/}
+             {checkingBooked ? (
+          <View className="bg-gray-300 mx-6 mt-3 rounded-xl py-4">
+            <Text className="text-center text-gray-600">Đang kiểm tra lịch...</Text>
+          </View>
+        ) : hasBooked ? (
+          <View className="bg-gray-400 mx-6 mt-3 rounded-xl py-4">
+            <Text className="text-center text-white font-semibold text-lg">
+              Bạn đã đặt lịch xem phòng!
+            </Text>
+          </View>
+        ) : (
+          <TouchableOpacity
+            style={{ backgroundColor: "#3F72AF" }}
+            className="bg-blue-600 mx-6 mt-3 rounded-xl py-4"
+            onPress={() => setShowBooking(true)}
+          >
+            <Text className="text-center text-white font-semibold text-lg">
+              Đặt lịch xem phòng
+            </Text>
+          </TouchableOpacity>
+        )}
 
         {/* Thông tin chủ trọ */}
         <HostInfo room={room} contactHost={contactHost} />
@@ -67,6 +112,8 @@ export default function RoomDetailScreen() {
 
         {/* Tiện ích */}
         <AmenitiesList amenities={room?.amenities} />
+       
+       
 
         {/* Bản đồ vị trí */}
         <MapSection
@@ -98,7 +145,17 @@ export default function RoomDetailScreen() {
           <SectionHeader title="Phòng xung quanh bạn" />
           <NearbyRooms />
         </View>
+        
       </ScrollView>
+      <BookingDialog
+        visible={showBooking}
+        onClose={() => setShowBooking(false)}
+        roomId={room._id}
+        hostId={room.createdBy}
+        roomName={room.title}
+        onBooked={() => setHasBooked(true)}
+      />
+
     </View>
   );
 }

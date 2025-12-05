@@ -99,6 +99,28 @@ export default function Profile() {
             Khóa tài khoản
           </Text>
         </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() =>
+            router.push(
+              user?.role?.toLowerCase() === "host"
+                ? "/(tabs)/booking/HostBookingList" // Trang host quản lý booking
+                : "/(tabs)/booking/UserBookingList" // Trang tenant xem booking
+            )
+          }
+          activeOpacity={0.8}
+          className="border border-[#3F72AF] py-3 rounded-full flex-row justify-center items-center mt-4"
+        >
+          <Ionicons
+            name="calendar-outline"
+            size={20}
+            color="#3F72AF"
+          />
+          <Text className="text-[#3F72AF] font-semibold text-[16px] ml-2">
+            {user?.role?.toLowerCase() === "host"
+              ? "Lịch Xem Phòng"
+              : "Lịch xem phòng của bạn"}
+          </Text>
+        </TouchableOpacity>
 
           {user?.role?.toLowerCase() === "host" && (
             <TouchableOpacity

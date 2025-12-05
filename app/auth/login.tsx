@@ -18,10 +18,14 @@ import FacebookIcon from "../../assets/images/facebook.svg";
 import GoogleIcon from "../../assets/images/google.svg";
 import Logo from "../../assets/images/logodoc.svg";
 import InputField from "../../components/InputField";
+import { useAuth } from "@/contexts/AuthContext";
+
 import apiClient from "@/services/apiClient";
 
 export default function Login() {
   const router = useRouter();
+  const { setUser } = useAuth();
+
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -51,6 +55,7 @@ export default function Login() {
       // Người dùng
       await AsyncStorage.setItem("token", accessToken);
       await AsyncStorage.setItem("user", JSON.stringify(user));
+      setUser(user);
       Alert.alert("🎉 Thành công", "Đăng nhập thành công!");
       router.replace("/home");
     } catch (error: any) {
