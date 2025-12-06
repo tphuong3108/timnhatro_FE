@@ -1,14 +1,13 @@
 import { io } from "socket.io-client";
-import { Platform } from "react-native";
 
-// ⚙️ Dùng chung IP & PORT như apiClient
-const LOCAL_IP = "192.168.1.177 ";
-const PORT = 5050; 
+const LOCAL_IP = "192.168.1.46";
+const PORT = 5050;
 
-const SOCKET_URL =
-  Platform.OS === "android"
-    ? `http://${LOCAL_IP}:${PORT}` // Android emulator
-    : `http://${LOCAL_IP}:${PORT}`; // iOS / thiết bị thật
+const SOCKET_URL = `http://${LOCAL_IP}:${PORT}`;
+
+if (__DEV__) {
+  console.log("[socket] connecting to:", SOCKET_URL);
+}
 
 export const socket = io(SOCKET_URL, {
   transports: ["websocket"],
