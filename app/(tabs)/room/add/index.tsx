@@ -7,7 +7,6 @@ import MediaPicker from "./MediaPicker";
 import AmenitiesList from "./AmenitiesList";
 import { useAddRoomLogic } from "./AddRoomLogic";
 import { useRouter } from "expo-router";
-
 export default function AddRoomIndex() {
   const router = useRouter();
   const {
@@ -83,7 +82,7 @@ export default function AddRoomIndex() {
           selectedAmenities={selectedAmenities}
           setSelectedAmenities={setSelectedAmenities}
         />
-
+        
         <TouchableOpacity
           onPress={() => {
             console.log("🖱️ Bấm nút đăng phòng");
