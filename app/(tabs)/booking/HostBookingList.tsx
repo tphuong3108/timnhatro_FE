@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { bookingApi, Booking } from "../../../services/bookingApi";
-import Toast from "react-native-toast-message"; // cần cài thư viện
+import React, { useEffect, useState } from "react";
+import { ActivityIndicator, FlatList, Image, Text, TouchableOpacity, View } from "react-native";
+import Toast from "react-native-toast-message";
+import { Booking, bookingApi } from "../../../services/bookingApi";
 
 const STATUS_COLORS: Record<string, string> = {
   pending: "#FFA500",
-  approved: "#546debff", 
+  approved: "#546debff",
   declined: "#F44336",
   completed: "#21e821ff",
 };
@@ -43,10 +43,6 @@ const HostBookingList = () => {
           await bookingApi.declineBooking(id);
           Toast.show({ type: 'success', text1: 'Thành công', text2: 'Booking đã bị từ chối.' });
           break;
-        case "cancel":
-          await bookingApi.cancelBooking(id);
-          Toast.show({ type: 'success', text1: 'Thành công', text2: 'Booking đã bị hủy.' });
-          break;
         case "complete":
           await bookingApi.completeBooking(id);
           Toast.show({ type: 'success', text1: 'Thành công', text2: 'Booking đã hoàn thành.' });
@@ -62,14 +58,22 @@ const HostBookingList = () => {
   const renderItem = ({ item }: { item: Booking }) => (
     <View className="mb-4 bg-white rounded-xl p-4 shadow-md">
       {/* Header: Tên phòng + trạng thái */}
-      <View className="flex-row justify-between items-center mb-2">
-        <Text className="font-bold text-lg">{item.roomId?.name || "N/A"}</Text>
+      <View className="flex-row items-center mb-2">
+        <View style={{ flex: 1, marginRight: 8 }}>
+          <Text numberOfLines={1} ellipsizeMode="tail" className="font-bold text-lg">
+            {item.roomId?.name || "N/A"}
+          </Text>
+        </View>
+
         <View
           style={{
             backgroundColor: STATUS_COLORS[item.status] || "#ccc",
             paddingHorizontal: 8,
-            paddingVertical: 2,
+            paddingVertical: 4,
             borderRadius: 12,
+            minWidth: 70,
+            alignItems: "center",
+            justifyContent: "center",
           }}
         >
           <Text className="text-white font-semibold text-xs">{item.status.toUpperCase()}</Text>
@@ -101,7 +105,7 @@ const HostBookingList = () => {
         <Text className="font-medium">
           {typeof item.userId === "object"
             ? item.userId.displayName ||
-              `${item.userId.firstName ?? ""} ${item.userId.lastName ?? ""}`.trim()
+            `${item.userId.firstName ?? ""} ${item.userId.lastName ?? ""}`.trim()
             : "N/A"}
         </Text>
       </View>
@@ -129,13 +133,7 @@ const HostBookingList = () => {
               <Ionicons name="close-circle-outline" size={16} color="#fff" className="mr-1" />
               <Text className="text-white text-center font-semibold">Từ chối</Text>
             </TouchableOpacity>
-            <TouchableOpacity
-              className="flex-1 bg-gray-400 p-2 rounded-lg flex-row justify-center items-center"
-              onPress={() => handleAction(item._id, "cancel")}
-            >
-              <Ionicons name="trash-outline" size={16} color="#fff" className="mr-1" />
-              <Text className="text-white text-center font-semibold">Hủy</Text>
-            </TouchableOpacity>
+            
           </>
         )}
 

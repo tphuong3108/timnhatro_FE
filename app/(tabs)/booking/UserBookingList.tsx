@@ -1,4 +1,3 @@
-// src/screens/Booking/UserBookingList.tsx
 import React, { useEffect, useState } from "react";
 import { View, Text, FlatList, Image, TouchableOpacity, ActivityIndicator } from "react-native";
 import { bookingApi, Booking } from "../../../services/bookingApi";
