@@ -79,7 +79,14 @@ export default function AddRoomForm({
       <View className="border border-gray-300 rounded-xl mb-4 bg-white h-9 justify-center">
         <Picker
           selectedValue={selectedWard}
-          onValueChange={(val) => setSelectedWard(val)}
+          onValueChange={(val) => {setSelectedWard(val);
+            const ward = wards?.find((w: any) => w._id === val);
+
+              if (ward) {
+                console.log("🆔 ID Phường:", ward._id);
+                console.log("📍 Tên Phường:", ward.name);
+              }
+          }}
           style={{ color: '#111827', paddingHorizontal: 12 }}
           dropdownIconColor="#111827"
           itemStyle={{ color: '#111827', fontSize: 14 }}
