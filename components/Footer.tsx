@@ -1,8 +1,8 @@
 import { profileApi } from "@/services/profileApi";
 import { Ionicons } from "@expo/vector-icons";
-import { usePathname, useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
-import { Dimensions, Text, TouchableOpacity, View } from "react-native";
+import { useRouter, usePathname } from "expo-router";
+import { useEffect, useState } from "react";
+import { Dimensions, TouchableOpacity, View, Text } from "react-native";
 import Toast from "react-native-toast-message";
 
 interface FooterProps {

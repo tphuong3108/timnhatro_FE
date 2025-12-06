@@ -7,16 +7,16 @@ export default function PieChartCard({ title, data }: any) {
   const { width } = useWindowDimensions();
   const chartWidth = width * 0.9;
 
-  const chartData = data.map((item: any, i: number) => ({
-    name: item.name,
-    population: item.value,
+  const chartData = (data ?? []).map((item: any, i: number) => ({
+    name: item?.name ?? "Unknown",
+    population: item?.value ?? 0,
     color:
-      item.color ||
-    ["#A7C7E7", "#FFDAB9", "#B2E0B2", "#C5E1F9", "#F7A8B8"][i % 5],
+      item?.color ||
+      ["#A7C7E7", "#FFDAB9", "#B2E0B2", "#C5E1F9", "#F7A8B8"][i % 5],
     legendFontColor: "#444",
     legendFontSize: 13,
   }));
-
+  
   return (
     <ChartCardWrapper>
       <Text

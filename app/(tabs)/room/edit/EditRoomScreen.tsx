@@ -16,8 +16,9 @@ import MediaPicker from "../add/MediaPicker";
 import EditAmenitiesList from "./EditAmenitiesList";
 
 export default function EditRoomScreen() {
-  const { id } = useLocalSearchParams();
-  const roomId = typeof id === "string" ? id : Array.isArray(id) ? id[0] : "";
+const { id  } = useLocalSearchParams();
+const roomId =
+  typeof id === "string" ? id : Array.isArray(id) ? id[0] : "";
   const router = useRouter();
 
   const {
