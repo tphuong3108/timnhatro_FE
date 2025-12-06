@@ -31,6 +31,9 @@ export default function AddRoomIndex() {
     loadingLocation,
     handleSubmit,
     loadingSubmit,
+    selectedWard,
+    setSelectedWard,
+    wards,
   } = useAddRoomLogic();
 
   return (
@@ -57,6 +60,9 @@ export default function AddRoomIndex() {
           setDescription={setDescription}
           marker={marker}
           setMarker={setMarker} 
+           selectedWard={selectedWard}
+            setSelectedWard={setSelectedWard}
+            wards={wards} 
         />
 
         <MapPicker

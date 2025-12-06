@@ -91,7 +91,7 @@ export const useAddRoomLogic = () => {
   const loadWards = async () => {
     try {
       const res = await apiClient.get("/wards");
-      setWards(res.data.data || []);
+      setWards(res.data);
     } catch (err) {
       console.log(" Lỗi load ward:", err);
     }

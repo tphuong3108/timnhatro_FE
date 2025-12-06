@@ -1,6 +1,6 @@
-import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, ScrollView, Keyboard } from "react-native";
 import { Picker } from "@react-native-picker/picker";
+import React, { useState } from "react";
+import { Keyboard, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
 
 export default function AddRoomForm({
   roomName, setRoomName,
@@ -76,10 +76,14 @@ export default function AddRoomForm({
 
       {/* ⭐ THÊM PICKER WARD */}
       <Text className="text-[#3F72AF] font-semibold mb-1 mt-4">Phường</Text>
-      <View className="border border-gray-300 rounded-xl mb-4">
+      <View className="border border-gray-300 rounded-xl mb-4 bg-white h-9 justify-center">
         <Picker
           selectedValue={selectedWard}
           onValueChange={(val) => setSelectedWard(val)}
+          style={{ color: '#111827', paddingHorizontal: 12 }}
+          dropdownIconColor="#111827"
+          itemStyle={{ color: '#111827', fontSize: 14 }}
+          mode="dropdown"
         >
           <Picker.Item label="-- Chọn phường --" value="" />
           {wards?.map((w: any) => (
