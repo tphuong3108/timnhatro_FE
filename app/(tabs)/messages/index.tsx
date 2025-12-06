@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import {
   View,
   Text,
@@ -6,8 +6,9 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Image,
+  Alert,
 } from "react-native";
-import { useRouter } from "expo-router";
+import { useRouter, useFocusEffect } from "expo-router";
 import { chatService } from "../../../services/chatService";
 import { useAuth } from "../../../contexts/AuthContext";
 
@@ -17,19 +18,45 @@ export default function ChatListScreen() {
   const router = useRouter();
   const { user } = useAuth();
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const chatsData = await chatService.getUserChats();
-        setChats(Array.isArray(chatsData) ? chatsData : []);
-      } catch (err) {
-        console.error("Lỗi khi tải danh sách chat:", err);
-        setChats([]);
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, []);
+  // Load list
+  const loadChats = async () => {
+    try {
+      setLoading(true);
+      const chatsData = await chatService.getUserChats();
+      setChats(Array.isArray(chatsData) ? chatsData : []);
+    } catch (error) {
+      console.error("Lỗi khi tải danh sách chat:", error);
+      setChats([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      loadChats();
+    }, [])
+  );
+
+  const handleDeleteChat = (chatId: string) => {
+    Alert.alert(
+      "Xóa đoạn chat",
+      "Bạn có chắc chắn muốn xóa đoạn chat này?\nToàn bộ tin nhắn sẽ bị xóa.",
+      [
+        { text: "Hủy", style: "cancel" },
+        {
+          text: "Xóa",
+          style: "destructive",
+          onPress: async () => {
+            const success = await chatService.deleteChat(chatId);
+            if (success) {
+              setChats((prev) => prev.filter((c) => c._id !== chatId));
+            }
+          },
+        },
+      ]
+    );
+  };
 
   if (loading)
     return (
@@ -70,11 +97,14 @@ export default function ChatListScreen() {
                   chatId: item._id,
                   receiverId: partner._id,
                   receiverName: `${partner.firstName} ${partner.lastName}`,
+                  receiverAvatar: partner.avatar,
                   roomId: item.roomId?._id,
                 },
               });
             }}
-            className="flex-row items-center px-4 py-3 border-b border-gray-200 active:bg-gray-100"
+            onLongPress={() => handleDeleteChat(item._id)}
+            delayLongPress={350}
+            className="flex-row items-center px-4 py-3 border-b border-gray-200 bg-white"
           >
             <Image
               source={{
