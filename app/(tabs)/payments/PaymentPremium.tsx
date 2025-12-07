@@ -11,7 +11,10 @@ export const PREMIUM_PACKAGES = [
 export function usePaymentPremium(roomId: string) {
   const [selectedPackage, setSelectedPackage] = useState<number | null>(null);
   const [paymentAmount, setPaymentAmount] = useState("");
-  const [premiumOrderId, setPremiumOrderId] = useState<string | null>(null); // ← thêm
+  const [premiumOrderId, setPremiumOrderId] = useState<string | null>(null);
+  const [paymentUrl, setPaymentUrl] = useState<string | null>(null);
+
+  // Cập nhật paymentAmount khi chọn gói
   useEffect(() => {
     if (selectedPackage) {
       const pkg = PREMIUM_PACKAGES.find((p) => p.days === selectedPackage);
@@ -19,37 +22,38 @@ export function usePaymentPremium(roomId: string) {
     }
   }, [selectedPackage]);
 
-  const handlePremiumPayment = async () => {
-  if (!selectedPackage) {
-    Alert.alert("Lỗi", "Vui lòng chọn gói Premium");
-    return null;
-  }
-
-  try {
-    const response = await paymentApi.createPremiumPayment({
-      roomId,
-      durationDays: selectedPackage,
-    });
-
-    const url = response.data?.paymentUrl;
-    const orderId = response.data?.orderId;
-
-    if (orderId) setPremiumOrderId(orderId);
-
-    if (url) {
-      await Linking.openURL(url); 
-    } else {
-      Alert.alert("Lỗi", "Không nhận được link thanh toán");
+  // Hàm thanh toán Premium
+  const handlePremiumPayment = async (): Promise<string | null> => {
+    if (!selectedPackage) {
+      Alert.alert("Lỗi", "Vui lòng chọn gói Premium");
+      return null;
     }
 
-    return orderId || null;   // ← TRẢ VỀ ORDER ID
-  } catch (err: any) {
-    const msg = err.response?.data?.message || err.message;
-    Alert.alert("Lỗi thanh toán Premium", msg);
-    return null;
-  }
-};
+    try {
+      const response = await paymentApi.createPremiumPayment({
+        roomId,
+        durationDays: selectedPackage,
+      });
 
+      const url = response.data?.paymentUrl;
+      const orderId = response.data?.orderId;
+
+      if (orderId) setPremiumOrderId(orderId);
+      if (url) setPaymentUrl(url); // lưu lại paymentUrl
+
+      if (url) {
+        await Linking.openURL(url);
+      } else {
+        Alert.alert("Lỗi", "Không nhận được link thanh toán");
+      }
+
+      return orderId || null; // trả về orderId
+    } catch (err: any) {
+      const msg = err.response?.data?.message || err.message;
+      Alert.alert("Lỗi thanh toán Premium", msg);
+      return null;
+    }
+  };
 
   return {
     selectedPackage,
@@ -57,6 +61,7 @@ export function usePaymentPremium(roomId: string) {
     paymentAmount,
     handlePremiumPayment,
     premiumPackages: PREMIUM_PACKAGES,
-    premiumOrderId, // ← QUAN TRỌNG: trả ra ngoài
+    premiumOrderId,
+    paymentUrl, // ← trả ra để PaymentContainer dùng
   };
 }

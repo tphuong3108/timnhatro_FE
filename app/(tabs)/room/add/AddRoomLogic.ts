@@ -22,6 +22,18 @@ export const useAddRoomLogic = () => {
   const [isHost, setIsHost] = useState(false);
   const [wards, setWards] = useState<any[]>([]);
   const [selectedWard, setSelectedWard] = useState<string>("");
+  const [isPremiumPost, setIsPremiumPost] = useState(false);
+  const resetForm = () => {
+  setRoomName("");
+  setPrice("");
+  setLocation("");
+  setDescription("");
+  setMedia([]);
+  setSelectedAmenities([]);
+  setMarker(null);
+  setSelectedWard("");
+};
+
 
   // 🧭 Lấy vị trí hiện tại
   const getCurrentLocation = async () => {
@@ -209,46 +221,16 @@ export const useAddRoomLogic = () => {
 
       const data = await res.json();
       console.log("✅ Phản hồi BE:", data);
-      if (res.ok) {
+      if (!res.ok) return 
         const roomId = data.data?._id;
-        Alert.alert(
-          "🎉 Thành công",
-          "Phòng đã được gửi duyệt.\nBạn có muốn nâng cấp phòng để được ưu tiên hiển thị không?",
-          [
-            {
-              text: "Không",
-              style: "cancel",
-              onPress: () => {
-                Alert.alert(
-                  "🎉 Thành công",
-                  "Phòng của bạn đã được gửi, vui lòng chờ admin duyệt.",
-                  [
-                    {
-                      text: "OK",
-                      onPress: () => {
-                        setRoomName("");
-                        setPrice("");
-                        setDescription("");
-                        setMedia([]);
-                        setSelectedAmenities([]);
-                        setMarker(null);
-                        setLocation("");
-                        router.push("/(tabs)/home");
-                      },
-                    },
-                  ]
-                );
-              },
-            },
-            {
-              text: "Có, nâng cấp ngay",
-              onPress: () => {
-                router.push(`/(tabs)/payments/PaymentContainer?roomId=${roomId}&isPremium=true`);
-              },
-            },
-          ]
-        );
-      }
+        if (!isPremiumPost) {
+            Alert.alert( "🎉 Thành công",
+                  "Phòng của bạn đã được gửi, vui lòng chờ admin duyệt.");
+            resetForm();
+            router.push("/(tabs)/home");
+            return;
+        }
+        router.push(`/(tabs)/payments/PaymentContainer?roomId=${roomId}&isPremium=true`);
     } catch (err: any) {
       console.log("❌ Lỗi đăng phòng:", err.message);
       Toast.show({
@@ -284,5 +266,7 @@ export const useAddRoomLogic = () => {
     loadingSubmit,
     handleSubmit,
     handleMapPress,
+    isPremiumPost,
+    setIsPremiumPost
   };
 };

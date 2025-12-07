@@ -1,4 +1,3 @@
-import React from "react";
 import { View, Text, ScrollView, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import AddRoomForm from "./AddRoomForm";
@@ -7,6 +6,7 @@ import MediaPicker from "./MediaPicker";
 import AmenitiesList from "./AmenitiesList";
 import { useAddRoomLogic } from "./AddRoomLogic";
 import { useRouter } from "expo-router";
+import React ,{ useState } from "react";
 export default function AddRoomIndex() {
   const router = useRouter();
   const {
@@ -33,8 +33,9 @@ export default function AddRoomIndex() {
     selectedWard,
     setSelectedWard,
     wards,
+    isPremiumPost,
+    setIsPremiumPost
   } = useAddRoomLogic();
-
   return (
     <View className="flex-1 bg-white">
       <View className="py-4">
@@ -76,6 +77,27 @@ export default function AddRoomIndex() {
           pickMedia={pickMedia}
           removeMedia={removeMedia}
         />
+        <View className="mt-4 bg-gray-50 p-4 rounded-2xl">
+        <TouchableOpacity
+          onPress={() => setIsPremiumPost(!isPremiumPost)}
+          className="flex-row items-center"
+        >
+          <Ionicons
+            name={isPremiumPost ? "checkbox-outline" : "square-outline"}
+            size={22}
+            color="#3F72AF"
+          />
+          <Text className="ml-3 text-[#3F72AF] font-semibold">
+            Đăng phòng ưu tiên (Premium)
+          </Text>
+        </TouchableOpacity>
+
+        {isPremiumPost && (
+          <Text className="text-gray-600 text-sm mt-2">
+            Phòng ưu tiên sẽ được hiển thị trên đầu danh sách và tiếp cận nhiều người thuê hơn.
+          </Text>
+        )}
+      </View>
 
         <Text className="text-[#3F72AF] font-semibold mb-2">Tiện nghi</Text>
         <AmenitiesList

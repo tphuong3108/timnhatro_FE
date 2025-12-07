@@ -20,7 +20,7 @@ export const paymentApi = {
   },
 
   getReturnPayment: async (query: PaymentReturnQuery) => {
-    return apiClient.get(`/payment/return${query}`);
+    return apiClient.get(`/payment/premium/return${query}`);
   },
 
   // Tạo thanh toán Premium dành cho chủ phòng
