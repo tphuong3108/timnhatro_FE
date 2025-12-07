@@ -2,7 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { BlurView } from "expo-blur";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Alert,
   Platform,
@@ -14,10 +14,42 @@ import {
 import { RFValue } from "react-native-responsive-fontsize";
 import Logo from "@/assets/images/logo.svg";
 import apiClient from "@/services/apiClient";
+import { notificationApi } from "@/services/notificationApi";
 
 export default function AdminHeader() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [unread, setUnread] = useState(0);
+  const [hasToken, setHasToken] = useState(false);
+
+  // ⭐ Realtime unread notifications cho Admin
+  useEffect(() => {
+    let interval: any = null;
+
+    const loadUnread = async () => {
+      try {
+        const token = await AsyncStorage.getItem("token");
+
+        if (!token) {
+          setHasToken(false);
+          setUnread(0);
+          return;
+        }
+
+        setHasToken(true);
+
+        const count = await notificationApi.getAdminUnreadCount();
+        setUnread(count);
+      } catch (e) {
+        console.log("Admin load unread error:", e);
+      }
+    };
+
+    loadUnread();
+    interval = setInterval(loadUnread, 5000);
+
+    return () => interval && clearInterval(interval);
+  }, []);
 
   const handleLogout = async () => {
     Alert.alert("Đăng xuất", "Bạn có chắc muốn đăng xuất khỏi quản trị?", [
@@ -27,18 +59,11 @@ export default function AdminHeader() {
         style: "destructive",
         onPress: async () => {
           try {
-            console.log("DEBUG | Bắt đầu đăng xuất...");
             setLoading(true);
-            await apiClient.post("/users/logout").catch((e) => {
-              console.warn("⚠️ Lỗi API logout:", e?.message);
-            });
+            await apiClient.post("/users/logout");
             await AsyncStorage.multiRemove(["token", "user"]);
-            console.log("DEBUG | Đăng xuất thành công, điều hướng về login...");
-            setTimeout(() => {
-              router.replace("/auth/login");
-            }, 300);
-          } catch (err) {
-            console.error("Lỗi đăng xuất:", err);
+            router.replace("/auth/login");
+          } catch {
             Alert.alert("Lỗi", "Không thể đăng xuất. Vui lòng thử lại.");
           } finally {
             setLoading(false);
@@ -60,18 +85,49 @@ export default function AdminHeader() {
         }}
         className="flex-row justify-between items-center"
       >
+        {/* Logo admin */}
         <Logo width={RFValue(95)} height={RFValue(30)} />
-        <TouchableOpacity
-          activeOpacity={0.8}
-          onPress={handleLogout}
-          disabled={loading}
-        >
-          {loading ? (
-            <ActivityIndicator size={RFValue(20)} color="#fff" />
-          ) : (
-            <Ionicons name="log-out-outline" size={RFValue(22)} color="#fff" />
+
+        <View className="flex-row items-center gap-4">
+          {/*  Chuông thông báo admin */}
+          {hasToken && (
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() =>
+                router.push({ pathname: "/admin/notifications/index" })
+              }
+            >
+              <View className="relative">
+                <Ionicons
+                  name="notifications-outline"
+                  size={RFValue(24)}
+                  color="#fff"
+                />
+
+                {unread > 0 && (
+                  <View className="absolute -top-1 -right-1 bg-red-600 w-4 h-4 rounded-full items-center justify-center">
+                    <Text className="text-white text-[10px] font-bold">
+                      {unread}
+                    </Text>
+                  </View>
+                )}
+              </View>
+            </TouchableOpacity>
           )}
-        </TouchableOpacity>
+
+          {/*  Logout */}
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={handleLogout}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator size={RFValue(20)} color="#fff" />
+            ) : (
+              <Ionicons name="log-out-outline" size={RFValue(22)} color="#fff" />
+            )}
+          </TouchableOpacity>
+        </View>
       </BlurView>
     </View>
   );
