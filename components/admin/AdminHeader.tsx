@@ -94,7 +94,7 @@ export default function AdminHeader() {
             <TouchableOpacity
               activeOpacity={0.8}
               onPress={() =>
-                router.push({ pathname: "/admin/notifications/index" })
+                router.push("/admin/notifications")
               }
             >
               <View className="relative">
