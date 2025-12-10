@@ -1,8 +1,8 @@
 import React from "react";
 import { View, Text, Image } from "react-native";
-
 interface Props {
   room: {
+    _id?: string;
     name?: string;
     images?: string[];
     address?: string;
@@ -11,6 +11,7 @@ interface Props {
 }
 
 export default function RoomHeader({ room }: Props) {
+  
   return (
     <View className="bg-white p-3 border-b border-gray-200">
       <View className="flex-row">

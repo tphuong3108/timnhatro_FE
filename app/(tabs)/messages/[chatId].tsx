@@ -36,7 +36,7 @@ export default function ChatRoomScreen() {
     <KeyboardAvoidingView
       style={{ flex: 1 }}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
-      keyboardVerticalOffset={140}
+       keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0}
     >
       <View className="flex-1 bg-white">
         <ChatHeader name={safeReceiverName} avatar={safeReceiverAvatar} />
@@ -49,10 +49,13 @@ export default function ChatRoomScreen() {
           userId={user?._id ?? ""}
         />
 
-        <MessageInput
-          receiverId={safeReceiverId}
-          onMessageSent={handleSendMessage}
-        />
+       
+        <View className="pb-6">
+          <MessageInput
+            receiverId={safeReceiverId}
+            onMessageSent={handleSendMessage}
+          />
+        </View>
       </View>
     </KeyboardAvoidingView>
   );
