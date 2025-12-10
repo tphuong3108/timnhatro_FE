@@ -24,7 +24,7 @@ export default function MessageInput({ receiverId, onMessageSent }: Props) {
     // Gửi text cho ChatRoom
     onMessageSent?.(value.trim());
 
-    setValue(""); // clear input
+    setValue("");
     setLoading(false);
   };
 
