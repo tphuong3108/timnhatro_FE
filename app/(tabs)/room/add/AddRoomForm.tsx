@@ -16,6 +16,8 @@ export default function AddRoomForm({
 }: any) {
 
   const [suggestions, setSuggestions] = useState<any[]>([]);
+  const [wardText, setWardText] = useState("");
+  const [showWardList, setShowWardList] = useState(false);
 
   const fetchSuggestions = async (text: string) => {
     setLocation(text);
@@ -74,30 +76,45 @@ export default function AddRoomForm({
         className="border border-gray-300 rounded-xl px-4 py-3 text-[14px]"
       />
 
-      {/* ⭐ THÊM PICKER WARD */}
-      <Text className="text-[#3F72AF] font-semibold mb-1 mt-4">Phường</Text>
-      <View className="border border-gray-300 rounded-xl mb-4 bg-white h-9 justify-center">
-        <Picker
-          selectedValue={selectedWard}
-          onValueChange={(val) => {setSelectedWard(val);
-            const ward = wards?.find((w: any) => w._id === val);
+    
+     {/* ⭐ Nhập tên phường (Autocomplete) */}
+        <Text className="text-[#3F72AF] font-semibold mb-1 mt-4">Phường</Text>
 
-              if (ward) {
-                console.log("🆔 ID Phường:", ward._id);
-                console.log("📍 Tên Phường:", ward.name);
-              }
+        <TextInput
+          value={wardText}
+          onChangeText={(text) => {
+            setWardText(text);
+            setShowWardList(true);
           }}
-          style={{ color: '#111827', paddingHorizontal: 12 }}
-          dropdownIconColor="#111827"
-          itemStyle={{ color: '#111827', fontSize: 14 }}
-          mode="dropdown"
-        >
-          <Picker.Item label="-- Chọn phường --" value="" />
-          {wards?.map((w: any) => (
-            <Picker.Item key={w._id} label={w.name} value={w._id} />
-          ))}
-        </Picker>
-      </View>
+          placeholder="Nhập tên phường..."
+          className="border border-gray-300 rounded-xl px-4 py-3 text-[14px]"
+        />
+
+        {/* Gợi ý phường */}
+        {showWardList && wardText.length > 0 && (
+          <View className="border border-gray-200 rounded-xl mt-1 bg-white shadow-sm max-h-40">
+            <ScrollView keyboardShouldPersistTaps="handled">
+              {wards
+                .filter((w: any) =>
+                  w.name.toLowerCase().includes(wardText.toLowerCase())
+                )
+                .map((w: any) => (
+                  <TouchableOpacity
+                    key={w._id}
+                    onPress={() => {
+                      setWardText(w.name);
+                      setSelectedWard(w._id);
+                      setShowWardList(false);
+                    }}
+                    className="p-2 border-b border-gray-100"
+                  >
+                    <Text className="text-gray-700 text-[13px]">{w.name}</Text>
+                  </TouchableOpacity>
+                ))}
+            </ScrollView>
+          </View>
+        )}
+
 
       {/* Gợi ý địa chỉ */}
       {suggestions.length > 0 && (

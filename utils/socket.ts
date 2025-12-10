@@ -2,7 +2,7 @@ import { io } from "socket.io-client";
 import { Platform } from "react-native";
 
 // ⚙️ Dùng chung IP & PORT như apiClient
-const LOCAL_IP = "192.168.1.23 ";
+const LOCAL_IP = "192.168.1.156 ";
 const PORT = 5050; 
 
 const SOCKET_URL =
