@@ -1,16 +1,15 @@
-import React, { useCallback, useState } from "react";
+import { useRouter } from "expo-router";
+import React, { useEffect, useState } from "react";
 import {
-  View,
-  Text,
+  ActivityIndicator,
   FlatList,
   Image,
+  Text,
   TouchableOpacity,
-  ActivityIndicator,
-  Alert,
+  View,
 } from "react-native";
-import { useRouter, useFocusEffect } from "expo-router";
-import { chatService } from "../../../services/chatService";
 import { useAuth } from "../../../contexts/AuthContext";
+import { chatService } from "../../../services/chatService";
 
 export default function ChatListScreen() {
   const [chats, setChats] = useState<any[]>([]);
@@ -72,16 +71,8 @@ export default function ChatListScreen() {
       </View>
     );
 
-  if (chats.length === 0)
-    return (
-      <View className="flex-1 justify-center items-center">
-        <Text className="text-gray-500 text-lg">Không có tin nhắn nào</Text>
-      </View>
-    );
-
   return (
     <View className="flex-1 bg-white">
-      {/* Thêm mục trợ lý AI */}
       <TouchableOpacity
         onPress={() => router.push("/messages/ai")}
         className="flex-row items-center px-4 py-4 border-b border-gray-200 bg-white"
@@ -97,6 +88,10 @@ export default function ChatListScreen() {
             Trợ lý AI
           </Text>
           <Text className="text-gray-500 text-[13px]">Hỏi tôi bất cứ điều gì...</Text>
+
+          <Text className="text-gray-500 text-[13px]">
+            Hỏi tôi bất cứ điều gì...
+          </Text>
         </View>
       </TouchableOpacity>
 

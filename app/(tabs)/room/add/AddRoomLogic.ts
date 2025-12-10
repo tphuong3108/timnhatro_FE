@@ -1,13 +1,13 @@
 import apiClient from "@/services/apiClient";
 import { profileApi } from "@/services/profileApi";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as FileSystem from "expo-file-system/legacy";
 import * as ImagePicker from "expo-image-picker";
 import * as Location from "expo-location";
-import { useEffect, useState } from "react";
-import Toast from "react-native-toast-message";
-import * as FileSystem from "expo-file-system/legacy";
 import { router } from "expo-router";
+import { useEffect, useState } from "react";
 import { Alert } from "react-native";
+import Toast from "react-native-toast-message";
 
 export const useAddRoomLogic = () => {
   const [roomName, setRoomName] = useState("");
@@ -20,6 +20,20 @@ export const useAddRoomLogic = () => {
   const [loadingLocation, setLoadingLocation] = useState(false);
   const [loadingSubmit, setLoadingSubmit] = useState(false);
   const [isHost, setIsHost] = useState(false);
+  const [wards, setWards] = useState<any[]>([]);
+  const [selectedWard, setSelectedWard] = useState<string>("");
+  const [isPremiumPost, setIsPremiumPost] = useState(false);
+  const resetForm = () => {
+  setRoomName("");
+  setPrice("");
+  setLocation("");
+  setDescription("");
+  setMedia([]);
+  setSelectedAmenities([]);
+  setMarker(null);
+  setSelectedWard("");
+};
+
 
   // 🧭 Lấy vị trí hiện tại
   const getCurrentLocation = async () => {
@@ -85,6 +99,19 @@ export const useAddRoomLogic = () => {
       return null;
     }
   };
+  useEffect(() => {
+  const loadWards = async () => {
+    try {
+      const res = await apiClient.get("/wards");
+      setWards(res.data);
+    } catch (err) {
+      console.log(" Lỗi load ward:", err);
+    }
+  };
+
+  loadWards();
+}, []);
+
 
   // 🧠 Tự động nâng quyền Host khi mở màn
   useEffect(() => {
@@ -140,40 +167,41 @@ export const useAddRoomLogic = () => {
 
 
 
-const handleSubmit = async () => {
-  console.log("🚀 handleSubmit được gọi!");
-  if (!roomName || !price || !location || !marker) {
-    Toast.show({ type: "error", text1: "Vui lòng nhập đầy đủ thông tin!" });
-    return;
-  }
-
-  try {
-    setLoadingSubmit(true);
-    const token = await AsyncStorage.getItem("token");
-    if (!token) {
-      Toast.show({ type: "error", text1: "Chưa đăng nhập!" });
+  const handleSubmit = async () => {
+    console.log("🚀 handleSubmit được gọi!");
+    if (!roomName || !price || !location || !marker) {
+      Toast.show({ type: "error", text1: "Vui lòng nhập đầy đủ thông tin!" });
       return;
     }
 
-    const uploadUrl = `${apiClient.defaults.baseURL}/hosts/rooms`;
-
-    // 📸 Chuyển ảnh sang base64
-    const base64Images: string[] = [];
-    for (const uri of media) {
-      try {
-        const base64 = await FileSystem.readAsStringAsync(uri, { encoding: "base64" });
-        base64Images.push(`data:image/jpeg;base64,${base64}`);
-      } catch (err) {
-        console.log("❌ Lỗi đọc file:", err);
+    try {
+      setLoadingSubmit(true);
+      const token = await AsyncStorage.getItem("token");
+      if (!token) {
+        Toast.show({ type: "error", text1: "Chưa đăng nhập!" });
+        return;
       }
-    }
+
+      const uploadUrl = `${apiClient.defaults.baseURL}/hosts/rooms`;
+
+      // 📸 Chuyển ảnh sang base64
+      const base64Images: string[] = [];
+      for (const uri of media) {
+        try {
+          const base64 = await FileSystem.readAsStringAsync(uri, { encoding: "base64" });
+          base64Images.push(`data:image/jpeg;base64,${base64}`);
+        } catch (err) {
+          console.log("❌ Lỗi đọc file:", err);
+        }
+      }
+
 
     const body = {
       name: roomName,
       address: location,
       price,
       description,
-      ward: "68fece1de79afdce26641857",
+      ward: selectedWard,
       amenities: selectedAmenities,
       location: {
         type: "Point",
@@ -182,47 +210,38 @@ const handleSubmit = async () => {
       images: base64Images,
     };
 
-    const res = await fetch(uploadUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(body),
-    });
+      const res = await fetch(uploadUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(body),
+      });
 
-    const data = await res.json();
-    console.log("✅ Phản hồi BE:", data);
-      if (res.ok) {
-      Alert.alert("🎉 Thành công", "Phòng của bạn đã được gửi, vui lòng chờ admin duyệt.",
-        [
-          {
-            text: "OK",
-            onPress: () => {
-              setRoomName("");
-              setPrice("");
-              setDescription("");
-              setMedia([]);
-              setSelectedAmenities([]);
-              setMarker(null);
-              setLocation("");
-              router.push("/(tabs)/home");
-            },
-          },
-        ]
-      );
+      const data = await res.json();
+      console.log("✅ Phản hồi BE:", data);
+      if (!res.ok) return 
+        const roomId = data.data?._id;
+        if (!isPremiumPost) {
+            Alert.alert( "🎉 Thành công",
+                  "Phòng của bạn đã được gửi, vui lòng chờ admin duyệt.");
+            resetForm();
+            router.push("/(tabs)/home");
+            return;
+        }
+        router.push(`/(tabs)/payments/PaymentContainer?roomId=${roomId}&isPremium=true`);
+    } catch (err: any) {
+      console.log("❌ Lỗi đăng phòng:", err.message);
+      Toast.show({
+        type: "error",
+        text1: "Đăng phòng thất bại!",
+        text2: err.message || "Vui lòng thử lại sau.",
+      });
+    } finally {
+      setLoadingSubmit(false);
     }
-  } catch (err: any) {
-    console.log("❌ Lỗi đăng phòng:", err.message);
-    Toast.show({
-      type: "error",
-      text1: "Đăng phòng thất bại!",
-      text2: err.message || "Vui lòng thử lại sau.",
-    });
-  } finally {
-    setLoadingSubmit(false);
-  }
-};
+  };
   return {
     roomName,
     setRoomName,
@@ -241,8 +260,13 @@ const handleSubmit = async () => {
     removeMedia,
     loadingLocation,
     getCurrentLocation,
+    wards,
+  selectedWard,
+  setSelectedWard,
     loadingSubmit,
     handleSubmit,
     handleMapPress,
+    isPremiumPost,
+    setIsPremiumPost
   };
 };

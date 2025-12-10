@@ -104,4 +104,10 @@ export const roomApi = {
     const res = await apiClient.delete(`/reviews/${reviewId}`);
     return res.data;
   },
+  //lấy phòng đã thanh toán premium
+  getPremiumStatus: async (id: string) => {
+  const res = await apiClient.get(`/rooms/${id}/premium-status`);
+  return res.data.data;
+}
+
 };

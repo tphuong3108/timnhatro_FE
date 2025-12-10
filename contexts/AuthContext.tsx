@@ -1,61 +1,90 @@
+// context/AuthContext.tsx
 import React, { createContext, useContext, useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import apiClient from "@/services/apiClient";
 
 interface User {
-  _id: string;
-  firstName: string;
-  lastName: string;
-  avatar:string;
-  email: string;
-  role: string;
+  _id?: string;
+  email?: string;
+  firstName?: string;
+  lastName?: string;
+  avatar?: string;
+  role?: "tenant" | "host" | "admin" | "guest";
 }
 
-interface AuthContextType {
+interface AuthContextProps {
   user: User | null;
-  setUser: (user: User | null) => void;
-  logout: () => Promise<void>;
   loading: boolean;
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
+  logout: () => Promise<void>;
+  login: (token: string, userData: User) => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType>({
+const AuthContext = createContext<AuthContextProps>({
   user: null,
+  loading: true,
   setUser: () => {},
   logout: async () => {},
-  loading: true,
+  login: async () => {},
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-  (async () => {
-    try {
-      console.log("🔍 Đang load user từ AsyncStorage...");
-      const data = await AsyncStorage.getItem("user");
-      if (data) {
-        console.log("✅ Có user trong storage");
-        setUser(JSON.parse(data));
-      } else {
-        console.log("⚠️ Không có user trong AsyncStorage");
-      }
-    } catch (err) {
-      console.error("❌ Lỗi load user:", err);
-    } finally {
-      console.log("✅ Set loading = false");
-      setLoading(false);
-    }
-  })();
-}, []);
+  const guestUser: User = {
+    _id: "guest",
+    firstName: "Guest",
+    lastName: "",
+    email: "",
+    role: "guest",
+    avatar: "https://cdn-icons-png.flaticon.com/512/9131/9131529.png",
+  };
 
+  useEffect(() => {
+    const loadUser = async () => {
+      try {
+        const token = await AsyncStorage.getItem("token");
+        const storedUser = await AsyncStorage.getItem("user");
+
+        if (token && storedUser) {
+          const parsedUser = JSON.parse(storedUser);
+          setUser(parsedUser);
+
+          apiClient.defaults.headers.Authorization = `Bearer ${token}`;
+        } else {
+          setUser(guestUser);
+        }
+      } catch (error) {
+        console.log("❌ Lỗi load user:", error);
+        setUser(guestUser); 
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadUser();
+  }, []);
+
+  const login = async (token: string, userData: User) => {
+    await AsyncStorage.setItem("token", token);
+    await AsyncStorage.setItem("user", JSON.stringify(userData));
+
+    apiClient.defaults.headers.Authorization = `Bearer ${token}`;
+    setUser(userData);
+  };
 
   const logout = async () => {
-    await AsyncStorage.multiRemove(["token", "user"]);
-    setUser(null);
+    await AsyncStorage.removeItem("token");
+    await AsyncStorage.removeItem("user");
+
+    delete apiClient.defaults.headers.Authorization;
+
+    setUser(guestUser);
   };
 
   return (
-    <AuthContext.Provider value={{ user, setUser, logout, loading }}>
+    <AuthContext.Provider value={{ user, loading, setUser, logout, login }}>
       {children}
     </AuthContext.Provider>
   );

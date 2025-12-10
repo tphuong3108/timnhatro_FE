@@ -20,32 +20,24 @@ export default function useEditRoomLogic(roomId: string) {
     try {
       setLoading(true);
       const token = await AsyncStorage.getItem("token");
-      const res = await apiClient.get(`/hosts/rooms/${roomId}`, {
+
+      const res = await apiClient.get(`/rooms/${roomId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
       const data = res.data.data;
 
-      let marker = undefined;
-      if (data.location) {
-        if (data.location.latitude && data.location.longitude) {
-          marker = {
-            latitude: data.location.latitude,
-            longitude: data.location.longitude,
-          };
-        } else if (
-          Array.isArray(data.location.coordinates) &&
-          data.location.coordinates.length === 2
-        ) {
-          marker = {
-            latitude: data.location.coordinates[1],
-            longitude: data.location.coordinates[0],
-          };
-        }
+      let marker;
+      if (data.location?.coordinates?.length === 2) {
+        marker = {
+          latitude: data.location.coordinates[1],
+          longitude: data.location.coordinates[0],
+        };
       }
 
       setRoomData({
         ...data,
+        ward: data.ward?._id || data.ward || null,
         marker,
       });
 
@@ -59,8 +51,8 @@ export default function useEditRoomLogic(roomId: string) {
   };
 
   useEffect(() => {
+    didFetchRef.current = false;
     fetchRoomData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roomId]);
 
   // 💾 Cập nhật phòng
@@ -69,23 +61,30 @@ export default function useEditRoomLogic(roomId: string) {
       const token = await AsyncStorage.getItem("token");
       if (!token) {
         setError("Bạn cần đăng nhập lại.");
-        return { success: false, error: "No token" };
+        return { success: false };
       }
-
-      const payload = {
+    console.log("WARD TRƯỚC KHI GỬI:", updatedData.ward, roomData?.ward);
+      const payload: any = {
         ...updatedData,
         amenities: selectedAmenities,
         location: updatedData.location || roomData?.location,
       };
 
-      const res = await apiClient.patch(`/hosts/rooms/${roomId}`, payload, {
+      // ⭐ Luôn gửi ward nếu có
+      if (roomData?.ward) {
+        payload.ward = roomData.ward;
+      }
+
+      console.log("⬆ PAYLOAD UPDATE:", payload);
+
+      const res = await apiClient.patch(`/rooms/${roomId}`, payload, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
       return { success: true, data: res.data };
     } catch (err) {
       console.log("❌ Lỗi update phòng:", err);
-      return { success: false, error: err };
+      return { success: false };
     }
   };
 
@@ -110,7 +109,6 @@ export default function useEditRoomLogic(roomId: string) {
     }
   };
 
-  // 🗑️ Xóa ảnh
   const removeMedia = (uri: string) => {
     setRoomData((prev: any) => ({
       ...prev,
@@ -118,17 +116,15 @@ export default function useEditRoomLogic(roomId: string) {
     }));
   };
 
-  // 🗺️ Khi bấm trên bản đồ
   const handleMapPress = (event: any) => {
     const { latitude, longitude } = event.nativeEvent.coordinate;
     setRoomData((prev: any) => ({
       ...prev,
       marker: { latitude, longitude },
-      location: { latitude, longitude },
+      location: { coordinates: [longitude, latitude] },
     }));
   };
 
-  // 📍 Lấy vị trí hiện tại
   const getCurrentLocation = async () => {
     try {
       setLoadingLocation(true);
@@ -144,11 +140,10 @@ export default function useEditRoomLogic(roomId: string) {
       setRoomData((prev: any) => ({
         ...prev,
         marker: { latitude, longitude },
-        location: { latitude, longitude },
+        location: { coordinates: [longitude, latitude] },
       }));
     } catch (err) {
       console.log("❌ Lỗi lấy vị trí:", err);
-      setError("Không thể lấy vị trí hiện tại");
     } finally {
       setLoadingLocation(false);
     }
