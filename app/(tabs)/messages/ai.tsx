@@ -24,11 +24,11 @@ export default function ChatAI() {
     avatar: "https://cdn-icons-png.flaticon.com/512/9131/9131529.png",
   };
 
-  const AI_BOT = {
+  const AI_BOT = useRef ({
     _id: "ai_bot",
     name: "AI Assistant",
     avatar: "https://cdn-icons-png.flaticon.com/512/4712/4712100.png",
-  };
+  }).current;
 
   useEffect(() => {
     setMessages([
@@ -39,7 +39,7 @@ export default function ChatAI() {
         user: AI_BOT,
       },
     ]);
-  }, []);
+  }, [AI_BOT]);
 
   const handleSend = async (text: string) => {
     const userMsg = {
@@ -111,7 +111,7 @@ export default function ChatAI() {
               <MessageBubble
                 text={item.text}
                 avatar={item.user.avatar}
-                isUser={item.user._id === currentUser._id}
+                isMe={item.user._id === currentUser._id}
                 createdAt={item.createdAt}
               />
             </View>

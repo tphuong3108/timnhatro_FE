@@ -1,15 +1,16 @@
 import { useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, {useState,useCallback } from "react";
 import {
   ActivityIndicator,
   FlatList,
   Image,
   Text,
   TouchableOpacity,
-  View,
+  View,Alert
 } from "react-native";
 import { useAuth } from "../../../contexts/AuthContext";
 import { chatService } from "../../../services/chatService";
+import { useFocusEffect } from "@react-navigation/native";
 
 export default function ChatListScreen() {
   const [chats, setChats] = useState<any[]>([]);
@@ -88,10 +89,6 @@ export default function ChatListScreen() {
             Trợ lý AI
           </Text>
           <Text className="text-gray-500 text-[13px]">Hỏi tôi bất cứ điều gì...</Text>
-
-          <Text className="text-gray-500 text-[13px]">
-            Hỏi tôi bất cứ điều gì...
-          </Text>
         </View>
       </TouchableOpacity>
 
@@ -105,6 +102,7 @@ export default function ChatListScreen() {
 
           return (
             <TouchableOpacity
+             onLongPress={() => handleDeleteChat(item._id)} 
               onPress={() => {
                 router.push({
                   pathname: "/messages/[chatId]",

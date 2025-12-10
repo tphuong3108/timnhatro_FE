@@ -6,6 +6,7 @@ interface Props {
   text: string;
   isMe: boolean;
   avatar?: string;
+  createdAt?: Date;
 }
 
 export default function MessageBubble({ text, isMe, avatar }: Props) {

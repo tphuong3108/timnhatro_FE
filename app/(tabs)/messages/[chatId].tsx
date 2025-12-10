@@ -28,7 +28,7 @@ export default function ChatRoomScreen() {
     loading,
     flatListRef,
     handleSendMessage,
-  } = useChatMessages(safeChatId, safeReceiverId, user);
+  } = useChatMessages(safeChatId, safeReceiverId, user?._id ? { _id: user._id } : null);
 
   if (loading) return null;
 

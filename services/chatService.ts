@@ -1,5 +1,5 @@
 import apiClient from "./apiClient";
-import { socket } from "../utils/socket"; // nhớ import socket.io client
+import { socket } from "../utils/socket";
 
 export interface Participant {
   _id: string;
@@ -38,11 +38,6 @@ export const chatService = {
     const res = await apiClient.delete(`/chats/${chatId}`);
     return res.data?.success || false;
   },
-
-  /**
-   lắng nghe socket real-time cho Chat  
-    callback sẽ dùng để update UI từ FE
-   */
   onChatCreated: (callback: (chat: Chat) => void) => {
     socket.on("chat:created", callback);
   },
@@ -57,7 +52,6 @@ export const chatService = {
     socket.on("chat:lastMessage", callback);
   },
 
-  // clear listener để tránh memory leak
   removeListeners: () => {
     socket.off("chat:created");
     socket.off("chat:deleted");

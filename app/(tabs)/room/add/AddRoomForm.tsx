@@ -1,4 +1,3 @@
-import { Picker } from "@react-native-picker/picker";
 import React, { useState } from "react";
 import { Keyboard, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
 
