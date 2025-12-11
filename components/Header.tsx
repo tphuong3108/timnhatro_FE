@@ -3,12 +3,16 @@ import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { BlurView } from "expo-blur";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+
+import { notificationApi } from "@/services/notificationApi";
+
+import React, { useEffect, useState } from "react";
 import {
   Alert,
   Platform,
   TouchableOpacity,
-  View
+  View, 
+  Text
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import Logo from "../assets/images/logo.svg";
@@ -17,6 +21,48 @@ export default function Header() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
+  const [unread, setUnread] = useState(0);
+  const [hasToken, setHasToken] = useState(false);
+
+  useEffect(() => {
+    const checkToken = async () => {
+      const token = await AsyncStorage.getItem("token");
+      setHasToken(!!token);
+
+      if (token) {
+        const count = await notificationApi.getUnreadCount();
+        setUnread(count);
+      }
+    };
+    checkToken();
+  }, []);
+
+  useEffect(() => {
+  let interval: any = null;
+
+  const loadUnread = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      if (!token) {
+        setUnread(0);
+        setHasToken(false);
+        return;
+      }
+
+      setHasToken(true);
+      const count = await notificationApi.getUnreadCount();
+      setUnread(count);
+    } catch (e) {
+      console.log("Load unread error:", e);
+    }
+  };
+  loadUnread();
+  interval = setInterval(loadUnread, 3000);
+
+  return () => {
+    if (interval) clearInterval(interval);
+  };
+}, []);
 
   const handleLogout = async () => {
     setShowPopup(false);
@@ -55,14 +101,41 @@ export default function Header() {
         className="flex-row justify-between items-center"
       >
         <Logo width={RFValue(95)} height={RFValue(30)} />
+        <View className="flex-row items-center gap-4">
 
-        {/* Nút menu 3 gạch */}
-        <TouchableOpacity
-          activeOpacity={0.8}
-          onPress={() => router.push("/account/menu")}
-        >
-          <Ionicons name="menu-outline" size={RFValue(26)} color="#fff" />
-        </TouchableOpacity>
+          {/* Icon thông báo */}
+          {hasToken && (
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() => router.push({ pathname: "/notifications" })}
+            >
+              <View className="relative">
+                <Ionicons
+                  name="notifications-outline"
+                  size={RFValue(24)}
+                  color="#fff"
+                />
+
+                {unread > 0 && (
+                  <View className="absolute -top-1 -right-1 bg-red-600 w-4 h-4 rounded-full items-center justify-center">
+                    <Text className="text-white text-[10px] font-bold">
+                      {unread}
+                    </Text>
+                  </View>
+                )}
+              </View>
+            </TouchableOpacity>
+          )}
+
+          {/* Icon menu */}
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={() => router.push("/account/menu")}
+          >
+            <Ionicons name="menu-outline" size={RFValue(26)} color="#fff" />
+          </TouchableOpacity>
+        </View>
+
       </BlurView>
     </View>
   );

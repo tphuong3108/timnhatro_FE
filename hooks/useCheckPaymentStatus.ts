@@ -30,7 +30,6 @@ export function useCheckPaymentStatus() {
     }
   }, [orderId]); 
 
-  // Khi qua lại app khởi động lại, tự check trạng thái
   useEffect(() => {
     const subscription = AppState.addEventListener("change", (state) => {
       if (state === "active" && orderId) {

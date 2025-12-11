@@ -1,38 +1,39 @@
 import apiClient from "./apiClient";
 
 export const notificationApi = {
-
-  // Lấy thông báo của user đang đăng nhập
   getMyNotifications: async () => {
     const res = await apiClient.get("/notifications/me");
-    return res.data; // BE trả trực tiếp array -> return nguyên array
+    return res.data.data;
   },
 
-  // Đánh dấu thông báo đã đọc
   markAsRead: async (id: string) => {
     const res = await apiClient.patch(`/notifications/${id}/read`);
-    return res.data;
+    return res.data.data;
   },
 
-  // Xóa mềm thông báo
   deleteNotification: async (id: string) => {
     const res = await apiClient.delete(`/notifications/${id}`);
-    return res.data;
+    return res.data.data;
   },
 
-  // Tạo thông báo mới
   createNotification: async (data: any) => {
     const res = await apiClient.post("/notifications", data);
-    return res.data;
+    return res.data.data;
   },
-
-  // Admin xem thông báo chung
   getAdminNotifications: async () => {
     const res = await apiClient.get("/notifications/admin");
-    return res.data;
+    return res.data.data;   // trả về array
   },
+
+  getAdminUnreadCount: async () => {
+    const res = await apiClient.get("/notifications/admin");
+    const arr = res.data.data || [];
+    return arr.filter((x: any) => !x.isRead).length;
+  },
+
   getUnreadCount: async () => {
     const res = await apiClient.get("/notifications/me");
-    return res.data.filter((x: any) => !x.isRead).length;
-    }
+    const arr = res.data.data || [];
+    return arr.filter((x: any) => !x.isRead).length;
+  }
 };

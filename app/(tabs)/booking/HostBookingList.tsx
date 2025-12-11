@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { bookingApi, Booking } from "../../../services/bookingApi";
-import Toast from "react-native-toast-message"; // cần cài thư viện
+import Toast from "react-native-toast-message";
 
 const STATUS_COLORS: Record<string, string> = {
   pending: "#FFA500",

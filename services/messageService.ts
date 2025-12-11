@@ -19,7 +19,6 @@ export const messageService = {
     return res.data?.data || { messages: [], room: null };
   },
 
-  // FE phải gửi chatId (BE không tạo chat trong sendMessage)
   sendMessage: async (params: { chatId: string; content: string; images?: string[] }) => {
     const { chatId, content, images = [] } = params;
     const res = await apiClient.post("/messages", { chatId, content, images });
