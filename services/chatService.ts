@@ -6,7 +6,7 @@ export interface Chat { _id: string; participants: Participant[]; lastMessage?: 
 
 export const chatService = {
   getUserChats: async (): Promise<Chat[]> => {
-    const res = await apiClient.get("/chats"); // giả sử GET /api/chat -> getUserChats
+    const res = await apiClient.get("/chats");
     return res.data?.data || [];
   },
 

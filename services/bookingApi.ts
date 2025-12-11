@@ -1,4 +1,3 @@
-// src/api/bookingApi.ts
 import apiClient from "./apiClient";
 
 export interface CreateBookingDto {
