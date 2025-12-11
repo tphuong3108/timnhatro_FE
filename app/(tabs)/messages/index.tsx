@@ -1,15 +1,16 @@
 import { useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, {useState,useCallback } from "react";
 import {
   ActivityIndicator,
   FlatList,
   Image,
   Text,
   TouchableOpacity,
-  View,
+  View,Alert
 } from "react-native";
 import { useAuth } from "../../../contexts/AuthContext";
 import { chatService } from "../../../services/chatService";
+import { useFocusEffect } from "@react-navigation/native";
 
 export default function ChatListScreen() {
   const [chats, setChats] = useState<any[]>([]);
@@ -17,19 +18,45 @@ export default function ChatListScreen() {
   const router = useRouter();
   const { user } = useAuth();
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const chatsData = await chatService.getUserChats();
-        setChats(Array.isArray(chatsData) ? chatsData : []);
-      } catch (err) {
-        console.error("Lỗi khi tải danh sách chat:", err);
-        setChats([]);
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, []);
+  // Load list
+  const loadChats = async () => {
+    try {
+      setLoading(true);
+      const chatsData = await chatService.getUserChats();
+      setChats(Array.isArray(chatsData) ? chatsData : []);
+    } catch (error) {
+      console.error("Lỗi khi tải danh sách chat:", error);
+      setChats([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      loadChats();
+    }, [])
+  );
+
+  const handleDeleteChat = (chatId: string) => {
+    Alert.alert(
+      "Xóa đoạn chat",
+      "Bạn có chắc chắn muốn xóa đoạn chat này?\nToàn bộ tin nhắn sẽ bị xóa.",
+      [
+        { text: "Hủy", style: "cancel" },
+        {
+          text: "Xóa",
+          style: "destructive",
+          onPress: async () => {
+            const success = await chatService.deleteChat(chatId);
+            if (success) {
+              setChats((prev) => prev.filter((c) => c._id !== chatId));
+            }
+          },
+        },
+      ]
+    );
+  };
 
   if (loading)
     return (
@@ -47,7 +74,6 @@ export default function ChatListScreen() {
 
   return (
     <View className="flex-1 bg-white">
-
       <TouchableOpacity
         onPress={() => router.push("/messages/ai")}
         className="flex-row items-center px-4 py-4 border-b border-gray-200 bg-white"
@@ -62,9 +88,7 @@ export default function ChatListScreen() {
           <Text className="font-semibold text-[16px] text-gray-800">
             Trợ lý AI
           </Text>
-          <Text className="text-gray-500 text-[13px]">
-            Hỏi tôi bất cứ điều gì...
-          </Text>
+          <Text className="text-gray-500 text-[13px]">Hỏi tôi bất cứ điều gì...</Text>
         </View>
       </TouchableOpacity>
 
@@ -78,6 +102,7 @@ export default function ChatListScreen() {
 
           return (
             <TouchableOpacity
+             onLongPress={() => handleDeleteChat(item._id)} 
               onPress={() => {
                 router.push({
                   pathname: "/messages/[chatId]",
