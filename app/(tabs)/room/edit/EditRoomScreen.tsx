@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback } from "react";
 import {
   View,
   Text,
@@ -45,7 +45,7 @@ const roomId =
     } else {
       Alert.alert("❌ Lỗi", "Không thể cập nhật phòng, vui lòng thử lại.");
     }
-  }, [roomData]);
+  }, [roomData, handleUpdateRoom, router]);
 
   if (loading)
     return (

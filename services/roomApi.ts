@@ -108,6 +108,11 @@ export const roomApi = {
   getPremiumStatus: async (id: string) => {
   const res = await apiClient.get(`/rooms/${id}/premium-status`);
   return res.data.data;
-}
+},
+updateRoom: async (id: string, data: any) => {
+  const res = await apiClient.patch(`/rooms/${id}/update`, data);
+  return res.data.data;
+},
+
 
 };

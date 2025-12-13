@@ -171,7 +171,7 @@ export default function HostPaymentHistory() {
                 onClose={() => setShowFilterModal(false)}
                 onApply={(newStatus) => {
                     setFilter((f) => ({ ...f, status: newStatus }));
-                    fetchPayments();
+                   setShowFilterModal(false);
                 }}
             />
         </View>

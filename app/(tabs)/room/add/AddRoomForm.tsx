@@ -7,8 +7,6 @@ export default function AddRoomForm({
   location, setLocation,
   marker, setMarker,
   description, setDescription,
-
-  // ⭐ THÊM MỚI
   selectedWard,
   setSelectedWard,
   wards,

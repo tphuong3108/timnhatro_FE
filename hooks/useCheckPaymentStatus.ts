@@ -18,7 +18,6 @@ export function useCheckPaymentStatus() {
     try {
       const res = await paymentApi.checkPaymentStatus(targetId);
       const status = res.data?.status;
-
       setPaymentInfo(res.data);
 
       if (status === "success") setPaymentStatus("success");

@@ -1,9 +1,9 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import apiClient from "@/services/apiClient";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as ImagePicker from "expo-image-picker";
 import * as Location from "expo-location";
-
+import { roomApi } from "@/services/roomApi";
 export default function useEditRoomLogic(roomId: string) {
   const [roomData, setRoomData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -13,7 +13,7 @@ export default function useEditRoomLogic(roomId: string) {
 
   const didFetchRef = useRef(false);
 
-  const fetchRoomData = async () => {
+  const fetchRoomData = useCallback(async () => {
     if (didFetchRef.current || !roomId) return;
     didFetchRef.current = true;
 
@@ -48,45 +48,38 @@ export default function useEditRoomLogic(roomId: string) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [roomId])
 
   useEffect(() => {
     didFetchRef.current = false;
     fetchRoomData();
-  }, [roomId]);
-
-  // 💾 Cập nhật phòng
+  }, [fetchRoomData]);;
+  
   const handleUpdateRoom = async (updatedData: any) => {
-    try {
-      const token = await AsyncStorage.getItem("token");
-      if (!token) {
-        setError("Bạn cần đăng nhập lại.");
-        return { success: false };
-      }
-    console.log("WARD TRƯỚC KHI GỬI:", updatedData.ward, roomData?.ward);
-      const payload: any = {
-        ...updatedData,
-        amenities: selectedAmenities,
-        location: updatedData.location || roomData?.location,
-      };
+  try {
+    const payload = {
+      name: updatedData.name,
+      price: Number(updatedData.price),
+      address: updatedData.address,
+      description: updatedData.description,
+      amenities: selectedAmenities,
+      ward: roomData?.ward,
 
-      // ⭐ Luôn gửi ward nếu có
-      if (roomData?.ward) {
-        payload.ward = roomData.ward;
-      }
+      location: updatedData.location
+        ? updatedData.location
+        : roomData?.location,
+    };
+    const res = await roomApi.updateRoom(roomId, payload);
+    return { success: true, data: res };
+  } catch (err: any) {
+    console.log(
+      "❌ Lỗi update phòng:",
+      err?.response?.data || err
+    );
+    return { success: false };
+  }
+};
 
-      console.log("⬆ PAYLOAD UPDATE:", payload);
-
-      const res = await apiClient.patch(`/rooms/${roomId}`, payload, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      return { success: true, data: res.data };
-    } catch (err) {
-      console.log("❌ Lỗi update phòng:", err);
-      return { success: false };
-    }
-  };
 
   const pickMedia = async () => {
     try {

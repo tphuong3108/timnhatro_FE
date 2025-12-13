@@ -103,8 +103,8 @@ export default function Profile() {
           onPress={() =>
             router.push(
               user?.role?.toLowerCase() === "host"
-                ? "/(tabs)/booking/HostBookingList" // Trang host quản lý booking
-                : "/(tabs)/booking/UserBookingList" // Trang tenant xem booking
+                ? "/(tabs)/booking/HostBookingList"
+                : "/(tabs)/booking/UserBookingList"
             )
           }
           activeOpacity={0.8}
@@ -121,6 +121,18 @@ export default function Profile() {
               : "Lịch xem phòng của bạn"}
           </Text>
         </TouchableOpacity>
+        {user?.role?.toLowerCase() === "host" && (
+  <TouchableOpacity
+    onPress={() => router.push("/(tabs)/historypayments/HostPaymentHistory")}
+    activeOpacity={0.8}
+    className="border border-[#3F72AF] py-3 rounded-full flex-row justify-center items-center mt-4"
+  >
+    <Ionicons name="cash-outline" size={20} color="#3F72AF" />
+    <Text className="text-[#3F72AF] font-semibold text-[15px] ml-2">
+      Lịch sử giao dịch
+    </Text>
+  </TouchableOpacity>
+)}
 
           {user?.role?.toLowerCase() === "host" && (
             <TouchableOpacity
