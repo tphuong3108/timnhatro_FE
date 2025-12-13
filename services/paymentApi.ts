@@ -9,6 +9,18 @@ export interface PremiumPaymentPayload {
   roomId: string;
   durationDays: number;
 }
+export interface PaymentFilter {
+  status?: "" |  "pending" | "success" | "failed";
+}
+const buildQueryString = (params: Record<string, any>) => {
+  const query = Object.entries(params)
+    .filter(([_, v]) => v !== undefined && v !== null && v !== "")
+    .map(([key, value]) => `${key}=${encodeURIComponent(String(value))}`)
+    .join("&");
+
+  return query ? `?${query}` : "";
+};
+
 
 // Loại dữ liệu query trả về từ VNPay
 export type PaymentReturnQuery = string; 
@@ -30,5 +42,14 @@ export const paymentApi = {
   checkPaymentStatus: async (orderId: string) => {
   return apiClient.get(`/payment/check-status?orderId=${orderId}`);
 },
+  getHostPaymentHistory: async (filter?: PaymentFilter) => {
+    const query = buildQueryString(filter || {});
+    return apiClient.get(`/payment/history/host${query}`);
+  },
+
+  getAdminPaymentHistory: async (filter?: PaymentFilter) => {
+    const query = buildQueryString(filter || {});
+    return apiClient.get(`/payment/history/admin${query}`);
+  }
 
 };
