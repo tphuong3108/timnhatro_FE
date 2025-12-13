@@ -11,6 +11,7 @@ const PORT = 5050;
 const SOCKET_URL = `http://${LOCAL_IP}:${PORT}`;
 
 // Helpful log when debugging connection issues in development
+
 if (__DEV__) {
   console.log("[socket] connecting to:", SOCKET_URL);
 }

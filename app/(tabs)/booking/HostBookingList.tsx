@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { bookingApi, Booking } from "../../../services/bookingApi";
+import React, { useEffect, useState } from "react";
+import { ActivityIndicator, FlatList, Image, Text, TouchableOpacity, View } from "react-native";
 import Toast from "react-native-toast-message";
+import { Booking, bookingApi } from "../../../services/bookingApi";
 
 const STATUS_COLORS: Record<string, string> = {
-  pending: "#FFA500",
-  approved: "#546debff", 
-  declined: "#F44336",
-  completed: "#21e821ff",
+  pending: "#8FAFD6",
+  approved: "#3F72AF",
+  declined: "#B9D7EA",
+  completed: "#3F72AF",
 };
 
 const HostBookingList = () => {
@@ -32,7 +32,7 @@ const HostBookingList = () => {
     loadData();
   }, []);
 
-  const handleAction = async (id: string, action: "approve" | "decline" | "cancel" | "complete") => {
+  const handleAction = async (id: string, action: "approve" | "decline" | "complete") => {
     try {
       switch (action) {
         case "approve":
@@ -42,10 +42,6 @@ const HostBookingList = () => {
         case "decline":
           await bookingApi.declineBooking(id);
           Toast.show({ type: 'success', text1: 'Thành công', text2: 'Booking đã bị từ chối.' });
-          break;
-        case "cancel":
-          await bookingApi.cancelBooking(id);
-          Toast.show({ type: 'success', text1: 'Thành công', text2: 'Booking đã bị hủy.' });
           break;
         case "complete":
           await bookingApi.completeBooking(id);
@@ -62,14 +58,22 @@ const HostBookingList = () => {
   const renderItem = ({ item }: { item: Booking }) => (
     <View className="mb-4 bg-white rounded-xl p-4 shadow-md">
       {/* Header: Tên phòng + trạng thái */}
-      <View className="flex-row justify-between items-center mb-2">
-        <Text className="font-bold text-lg">{item.roomId?.name || "N/A"}</Text>
+      <View className="flex-row items-center mb-2">
+        <View style={{ flex: 1, marginRight: 8 }}>
+          <Text numberOfLines={1} ellipsizeMode="tail" className="font-bold text-lg">
+            {item.roomId?.name || "N/A"}
+          </Text>
+        </View>
+
         <View
           style={{
             backgroundColor: STATUS_COLORS[item.status] || "#ccc",
             paddingHorizontal: 8,
-            paddingVertical: 2,
+            paddingVertical: 4,
             borderRadius: 12,
+            minWidth: 70,
+            alignItems: "center",
+            justifyContent: "center",
           }}
         >
           <Text className="text-white font-semibold text-xs">{item.status.toUpperCase()}</Text>
@@ -101,7 +105,7 @@ const HostBookingList = () => {
         <Text className="font-medium">
           {typeof item.userId === "object"
             ? item.userId.displayName ||
-              `${item.userId.firstName ?? ""} ${item.userId.lastName ?? ""}`.trim()
+            `${item.userId.firstName ?? ""} ${item.userId.lastName ?? ""}`.trim()
             : "N/A"}
         </Text>
       </View>
@@ -115,40 +119,59 @@ const HostBookingList = () => {
       <View className="flex-row mt-3 space-x-2">
         {item.status === "pending" && (
           <>
+            {/* Duyệt */}
             <TouchableOpacity
-              className="flex-1 bg-green-500 p-2 rounded-lg flex-row justify-center items-center"
+              className="flex-1 p-2 rounded-lg flex-row justify-center items-center"
+              style={{ backgroundColor: "#3F72AF" }}
               onPress={() => handleAction(item._id, "approve")}
             >
-              <Ionicons name="checkmark-circle-outline" size={16} color="#fff" className="mr-1" />
+              <Ionicons
+                name="checkmark-circle-outline"
+                size={16}
+                color="#fff"
+                style={{ marginRight: 4 }}
+              />
               <Text className="text-white text-center font-semibold">Duyệt</Text>
             </TouchableOpacity>
+
+            {/* Từ chối */}
             <TouchableOpacity
-              className="flex-1 bg-red-500 p-2 rounded-lg flex-row justify-center items-center"
+              className="flex-1 p-2 rounded-lg flex-row justify-center items-center"
+              style={{ backgroundColor: "#B9D7EA" }}
               onPress={() => handleAction(item._id, "decline")}
             >
-              <Ionicons name="close-circle-outline" size={16} color="#fff" className="mr-1" />
-              <Text className="text-white text-center font-semibold">Từ chối</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              className="flex-1 bg-gray-400 p-2 rounded-lg flex-row justify-center items-center"
-              onPress={() => handleAction(item._id, "cancel")}
-            >
-              <Ionicons name="trash-outline" size={16} color="#fff" className="mr-1" />
-              <Text className="text-white text-center font-semibold">Hủy</Text>
+              <Ionicons
+                name="close-circle-outline"
+                size={16}
+                color="#3F72AF"
+                style={{ marginRight: 4 }}
+              />
+              <Text className="text-[#3F72AF] text-center font-semibold">
+                Từ chối
+              </Text>
             </TouchableOpacity>
           </>
         )}
 
         {item.status === "approved" && (
           <TouchableOpacity
-            className="flex-1 bg-blue-500 p-2 rounded-lg flex-row justify-center items-center"
+            className="flex-1 p-2 rounded-lg flex-row justify-center items-center"
+            style={{ backgroundColor: "#3F72AF" }}
             onPress={() => handleAction(item._id, "complete")}
           >
-            <Ionicons name="checkmark-done-outline" size={16} color="#fff" className="mr-1" />
-            <Text className="text-white text-center font-semibold">Hoàn thành</Text>
+            <Ionicons
+              name="checkmark-done-outline"
+              size={16}
+              color="#fff"
+              style={{ marginRight: 4 }}
+            />
+            <Text className="text-white text-center font-semibold">
+              Hoàn thành
+            </Text>
           </TouchableOpacity>
         )}
       </View>
+
     </View>
   );
 

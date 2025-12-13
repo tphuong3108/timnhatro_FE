@@ -1,4 +1,3 @@
-// src/screens/Booking/UserBookingList.tsx
 import React, { useEffect, useState } from "react";
 import { View, Text, FlatList, Image, TouchableOpacity, ActivityIndicator } from "react-native";
 import { bookingApi, Booking } from "../../../services/bookingApi";
@@ -6,11 +5,11 @@ import { Ionicons } from "@expo/vector-icons";
 import Toast from "react-native-toast-message";
 
 const STATUS_COLORS: Record<string, string> = {
-  pending: "#FFA500",
-  approved: "#4CAF50",
-  declined: "#F44336",
+  pending: "#8FAFD6",
+  approved: "#3F72AF",
+  declined: "#B9D7EA",
+  completed: "#3F72AF",
   canceled: "#9E9E9E",
-  completed: "#21e821ff",
 };
 
 const UserBookingList = () => {
@@ -66,9 +65,11 @@ const UserBookingList = () => {
           {/* Nút Hủy */}
           {item.status === "pending" && (
             <TouchableOpacity
-              className="mt-2 flex-row items-center bg-red-500 p-2 rounded-lg justify-center"
-              onPress={() => handleCancel(item._id)}
-            >
+                style={{ backgroundColor: "#3F72AF" }}
+                className="mt-2 flex-row items-center p-2 rounded-lg justify-center"
+                onPress={() => handleCancel(item._id)}
+              >
+
               <Ionicons name="trash-outline" size={16} color="#fff" className="mr-1" />
               <Text className="text-white font-semibold">Hủy</Text>
             </TouchableOpacity>
