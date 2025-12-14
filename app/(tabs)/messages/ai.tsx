@@ -6,6 +6,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   SafeAreaView,
+  Image,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import MessageBubble from "./components/MessageBubble";
@@ -40,6 +41,13 @@ export default function ChatAI() {
       },
     ]);
   }, [AI_BOT]);
+
+  // keep list scrolled to bottom so new messages aren't hidden by the input
+  useEffect(() => {
+    try {
+      flatListRef.current?.scrollToEnd?.({ animated: true });
+    } catch (e) {}
+  }, [messages]);
 
   const handleSend = async (text: string) => {
     const userMsg = {
@@ -95,38 +103,39 @@ export default function ChatAI() {
       </View>
 
       {/* Chat */}
-      <FlatList
-        ref={flatListRef}
-        data={messages}
-        keyExtractor={(item) => item._id}
-        renderItem={({ item }) => (
-          <View
-            style={{
-              width: "100%",
-              alignItems:
-                item.user._id === currentUser._id ? "flex-end" : "flex-start",
-            }}
-          >
-            <View style={{ maxWidth: "85%" }}>
-              <MessageBubble
-                text={item.text}
-                avatar={item.user.avatar}
-                isMe={item.user._id === currentUser._id}
-                createdAt={item.createdAt}
-              />
-            </View>
-          </View>
-        )}
-        contentContainerStyle={{
-          padding: 20,
-          paddingBottom: 20 + insets.bottom,
-        }}
-      />
+      <View style={{ marginHorizontal: -16, flex: 1 }}>
+        <FlatList
+          ref={flatListRef}
+          data={messages}
+          keyExtractor={(item) => item._id}
+          renderItem={({ item }) => {
+            const isMe = item.user._id === currentUser._id;
+            return (
+              <View style={{ width: "100%", alignItems: isMe ? "flex-end" : "flex-start" }}>
+                <MessageBubble
+                  text={item.text}
+                  avatar={isMe ? undefined : item.user?.avatar}
+                  isMe={isMe}
+                  createdAt={item.createdAt}
+                />
+              </View>
+            );
+          }}
+          style={{ width: '100%' }}
+          contentContainerStyle={{
+            paddingHorizontal: 16,
+            paddingTop: 12,
+            paddingBottom: 20 + insets.bottom + 100,
+          }}
+          onContentSizeChange={() => flatListRef.current?.scrollToEnd?.({ animated: true })}
+          onLayout={() => flatListRef.current?.scrollToEnd?.({ animated: false })}
+        />
+      </View>
 
       {/* Input */}
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
-        keyboardVerticalOffset={insets.bottom + 70}
+        keyboardVerticalOffset={insets.bottom + 68}
       >
         <MessageInputAI onSend={handleSend} bottomInset={insets.bottom} />
       </KeyboardAvoidingView>
