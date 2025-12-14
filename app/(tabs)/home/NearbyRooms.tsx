@@ -119,9 +119,7 @@ export default function NearbyRooms() {
           >
             <ImageBackground
               source={{
-                uri:
-                  item.images?.[0] ||
-                  "https://via.placeholder.com/300x200.png?text=No+Image",
+                uri: item.images?.[0] || "/logodoc.svg",
               }}
               resizeMode="cover"
               className="w-[180px] h-[200px] justify-end"

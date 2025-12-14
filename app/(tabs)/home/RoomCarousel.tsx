@@ -30,7 +30,7 @@ export default function RoomCarousel({ rooms: propRooms = [] }: any) {
     const fetchHotRooms = async () => {
       try {
         const res = await roomApi.getHotRooms();
-        setRooms(res || []);
+        setRooms((res || []).slice(0, 10));
       } catch (error) {
         console.error("❌ Lỗi khi tải phòng nổi bật:", error);
       } finally {
@@ -85,10 +85,8 @@ export default function RoomCarousel({ rooms: propRooms = [] }: any) {
             extrapolate: "clamp",
           });
 
-          const imageUri =
-            item.image ||
-            item.images?.[0] ||
-            "https://via.placeholder.com/300x200.png?text=No+Image";
+          const imageUri = item.image || item.images?.[0] || "/logodoc.svg";
+            // "https://via.placeholder.com/300x200.png?text=No+Image";
 
           return (
             <Animated.View

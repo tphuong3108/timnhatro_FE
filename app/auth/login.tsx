@@ -82,7 +82,7 @@ export default function Login() {
       >
         {/* Logo & tiêu đề */}
         <View className="items-center mt-4">
-          <Logo width={RFValue(165)} height={RFValue(165)} />
+          <Logo width={RFValue(165)} height={RFValue(165)} onPress={() => router.push("/home")}/>
           <Text
             className="font-bold text-center mt-2 text-[#3F72AF]"
             style={{ fontSize: RFPercentage(3.2) }}
