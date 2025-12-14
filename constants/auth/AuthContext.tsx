@@ -46,7 +46,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           setUser(null);
         }
       } catch (error) {
-        console.log("❌ Lỗi khi load user:", error);
         setUser(null);
       } finally {
         setLoading(false);

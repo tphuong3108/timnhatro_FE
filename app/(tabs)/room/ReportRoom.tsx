@@ -64,7 +64,6 @@ export default function ReportRoom() {
       setReportText("");
       setMedia([]);
     } catch (err: any) {
-      console.log("❌ Lỗi gửi báo cáo:", err.response?.data || err.message);
       Alert.alert(
         "Lỗi",
         err.response?.data?.message ||

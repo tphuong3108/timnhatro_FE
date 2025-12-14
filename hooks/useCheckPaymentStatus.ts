@@ -24,7 +24,6 @@ export function useCheckPaymentStatus() {
       else if (status === "failed") setPaymentStatus("failed");
       else setPaymentStatus("pending");
     } catch (err) {
-      console.error("[HOOK] checkStatus error:", err);
       setPaymentStatus("failed");
     }
   }, [orderId]); 

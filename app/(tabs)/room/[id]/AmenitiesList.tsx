@@ -93,7 +93,6 @@ export default function AmenitiesList({ amenities }: { amenities: any[] }) {
   });
 
   if (!enrichedAmenities.length) {
-    console.log("⚠️ Không có tiện ích để hiển thị:", amenities);
     return null;
   }
 

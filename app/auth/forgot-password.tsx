@@ -48,7 +48,6 @@ export default function ForgotPassword() {
         ]
       );
     } catch (error: any) {
-      console.log("Forgot password error:", error.response?.data || error.message);
       Alert.alert(
         "Lỗi",
         error.response?.data?.message ||

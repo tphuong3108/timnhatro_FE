@@ -79,7 +79,6 @@ export default function Register() {
         },
       ]);
     } catch (error: any) {
-      console.log("Register error:", error.response?.data || error.message);
       Alert.alert(
         "Lỗi gửi OTP",
         error.response?.data?.message || "Không thể gửi mã OTP. Thử lại sau."

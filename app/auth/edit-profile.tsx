@@ -43,14 +43,12 @@ export default function EditProfile() {
       const decoded: DecodedToken = jwtDecode(token);
       if (decoded?.email) setEmail(decoded.email);
     } catch (error) {
-      console.log("Token decode error:", error);
     }
   };
   const fetchProfile = async () => {
     try {
       const res = await apiClient.get("/me");
       const data = res.data?.data;
-      console.log("🟢 Extracted data:", data);
 
       if (!data) throw new Error("Không có dữ liệu người dùng");
 
@@ -67,7 +65,6 @@ export default function EditProfile() {
       setPhone(data.phone || "");
       setBio(data.bio || "");
     } catch (error: any) {
-      console.log("❌ Fetch profile error:", error.response?.data || error.message);
       Alert.alert("Lỗi", "Không thể tải thông tin người dùng.");
     } finally {
       setLoading(null);
@@ -102,7 +99,6 @@ export default function EditProfile() {
         { text: "OK", onPress: () => router.back() },
       ]);
     } catch (error: any) {
-      console.log("Update profile error:", error.response?.data || error.message);
       Alert.alert("Lỗi", "Không thể cập nhật thông tin.");
     } finally {
       setLoading(null);

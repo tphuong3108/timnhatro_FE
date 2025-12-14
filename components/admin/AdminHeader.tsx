@@ -41,7 +41,6 @@ export default function AdminHeader() {
         const count = await notificationApi.getAdminUnreadCount();
         setUnread(count);
       } catch (e) {
-        console.log("Admin load unread error:", e);
       }
     };
 

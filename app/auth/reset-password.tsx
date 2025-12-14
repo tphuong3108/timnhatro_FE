@@ -52,7 +52,6 @@ export default function ResetPasswordOtp() {
         { text: "Đăng nhập", onPress: () => router.replace("/auth/login") },
       ]);
     } catch (error: any) {
-      console.log("Reset password error:", error.response?.data || error.message);
       Alert.alert(
         "Lỗi",
         error.response?.data?.message || "Mã OTP không hợp lệ hoặc đã hết hạn."
@@ -67,9 +66,8 @@ export default function ResetPasswordOtp() {
       setCanResend(false);
       setTimer(60);
       await apiClient.post("/users/forgot-password", { email });
-      Alert.alert("✅ Đã gửi lại mã OTP", "Vui lòng kiểm tra email.");
+      Alert.alert("Đã gửi lại mã OTP", "Vui lòng kiểm tra email.");
     } catch (error: any) {
-      console.log("Resend OTP error:", error.response?.data || error.message);
       Alert.alert("Lỗi", "Không thể gửi lại OTP. Thử lại sau.");
     }
   };

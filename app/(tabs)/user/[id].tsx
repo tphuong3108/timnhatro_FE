@@ -31,15 +31,12 @@ export default function UserProfile() {
         setLoading(true);
         setError(null);
 
-        console.log("🔍 Fetching public profile for ID:", id);
 
         const data = await profileApi.getPublicProfile(id as string);
 
-        console.log("📦 API Response:", data);
 
         setUser(data);
       } catch (err) {
-        console.error("❌ Lỗi khi tải thông tin người dùng:", err);
         setError("Không thể tải thông tin người dùng.");
       } finally {
         setLoading(false);
@@ -47,7 +44,6 @@ export default function UserProfile() {
     })();
   }, [id]);
 
-  // 🌀 Đang tải
   if (loading) {
     return (
       <View className="flex-1 justify-center items-center bg-white">
@@ -57,7 +53,6 @@ export default function UserProfile() {
     );
   }
 
-  // ❌ Lỗi khi tải
   if (error || !user) {
     return (
       <View className="flex-1 justify-center items-center bg-white px-6">
@@ -73,7 +68,6 @@ export default function UserProfile() {
     );
   }
 
-  // ✅ Hiển thị profile
   return (
     <Animated.ScrollView
       entering={FadeInDown.duration(500)}

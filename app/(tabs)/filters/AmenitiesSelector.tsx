@@ -132,7 +132,6 @@ export default function AmenitiesSelector() {
 
         setAmenities(mapped);
       } catch (error) {
-        console.error("❌ Lỗi khi lấy danh sách tiện ích:", error);
         setAmenities([]);
       }
     };

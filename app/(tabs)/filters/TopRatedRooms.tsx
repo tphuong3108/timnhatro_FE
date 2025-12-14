@@ -28,7 +28,6 @@ export default function TopRatedRooms() {
         [];
 
       if (!Array.isArray(rooms)) {
-        console.warn("⚠️ Dữ liệu không phải mảng:", rooms);
         setTopRooms([]);
         return;
       }
@@ -40,7 +39,6 @@ export default function TopRatedRooms() {
 
       setTopRooms(top);
     } catch (error) {
-      console.error("❌ Lỗi khi lấy phòng nổi bật:", error);
       setTopRooms([]);
     } finally {
       setLoading(false);
@@ -48,17 +46,13 @@ export default function TopRatedRooms() {
     }
   }, [refreshing]);
 
-  // ✅ Gọi lần đầu và tự động refresh định kỳ
   useEffect(() => {
     fetchTopRooms();
 
-    // Refresh lại mỗi 15 giây
     const interval = setInterval(() => {
-      console.log("🔄 Tự động refresh phòng nổi bật...");
       fetchTopRooms();
     }, 15000);
 
-    // Clear interval khi unmount
     return () => clearInterval(interval);
   }, [fetchTopRooms]);
 

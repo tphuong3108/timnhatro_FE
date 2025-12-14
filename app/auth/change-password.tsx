@@ -46,7 +46,6 @@ export default function ChangePassword() {
         { text: "OK", onPress: () => router.back() },
       ]);
     } catch (error: any) {
-      console.log("Change password error:", error.response?.data || error.message);
       Alert.alert("Lỗi", error.response?.data?.message || "Không thể đổi mật khẩu.");
     } finally {
       setLoading(false);

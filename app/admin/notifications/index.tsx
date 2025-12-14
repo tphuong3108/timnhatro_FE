@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
-import { View, Text, FlatList } from "react-native";
-import NotificationItemAdmin from "./NotificationItemAdmin";
 import { notificationApi } from "@/services/notificationApi";
 import { useRouter } from "expo-router";
+import { useEffect, useState } from "react";
+import { FlatList, Text, View } from "react-native";
+import NotificationItemAdmin from "./NotificationItemAdmin";
 
 interface IAdminNotification {
   _id: string;
@@ -12,6 +12,7 @@ interface IAdminNotification {
   createdAt: string;
   avatar?: string;
   metadata?: any;
+  actionPath?: string | null;
 }
 
 export default function AdminNotificationsScreen() {
@@ -23,7 +24,7 @@ export default function AdminNotificationsScreen() {
         const arr = await notificationApi.getAdminNotifications();
         setNotis(Array.isArray(arr) ? arr : []);
     } catch (e) {
-        console.log("Admin load notifications error:", e);
+        // Error loading notifications
     }
     };
 
@@ -36,7 +37,6 @@ export default function AdminNotificationsScreen() {
         prev.map(n => (n._id === id ? { ...n, isRead: true } : n))
       );
     } catch (e) {
-      console.log("Mark read error:", e);
     }
   };
 
@@ -47,17 +47,23 @@ export default function AdminNotificationsScreen() {
   }, []);
 
   return (
-    <View className="flex-1 bg-white">
+    <View className="flex-1 -mx-4 bg-[#F9FAFB]">
       <Text className="text-xl font-bold p-4">Thông báo quản trị</Text>
 
       <FlatList
         data={notis}
+        scrollEnabled={false}
+        nestedScrollEnabled={true}
         keyExtractor={(item) => item._id}
         renderItem={({ item }) => (
           <NotificationItemAdmin
             item={item}
             onPress={() => {
               if (!item.isRead) markAsRead(item._id);
+              if (item.actionPath) {
+                router.push(item.actionPath as any);
+                return;
+              }
             }}
           />
         )}

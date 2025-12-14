@@ -26,7 +26,6 @@ export default function AdminLayout() {
         setIsLoggedIn(true);
         setIsAdmin(user?.role?.toLowerCase() === "admin");
       } catch (error) {
-        console.error("Auth check failed:", error);
       } finally {
         setIsChecking(false);
       }

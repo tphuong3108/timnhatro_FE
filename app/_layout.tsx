@@ -46,7 +46,6 @@ export default function RootLayout() {
 
         setInitialRoute("/");
       } catch (err) {
-        console.error("Init error:", err);
       } finally {
         setAppReady(true);
       }

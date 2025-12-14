@@ -23,8 +23,8 @@ export default function NotificationItemAdmin({ item, onPress }: Props) {
   return (
     <TouchableOpacity
       onPress={onPress}
-      className={`flex-row p-3 border-b border-gray-200 ${
-        isUnread ? "bg-gray-100" : "bg-white"
+      className={`w-full flex-row p-3 border-b border-gray-200 ${
+        isUnread ? "bg-gray-100" : "bg-[#F9FAFB]"
       }`}
       activeOpacity={0.8}
     >
@@ -32,7 +32,7 @@ export default function NotificationItemAdmin({ item, onPress }: Props) {
         <Image source={{ uri: item.avatar }} className="w-12 h-12 rounded-full" />
       ) : (
         <View className="w-12 h-12 rounded-full bg-gray-300 items-center justify-center">
-          <Ionicons name="notifications" size={24} color="#374151" />
+          <Ionicons name="notifications" size={24} color="#144493ff" />
         </View>
       )}
 

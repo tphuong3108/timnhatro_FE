@@ -25,7 +25,6 @@ export default function HostStatsScreen() {
         setDailyStats(dailyRes);
         setTopRooms(topRoomsRes);
       } catch (err) {
-        console.error("❌ Lỗi tải thống kê host:", err);
       } finally {
         setLoading(false);
       }

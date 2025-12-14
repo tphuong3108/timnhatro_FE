@@ -59,7 +59,6 @@ export default function Login() {
       Alert.alert("🎉 Thành công", "Đăng nhập thành công!");
       router.replace("/home");
     } catch (error: any) {
-      console.log("Login error:", error.response?.data || error.message);
       Alert.alert(
         "Đăng nhập thất bại",
         error.response?.data?.message || "Sai email hoặc mật khẩu!"

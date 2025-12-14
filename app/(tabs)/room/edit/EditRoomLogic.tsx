@@ -43,7 +43,6 @@ export default function useEditRoomLogic(roomId: string) {
 
       setSelectedAmenities(data.amenities?.map((a: any) => a._id || a) || []);
     } catch (err) {
-      console.log("❌ Lỗi fetch room:", err);
       setError("Không thể tải dữ liệu phòng");
     } finally {
       setLoading(false);
@@ -72,10 +71,6 @@ export default function useEditRoomLogic(roomId: string) {
     const res = await roomApi.updateRoom(roomId, payload);
     return { success: true, data: res };
   } catch (err: any) {
-    console.log(
-      "❌ Lỗi update phòng:",
-      err?.response?.data || err
-    );
     return { success: false };
   }
 };
@@ -98,7 +93,6 @@ export default function useEditRoomLogic(roomId: string) {
         }));
       }
     } catch (err) {
-      console.log("❌ Lỗi chọn ảnh:", err);
     }
   };
 
@@ -136,7 +130,6 @@ export default function useEditRoomLogic(roomId: string) {
         location: { coordinates: [longitude, latitude] },
       }));
     } catch (err) {
-      console.log("❌ Lỗi lấy vị trí:", err);
     } finally {
       setLoadingLocation(false);
     }

@@ -30,7 +30,6 @@ export default function NotificationsScreen() {
       if (!Array.isArray(data)) return setNotis([]);
       setNotis(data);
     } catch (e) {
-      console.log("Load notifications error:", e);
     }
   };
 
@@ -50,7 +49,6 @@ export default function NotificationsScreen() {
           )
         );
       } catch (e) {
-        console.log("Mark read error:", e);
       }
     }
 

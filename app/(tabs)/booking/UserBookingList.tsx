@@ -22,7 +22,6 @@ const UserBookingList = () => {
       const res = await bookingApi.getUserBookings();
       setBookings(res.data);
     } catch (err) {
-      console.log("Lỗi tải lịch đặt:", err);
       Toast.show({ type: 'error', text1: 'Lỗi', text2: 'Không thể tải danh sách booking.' });
     } finally {
       setLoading(false);
@@ -39,7 +38,6 @@ const UserBookingList = () => {
       Toast.show({ type: 'success', text1: 'Thành công', text2: 'Booking đã được hủy.' });
       loadData();
     } catch (err: any) {
-      console.log(err);
       Toast.show({ type: 'error', text1: 'Lỗi', text2: err?.response?.data?.error || 'Có lỗi xảy ra' });
     }
   };

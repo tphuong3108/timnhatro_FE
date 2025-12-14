@@ -66,7 +66,6 @@ export default function RatingSection({ room, refreshRoomStatus }: RatingSection
       setReportModal(false);
       Alert.alert("Thành công", "Báo cáo của bạn đã được gửi.");
     } catch (error) {
-      console.log(error);
       Alert.alert("Lỗi", "Không thể gửi báo cáo.");
     }
   };
@@ -96,7 +95,6 @@ export default function RatingSection({ room, refreshRoomStatus }: RatingSection
       else router.reload();
 
     } catch (error) {
-      console.log(error);
       Alert.alert("Lỗi", "Không thể xóa đánh giá.");
     }
   };

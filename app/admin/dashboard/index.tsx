@@ -50,9 +50,8 @@ export default function AdminDashboard() {
         setPopularRooms(popularRes);
         setTopAmenities(amenitiesRes);
         setTopWards(wardsRes);
-        setLoginStats(loginRes); // ✅ lưu dữ liệu lượt truy cập
+        setLoginStats(loginRes); 
       } catch (err) {
-        console.error("Lỗi khi tải dữ liệu admin:", err);
       } finally {
         setLoading(false);
       }

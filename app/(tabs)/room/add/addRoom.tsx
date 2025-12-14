@@ -12,7 +12,7 @@ export default function useAddRoom() {
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
   const [loadingLocation, setLoadingLocation] = useState(false);
 
-  // 📍 Lấy vị trí hiện tại
+  //  Lấy vị trí hiện tại
   const getCurrentLocation = async () => {
     try {
       setLoadingLocation(true);
@@ -26,21 +26,20 @@ export default function useAddRoom() {
       const { latitude, longitude } = loc.coords;
       setMarker({ latitude, longitude });
 
-      // 🏠 Lấy địa chỉ dạng text
+      //  Lấy địa chỉ dạng text
       const addr = await Location.reverseGeocodeAsync({ latitude, longitude });
       if (addr.length > 0) {
         const a = addr[0];
         setLocation(`${a.name || ""} ${a.street || ""}, ${a.district || ""}, ${a.city || ""}`);
       }
     } catch (error) {
-      console.error("Lỗi khi lấy vị trí:", error);
       alert("Không thể lấy vị trí hiện tại!");
     } finally {
       setLoadingLocation(false);
     }
   };
 
-  // 🗺️ Khi chạm bản đồ → cập nhật marker + địa chỉ
+  // Khi chạm bản đồ → cập nhật marker + địa chỉ
   const handleMapPress = async (event: any) => {
     const coord = event?.nativeEvent?.coordinate;
     if (!coord) return;
@@ -52,11 +51,10 @@ export default function useAddRoom() {
         setLocation(`${a.name || ""} ${a.street || ""}, ${a.district || ""}, ${a.city || ""}`);
       }
     } catch (error) {
-      console.error("Reverse geocode error:", error);
     }
   };
 
-  // 📸 Chọn ảnh / video
+  //  Chọn ảnh / video
   const pickMedia = async () => {
     try {
       const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -76,12 +74,11 @@ export default function useAddRoom() {
         setMedia((prev) => [...prev, ...uris]);
       }
     } catch (error) {
-      console.error("Lỗi khi chọn ảnh/video:", error);
       alert("Không thể chọn tệp phương tiện!");
     }
   };
 
-  // ❌ Xóa ảnh/video
+  //  Xóa ảnh/video
   const removeMedia = (index: number) => {
     setMedia((prev) => prev.filter((_, i) => i !== index));
   };

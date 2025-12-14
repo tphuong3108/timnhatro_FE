@@ -56,7 +56,6 @@ export default function BookingDialog({
         const res = await bookingApi.checkUserBookedRoom(roomId);
         setAlreadyBooked(!!res.data?.alreadyBooked);
       } catch (err) {
-        console.log("Check booking error:", err);
       }
     };
 
@@ -86,7 +85,6 @@ export default function BookingDialog({
       if (onBooked) onBooked();
       onClose();
     } catch (err: any) {
-      console.log("Booking error:", err?.response?.data);
       Toast.show({
         type: "error",
         text1: "Lỗi",

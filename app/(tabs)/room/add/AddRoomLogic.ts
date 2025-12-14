@@ -52,14 +52,13 @@ export const useAddRoomLogic = () => {
       });
       Toast.show({ type: "info", text1: "Đã chọn vị trí hiện tại!" });
     } catch (err) {
-      console.log("❌ Lỗi lấy vị trí:", err);
       Toast.show({ type: "error", text1: "Không thể lấy vị trí hiện tại!" });
     } finally {
       setLoadingLocation(false);
     }
   };
 
-  // 📸 Chọn ảnh hoặc video
+  //  Chọn ảnh hoặc video
   const pickMedia = async () => {
     try {
       const result = await ImagePicker.launchImageLibraryAsync({
@@ -71,10 +70,8 @@ export const useAddRoomLogic = () => {
       if (!result.canceled) {
         const uris = result.assets.map((a) => a.uri);
         setMedia((prev) => [...prev, ...uris]);
-        console.log("🖼️ Chọn media thành công:", uris);
       }
     } catch (err) {
-      console.log("❌ Lỗi chọn media:", err);
       Toast.show({ type: "error", text1: "Không thể chọn ảnh hoặc video!" });
     }
   };
@@ -83,19 +80,18 @@ export const useAddRoomLogic = () => {
     setMedia((prev) => prev.filter((m) => m !== uri));
   };
 
-  // 🗺️ Chọn vị trí thủ công
+  //  Chọn vị trí thủ công
   const handleMapPress = (e: any) => {
     const { latitude, longitude } = e.nativeEvent.coordinate;
     setMarker({ latitude, longitude });
   };
 
-  // 🔍 Lấy wardId theo tên
+  //  Lấy wardId theo tên
   const fetchWardIdByName = async (wardName: string): Promise<string | null> => {
     try {
       const res = await apiClient.get(`/wards/name/${name}`)
       return res.data.data?._id || null;
     } catch {
-      console.log("⚠️ Không tìm thấy ward:", wardName);
       return null;
     }
   };
@@ -105,7 +101,6 @@ export const useAddRoomLogic = () => {
       const res = await apiClient.get("/wards");
       setWards(res.data);
     } catch (err) {
-      console.log(" Lỗi load ward:", err);
     }
   };
 
@@ -113,7 +108,6 @@ export const useAddRoomLogic = () => {
 }, []);
 
 
-  // 🧠 Tự động nâng quyền Host khi mở màn
   useEffect(() => {
     const upgradeRole = async () => {
       try {
@@ -127,7 +121,6 @@ export const useAddRoomLogic = () => {
         }
         setIsHost(true);
       } catch (err) {
-        console.log("⚠️ Không thể nâng role:", err);
       }
     };
 
@@ -156,10 +149,8 @@ export const useAddRoomLogic = () => {
           const street = geo.name || geo.street || "";
           const address = `${street} ${ward ? ward + ", " : ""}${city}`;
           setLocation(address);
-          console.log("📍 Địa chỉ tự động:", address);
         }
       } catch (error) {
-        console.log("❌ Lỗi reverse geocoding:", error);
       }
     };
     updateAddressFromMarker();
@@ -168,7 +159,6 @@ export const useAddRoomLogic = () => {
 
 
   const handleSubmit = async () => {
-    console.log("🚀 handleSubmit được gọi!");
     if (!roomName || !price || !location || !marker) {
       Toast.show({ type: "error", text1: "Vui lòng nhập đầy đủ thông tin!" });
       return;
@@ -191,7 +181,6 @@ export const useAddRoomLogic = () => {
           const base64 = await FileSystem.readAsStringAsync(uri, { encoding: "base64" });
           base64Images.push(`data:image/jpeg;base64,${base64}`);
         } catch (err) {
-          console.log("❌ Lỗi đọc file:", err);
         }
       }
 
@@ -220,7 +209,6 @@ export const useAddRoomLogic = () => {
       });
 
       const data = await res.json();
-      console.log("✅ Phản hồi BE:", data);
       if (!res.ok) return 
         const roomId = data.data?._id;
         if (!isPremiumPost) {
@@ -232,7 +220,6 @@ export const useAddRoomLogic = () => {
         }
         router.push(`/(tabs)/payments/PaymentContainer?roomId=${roomId}&isPremium=true`);
     } catch (err: any) {
-      console.log("❌ Lỗi đăng phòng:", err.message);
       Toast.show({
         type: "error",
         text1: "Đăng phòng thất bại!",

@@ -32,7 +32,6 @@ export default function RoomCarousel({ rooms: propRooms = [] }: any) {
         const res = await roomApi.getHotRooms();
         setRooms((res || []).slice(0, 10));
       } catch (error) {
-        console.error("❌ Lỗi khi tải phòng nổi bật:", error);
       } finally {
         setLoading(false);
       }

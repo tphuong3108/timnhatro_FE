@@ -33,7 +33,6 @@ export default function OtpVerify() {
         { text: "OK", onPress: () => router.replace("/auth/login") },
       ]);
     } catch (error: any) {
-      console.log("Verify OTP error:", error.response?.data || error.message);
       Alert.alert(
         "Lỗi xác thực",
         error.response?.data?.message || "Mã OTP không hợp lệ hoặc đã hết hạn."
@@ -56,7 +55,6 @@ export default function OtpVerify() {
       });
       Alert.alert("Đã gửi lại mã OTP", "Vui lòng kiểm tra email.");
     } catch (error: any) {
-      console.log("Resend OTP error:", error.response?.data || error.message);
       Alert.alert("Lỗi", "Không thể gửi lại OTP. Thử lại sau.");
     }
   };

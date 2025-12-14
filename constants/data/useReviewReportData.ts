@@ -26,7 +26,6 @@ export function useReviewReportData() {
         }))
       );
     } catch (error) {
-      console.error("Lỗi khi tải báo cáo review:", error);
     } finally {
       setLoading(false);
     }

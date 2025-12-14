@@ -36,7 +36,6 @@ export default function PostList() {
       setTotalPages(pagination?.totalPages || 1);
       setPage(pageNum);
     } catch (error: any) {
-      console.error("❌ Lỗi khi tải phòng:", error?.response?.data || error.message);
       Alert.alert("Lỗi", "Không thể tải danh sách phòng!");
     } finally {
       setLoading(false);
@@ -81,7 +80,6 @@ export default function PostList() {
         },
       ]);
     } catch (error: any) {
-      console.error(`❌ Lỗi khi ${status} phòng:`, error);
       Alert.alert("Lỗi", "Không thể cập nhật trạng thái phòng!");
     }
   };
@@ -99,7 +97,6 @@ export default function PostList() {
             Alert.alert("Thành công", "Phòng đã bị xóa.");
             fetchRooms(1);
           } catch (error: any) {
-            console.error("❌ Lỗi khi xóa phòng:", error);
             Alert.alert("Lỗi", "Không thể xóa phòng!");
           }
         },

@@ -60,7 +60,6 @@ const handleAddRoom = async () => {
     // Sau khi nâng cấp xong → chuyển tới trang thêm phòng
     router.push("/room/add");
   } catch (error: any) {
-    console.log("Upgrade role error:", error?.response?.data || error.message);
 
     Toast.show({
       type: "error",

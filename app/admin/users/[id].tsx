@@ -32,13 +32,11 @@ export default function AdminUserDetail() {
         setLoading(true);
         setError(null);
 
-        console.log("🔍 Fetching admin user details:", id);
         const data = await adminApi.getUserDetails(id as string);
 
         // Dữ liệu backend trả về có dạng { success: true, user: {...} }
         setUser(data.user || data);
       } catch (err) {
-        console.error("❌ Lỗi khi tải thông tin người dùng:", err);
         setError("Không thể tải thông tin người dùng.");
       } finally {
         setLoading(false);

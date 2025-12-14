@@ -65,7 +65,6 @@ export function useRoomMapLogic() {
         setPage(1);
         setHasMore(pagination.page < pagination.totalPages);
       } catch (err) {
-        console.warn("⚠️ Không thể tải dữ liệu phòng:", err);
         setRooms(roomsMock);
       }
     };
@@ -109,7 +108,6 @@ export function useRoomMapLogic() {
       setPage(page + 1);
       setHasMore(pagination.page < pagination.totalPages);
     } catch (err) {
-      console.warn("⚠️ Lỗi khi tải thêm phòng:", err);
     } finally {
       setLoadingMore(false);
     }
@@ -179,7 +177,6 @@ export function useRoomMapLogic() {
         { duration: 500 }
       );
     } catch (err) {
-      console.warn("⚠️ moveMarkerToVisibleCenter error:", err);
     }
   };
 

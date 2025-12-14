@@ -37,7 +37,6 @@ export default function Onboarding() {
         router.replace("/(tabs)/home");
       }, 100);
     } catch (error) {
-      console.error("Error saving guest mode:", error);
     }
   };
 

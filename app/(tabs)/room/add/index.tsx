@@ -107,7 +107,6 @@ export default function AddRoomIndex() {
         
         <TouchableOpacity
           onPress={() => {
-            console.log("🖱️ Bấm nút đăng phòng");
             handleSubmit();
           }}
           disabled={loadingSubmit}

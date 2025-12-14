@@ -45,7 +45,6 @@ export default function HostInfo({ room, contactHost }: any) {
     });
 
   } catch (error) {
-    console.error("Lỗi tạo chat:", error);
   }
 };
 

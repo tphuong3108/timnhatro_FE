@@ -24,7 +24,6 @@ export function useRoomLogic() {
       if (!id) return;
       try {
         setLoadingRoom(true);
-        console.log("🧭 Đang tải phòng theo slug:", id);
 
         const data = await roomApi.getRoomBySlug(id);
 
@@ -48,7 +47,6 @@ export function useRoomLogic() {
 
         setFavorited(!!data.isFavorited);
       } catch (err) {
-        console.warn("❌ Lỗi khi tải phòng:", err);
         Alert.alert("Lỗi", "Không thể tải thông tin phòng này.");
         router.back();
       } finally {
@@ -68,7 +66,6 @@ export function useRoomLogic() {
       setFavorited(!!data.isFavorited);
 
     } catch (err) {
-      console.warn("⚠️ Không thể refresh trạng thái phòng:", err);
     }
   };
 
@@ -82,7 +79,6 @@ export function useRoomLogic() {
           setUserLocation(loc.coords);
         }
       } catch (error) {
-        console.warn("⚠️ Không thể lấy vị trí người dùng:", error);
       } finally {
         setLoadingLoc(false);
       }

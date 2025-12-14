@@ -38,7 +38,6 @@ export default function Profile() {
       const data = await profileApi.getMyProfile();
       setUser(data);
     } catch (error) {
-      console.error("Fetch profile error:", error);
       Alert.alert("Lỗi", "Không thể tải hồ sơ người dùng.");
     } finally {
       setLoading(false);

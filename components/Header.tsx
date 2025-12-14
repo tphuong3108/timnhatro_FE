@@ -53,7 +53,6 @@ export default function Header() {
       const count = await notificationApi.getUnreadCount();
       setUnread(count);
     } catch (e) {
-      console.log("Load unread error:", e);
     }
   };
   loadUnread();

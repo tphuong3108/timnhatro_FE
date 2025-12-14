@@ -39,7 +39,6 @@ export default function HostPaymentHistory() {
             const response = await paymentApi.getHostPaymentHistory(queryParams);
             setPayments(response.data.data || []);
         } catch (error) {
-            console.error("Lỗi lấy lịch sử giao dịch:", error);
         } finally {
             setLoading(false);
         }

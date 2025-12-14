@@ -55,7 +55,6 @@ export default function Banner({
       setLiked((prev: boolean) => !prev);
       await refreshRoomStatus?.();
     } catch (error: any) {
-      console.error(" Lỗi khi like phòng:", error);
       Alert.alert("Lỗi", "Không thể cập nhật trạng thái thả tim.");
     }
   };
@@ -77,7 +76,6 @@ export default function Banner({
 
       await refreshRoomStatus?.();
     } catch (error: any) {
-      console.error("❌ Lỗi Favorites:", error?.response?.data || error);
       Alert.alert("Lỗi", "Không thể cập nhật danh sách yêu thích.");
     }
   };

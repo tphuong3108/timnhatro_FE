@@ -25,7 +25,6 @@ export default function ChatListScreen() {
       const chatsData = await chatService.getUserChats();
       setChats(Array.isArray(chatsData) ? chatsData : []);
     } catch (error) {
-      console.error("Lỗi khi tải danh sách chat:", error);
       setChats([]);
     } finally {
       setLoading(false);

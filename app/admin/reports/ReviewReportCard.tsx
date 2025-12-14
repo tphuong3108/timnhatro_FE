@@ -12,6 +12,12 @@ interface ReviewReport {
   reviewer: string;
   rating: number;
   status: "approved" | "pending" | "rejected";
+  reports: Array<{
+    [x: string]: string;
+    userId: string;
+    reason: string;
+    reportedAt: string;
+  }>;
 }
 
 interface Props {
@@ -29,16 +35,14 @@ export default function ReviewReportCard({
 }: Props) {
   const router = useRouter();
 
-  if (!review) return null; // ✅ tránh crash nếu dữ liệu lỗi
+  if (!review) return null;
 
   const handleNavigate = () => {
     const slug = roomSlug || review.roomSlug;
     if (!slug) {
       Alert.alert("Không thể mở chi tiết phòng", "Slug bị thiếu hoặc không hợp lệ.");
-      console.warn("⚠️ roomSlug bị thiếu:", review);
       return;
     }
-    console.log("🧭 Đang tải phòng theo slug:", slug);
     router.push(`/room/${slug}` as any);
   };
 
@@ -68,8 +72,19 @@ export default function ReviewReportCard({
           Người đánh giá: {review.reviewer}
         </Text>
         <Text className="text-gray-500 text-[13px] mt-1">
-          Báo cáo bởi: {review.reportedBy}
+          Báo cáo bởi: {review.reports[0].reportedByName || review.reportedBy}
         </Text>
+
+        {/* Hiển thị lý do báo cáo */}
+        {review.reports && review.reports.length > 0 && (
+          <View className="mt-2">
+            <Text className="text-gray-700 text-[13px] font-semibold">
+              Lý do báo cáo:
+            </Text>
+            <Text className="text-gray-500 text-[13px]">{review.reports[0].reason}</Text>
+          </View>
+        )}
+
         <Text className="text-gray-700 text-[13px] leading-5 mt-2">
           “{review.reviewText}”
         </Text>
@@ -78,7 +93,7 @@ export default function ReviewReportCard({
       {/* Footer */}
       <View className="flex-row justify-between items-center mt-4 pt-3 border-t border-gray-100">
         <Text className="text-[#3F72AF] font-semibold text-sm">
-          ★ {review.rating.toFixed(1)}
+          ★ {(review.rating && !isNaN(review.rating)) ? review.rating.toFixed(1) : '5.0'}
         </Text>
 
         {review.status === "pending" ? (

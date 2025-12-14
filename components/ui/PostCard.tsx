@@ -58,7 +58,6 @@ export default function PostCard({ item, onDeleted, showActions }: RoomCardProps
           setIsOwner(false);
         }
       } catch (err) {
-        console.log("Error decoding token:", err);
       }
     };
     checkOwner();
@@ -94,7 +93,6 @@ export default function PostCard({ item, onDeleted, showActions }: RoomCardProps
             Alert.alert("Success", "Room has been deleted!");
             onDeleted?.();
           } catch (err: any) {
-            console.log("Error deleting room:", err?.response?.data || err);
             Alert.alert("Error", "Could not delete the room, please try again.");
           }
         },

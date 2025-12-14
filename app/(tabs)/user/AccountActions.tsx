@@ -17,21 +17,17 @@ export default function AccountActions() {
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState<any>(null);
 
-  // 🧭 Lấy thông tin người dùng
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        // Ưu tiên gọi hostApi.getMe (nếu là host)
         const res = await hostApi.getMe();
         setUser(res);
       } catch (err) {
-        console.log("❌ Không thể lấy thông tin người dùng:", err);
       }
     };
     fetchUser();
   }, []);
 
-  // 🚪 Đăng xuất
   const handleLogout = async () => {
     Alert.alert("Đăng xuất", "Bạn có chắc muốn đăng xuất không?", [
       { text: "Hủy", style: "cancel" },

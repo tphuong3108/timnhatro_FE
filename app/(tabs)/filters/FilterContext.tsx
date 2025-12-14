@@ -61,12 +61,9 @@ export function FilterProvider({ children }: { children: ReactNode }) {
       if (filters.totalRatings > 0)
         params.totalRatings = Number(filters.totalRatings);
 
-      console.log(" Sending search params:", params);
-
       const res = await roomApi.searchRooms(params);
       setFilteredRooms(res || []);
     } catch (error: any) {
-      console.error(" Lỗi khi lọc phòng:", error.response?.data || error.message);
       setFilteredRooms([]);
     }
   };

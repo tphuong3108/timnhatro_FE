@@ -56,7 +56,6 @@ export function useRoomReportData() {
 
       setRooms(mapped);
     } catch (error) {
-      console.error("❌ Lỗi khi tải báo cáo phòng:", error);
     } finally {
       setLoading(false);
     }

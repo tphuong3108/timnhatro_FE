@@ -14,7 +14,6 @@ export default function AreaSelector() {
         const data = await getAllWards();
         setWards(data);
       } catch (error) {
-        console.error(" Lỗi khi lấy danh sách phường:", error);
       }
     };
     fetchWards();

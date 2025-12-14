@@ -46,7 +46,6 @@ useEffect(() => {
       const res = await bookingApi.checkUserBookedRoom(room._id);
       setHasBooked(res.data.booked);
     } catch (err) {
-      console.log("Lỗi kiểm tra booking:", err);
     } finally {
       setCheckingBooked(false);
     }

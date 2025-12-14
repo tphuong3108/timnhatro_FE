@@ -60,7 +60,6 @@ export default function AmenitiesList({
 
         setAmenities(mapped);
       } catch (error) {
-        console.error("❌ Lỗi khi lấy danh sách tiện nghi:", error);
         setAmenities([]);
       } finally {
         setLoading(false);

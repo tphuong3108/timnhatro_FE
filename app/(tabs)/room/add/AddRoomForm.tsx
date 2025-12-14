@@ -29,7 +29,6 @@ export default function AddRoomForm({
       const data = await res.json();
       setSuggestions(data);
     } catch (err) {
-      console.log("Error fetching suggestions:", err);
     }
   };
 

@@ -11,7 +11,6 @@ export default function EditRoomForm({ roomData, setRoomData }: any) {
       const res = await apiClient.get("/wards");
       setWards(res.data);
     } catch (err) {
-      console.log("❌ Lỗi load wards:", err);
     }
   };
   loadWards();

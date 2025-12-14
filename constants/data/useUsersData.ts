@@ -17,7 +17,6 @@ export const useUsersData = () => {
 
       setUsers(mappedUsers);
     } catch (error) {
-      console.error("❌ Lỗi khi tải người dùng:", error);
     } finally {
       setLoading(false);
     }
@@ -28,7 +27,6 @@ export const useUsersData = () => {
       await adminApi.toggleUserActive(id);
       await fetchUsers();
     } catch (error) {
-      console.error("❌ Lỗi khi cập nhật trạng thái người dùng:", error);
     }
   };
 

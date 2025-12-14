@@ -50,7 +50,6 @@ export default function AdminPaymentHistory() {
       const response = await paymentApi.getAdminPaymentHistory(queryParams);
       setPayments(response.data.data || []);
     } catch (error) {
-      console.error("Lỗi lấy lịch sử giao dịch admin:", error);
     } finally {
       setLoading(false);
     }

@@ -1,16 +1,16 @@
-import React, { useEffect, useState, useRef } from "react";
+import { roomApi } from "@/services/roomApi";
+import { Ionicons } from "@expo/vector-icons";
+import * as Location from "expo-location";
+import { useRouter } from "expo-router";
+import React, { useEffect, useRef, useState } from "react";
 import {
+  ActivityIndicator,
   Animated,
-  View,
+  ImageBackground,
   Text,
   TouchableOpacity,
-  ImageBackground,
-  ActivityIndicator,
+  View,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
-import * as Location from "expo-location";
-import { roomApi } from "@/services/roomApi";
 
 const CARD_WIDTH = 180;
 const CARD_HEIGHT = 200;
@@ -26,7 +26,6 @@ export default function NearbyRooms() {
   useEffect(() => {
     (async () => {
       try {
-        console.log("🔄 Bắt đầu tải phòng gần đây...");
         const { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== "granted") {
           setError(" Vui lòng bật quyền truy cập vị trí để xem phòng gần bạn");
@@ -36,31 +35,16 @@ export default function NearbyRooms() {
 
         const location = await Location.getCurrentPositionAsync({});
         const { latitude, longitude } = location.coords;
-        console.log(" Vị trí hiện tại của bạn:", { latitude, longitude });
 
         // Gọi API lấy phòng gần đây
         const res = await roomApi.getNearbyRooms(latitude, longitude, 20000);
-        console.log(" Dữ liệu trả về từ API getNearbyRooms:", res);
 
         if (Array.isArray(res) && res.length > 0) {
-          res.forEach((room, idx) => {
-            console.log(` Phòng #${idx + 1}:`, {
-              id: room._id,
-              name: room.name,
-              location: room.location,
-              distance: room.distance,
-              avgRating: room.avgRating,
-              totalLikes: room.totalLikes,
-              viewCount: room.viewCount,
-            });
-          });
           setRooms(res);
         } else {
-          console.log(" Không có phòng nào được trả về!");
           setRooms([]);
         }
       } catch (err) {
-        console.error(" Lỗi khi tải phòng gần đây:", err);
         setError("Đã có lỗi xảy ra khi tải dữ liệu phòng gần đây");
       } finally {
         setLoading(false);

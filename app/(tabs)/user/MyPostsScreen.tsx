@@ -20,7 +20,6 @@ export default function MyPostsScreen() {
       const data = await res.json();
       setRooms(data.data?.rooms || []);
     } catch (err) {
-      console.log("❌ Lỗi load rooms:", err);
       Toast.show({
         type: "error",
         text1: "Không thể tải danh sách phòng!",
@@ -66,7 +65,6 @@ export default function MyPostsScreen() {
               });
             }
           } catch (err) {
-            console.log("❌ Lỗi xóa:", err);
             Toast.show({
               type: "error",
               text1: "Không thể xóa phòng!",
