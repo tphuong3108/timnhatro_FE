@@ -109,10 +109,16 @@ export const roomApi = {
   const res = await apiClient.get(`/rooms/${id}/premium-status`);
   return res.data.data;
 },
-updateRoom: async (id: string, data: any) => {
-  const res = await apiClient.patch(`/rooms/${id}/update`, data);
-  return res.data.data;
+updateRoom: async (id: string, formData: FormData) => {
+  const res = await apiClient.patch(`/hosts/rooms/${id}`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+    transformRequest: (data) => data,
+  });
+  return res.data;
 },
+
 
 
 };
