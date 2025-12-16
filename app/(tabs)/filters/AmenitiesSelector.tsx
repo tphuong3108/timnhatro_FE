@@ -34,25 +34,48 @@ function useRippleAnimation(index: number) {
   return animatedStyle;
 }
 
-// 🎨 Danh sách keyword map sang icon
+// Danh sách keyword map sang icon
 const ICON_MAP = [
-  { keywords: ["wifi"], icon: "wifi-outline", type: "Ionicons" },
-  { keywords: ["tivi", "tv"], icon: "tv-outline", type: "Ionicons" },
+  // --- Nhóm điện tử & Gia dụng ---
+  { keywords: ["wifi", "internet", "mạng"], icon: "wifi-outline", type: "Ionicons" },
+  { keywords: ["tivi", "tv", "truyền hình"], icon: "tv-outline", type: "Ionicons" },
   { keywords: ["điều hòa", "máy lạnh"], icon: "snowflake", type: "Material" },
-  { keywords: ["máy giặt"], icon: "washing-machine", type: "Material" },
-  { keywords: ["bếp", "nấu ăn"], icon: "stove", type: "Material" },
+  { keywords: ["máy giặt", "giặt là"], icon: "washing-machine", type: "Material" },
   { keywords: ["tủ lạnh"], icon: "fridge-outline", type: "Material" },
-  { keywords: ["xe", "ô tô"], icon: "car-outline", type: "Ionicons" },
-  { keywords: ["ban công"], icon: "balcony", type: "Material" },
+  { keywords: ["nóng lạnh", "bình nước nóng", "máy nước nóng"], icon: "water-thermometer", type: "Material" },  
+  { keywords: ["máy báo khói", "báo khói", "khói"], icon: "smoke-detector", type: "Material" },
+
+  // --- Nhóm nội thất & Cấu trúc phòng ---
+  { keywords: ["bếp", "nấu ăn"], icon: "stove", type: "Material" },
+  { keywords: ["làm việc", "bàn làm việc"], icon: "briefcase", type: "Material" },
+  { keywords: ["gác", "gác lửng"], icon: "stairs", type: "Material" },  
+  { keywords: ["vệ sinh", "toilet", "wc"], icon: "toilet", type: "Material" },  
+  { keywords: ["phòng tắm", "tắm", "vòi sen"], icon: "shower", type: "Material" },  
   { keywords: ["bồn tắm"], icon: "bathtub", type: "Material" },
-  { keywords: ["gym"], icon: "dumbbell", type: "Material" },
+  { keywords: ["giường", "nệm", "đệm"], icon: "bed", type: "Material" },  
+  { keywords: ["tủ áo", "tủ quần áo", "quần áo"], icon: "wardrobe", type: "Material" },  
+  { keywords: ["ban công", "sân nhỏ"], icon: "balcony", type: "Material" },
+
+  // --- Nhóm tiện ích chung & An ninh ---
+  { keywords: ["xe", "ô tô", "bãi đậu xe", "để xe"], icon: "car-outline", type: "Ionicons" },
+  { keywords: ["thang máy"], icon: "elevator", type: "Material" },  
+  { keywords: ["camera", "camera an ninh"], icon: "cctv", type: "Material" },  
+  { keywords: ["an ninh", "bảo vệ"], icon: "shield-account", type: "Material" },
+  { keywords: ["chữa cháy", "bình chữa cháy"], icon: "fire-extinguisher", type: "Material" },
+  { keywords: ["sơ cứu", "y tế"], icon: "medical-bag", type: "Material" },
+  { keywords: ["gym", "thể dục"], icon: "dumbbell", type: "Material" },
   { keywords: ["hồ bơi", "bể bơi"], icon: "pool", type: "Material" },
-  { keywords: ["khói"], icon: "smoke-detector", type: "Material" },
-  { keywords: ["an ninh"], icon: "shield-account", type: "Material" },
-  { keywords: ["sơ cứu"], icon: "medical-bag", type: "Material" },
-  { keywords: ["chữa cháy"], icon: "fire-extinguisher", type: "Material" },
-  { keywords: ["làm việc"], icon: "briefcase", type: "Material" },
-  { keywords: ["ăn uống"], icon: "silverware-fork-knife", type: "Material" },
+  { keywords: ["sân vườn", "cây xanh"], icon: "tree", type: "Material" },  
+  { keywords: ["ăn uống", "bàn ăn"], icon: "silverware-fork-knife", type: "Material" },
+
+  // --- Nhóm môi trường xung quanh ---
+  { keywords: ["chợ"], icon: "storefront-outline", type: "Ionicons" },
+  { keywords: ["siêu thị"], icon: "cart-outline", type: "Ionicons" },
+  { keywords: ["bệnh viện", "cơ sở y tế"], icon: "hospital-box-outline", type: "Material" },
+  { keywords: ["trường", "học", "đại học"], icon: "school-outline", type: "Ionicons" },
+  { keywords: ["công viên"], icon: "pine-tree", type: "Material" },
+  { keywords: ["bus", "xe buýt", "bến xe"], icon: "bus-outline", type: "Ionicons" },
+  { keywords: ["thể thao", "sân vận động"], icon: "run", type: "Material" },
 ];
 
 function getIconForAmenity(name: string) {
