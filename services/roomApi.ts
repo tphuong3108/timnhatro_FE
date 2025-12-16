@@ -47,7 +47,7 @@ export const roomApi = {
 
   //  Like phòng (đúng route backend PATCH /rooms/:id)
   likeRoom: async (id: string) => {
-    const res = await apiClient.patch(`/rooms/${id}`);
+    const res = await apiClient.patch(`/rooms/${id}/like`);
     return res.data.data;
   },
   

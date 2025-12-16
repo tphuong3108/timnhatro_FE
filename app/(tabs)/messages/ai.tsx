@@ -1,17 +1,16 @@
-import React, { useState, useRef, useEffect } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import React, { useEffect, useRef, useState } from "react";
 import {
-  View,
-  Text,
-  FlatList,
-  KeyboardAvoidingView,
-  Platform,
-  SafeAreaView,
-  Image,
+    FlatList,
+    KeyboardAvoidingView,
+    Platform,
+    SafeAreaView,
+    Text,
+    View
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import MessageBubble from "./components/MessageBubble";
-import { useAuth } from "@/contexts/AuthContext";
 import { aiService } from "../../../services/aiService";
+import MessageBubble from "./components/MessageBubble";
 import MessageInputAI from "./components/MessageInputAI";
 
 export default function ChatAI() {
@@ -55,6 +54,7 @@ export default function ChatAI() {
       text,
       createdAt: new Date(),
       user: currentUser,
+      rooms: [],
     };
 
     setMessages((prev) => [...prev, userMsg]);
@@ -65,6 +65,7 @@ export default function ChatAI() {
       text: "Đang trả lời...",
       createdAt: new Date(),
       user: AI_BOT,
+      rooms: [],
     };
 
     setMessages((prev) => [...prev, typingMsg]);
@@ -77,6 +78,7 @@ export default function ChatAI() {
         text: res.data.reply,
         createdAt: new Date(),
         user: AI_BOT,
+        rooms: res.data.rooms || [], // Lưu rooms array từ API
       };
 
       setMessages((prev) => prev.filter((m) => m._id !== typingId));
@@ -90,6 +92,7 @@ export default function ChatAI() {
           text: "AI gặp lỗi, thử lại sau.",
           createdAt: new Date(),
           user: AI_BOT,
+          rooms: [],
         },
       ]);
     }
@@ -117,6 +120,7 @@ export default function ChatAI() {
                   avatar={isMe ? undefined : item.user?.avatar}
                   isMe={isMe}
                   createdAt={item.createdAt}
+                  rooms={item.rooms}
                 />
               </View>
             );
