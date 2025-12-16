@@ -4,7 +4,7 @@ import { Platform } from "react-native";
 
 // IP máy tính 
 
-const LOCAL_IP = "192.168.1.113";
+const LOCAL_IP = "192.168.1.147";
 const PORT = 5050;
 
 //  Cấu hình chính xác cho mọi môi trường
