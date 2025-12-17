@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from "react";
-import { ScrollView, View, ActivityIndicator, Text } from "react-native";
-import { hostApi } from "@/services/hostApi";
-import ChartCardWrapper from "@/components/admin/ChartCardWrapper";
 import PieChartCard from "@/app/admin/dashboard/PieChartCard";
 import StatCard from "@/app/admin/dashboard/StatCard";
 import TopView from "@/app/admin/dashboard/TopView";
 import WardBarChart from "@/app/admin/dashboard/WardBarChart";
+import { hostApi } from "@/services/hostApi";
+import React, { useEffect, useState } from "react";
+import { ActivityIndicator, ScrollView, Text, View } from "react-native";
 
 export default function HostStatsScreen() {
   const [loading, setLoading] = useState(true);
@@ -23,7 +22,20 @@ export default function HostStatsScreen() {
         ]);
         setOverview(overviewRes);
         setDailyStats(dailyRes);
-        setTopRooms(topRoomsRes);
+        
+        // Chuẩn hóa dữ liệu topRooms (xử lý cấu trúc lồng nhau)
+        const normalizedRooms = (topRoomsRes || []).map((item: any) => {
+          // Nếu dữ liệu có cấu trúc { room: {...}, viewCount: ... }
+          if (item.room) {
+            return {
+              ...item.room,
+              viewCount: item.viewCount || item.room.viewCount || 0,
+            };
+          }
+          // Nếu dữ liệu là phòng trực tiếp
+          return item;
+        });
+        setTopRooms(normalizedRooms);
       } catch (err) {
       } finally {
         setLoading(false);

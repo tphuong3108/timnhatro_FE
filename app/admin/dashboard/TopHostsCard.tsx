@@ -1,7 +1,8 @@
-import React from "react";
-import { View, Text, Image, FlatList, useWindowDimensions } from "react-native";
-import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import ChartCardWrapper from "@/components/admin/ChartCardWrapper";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
+import React from "react";
+import { FlatList, Image, Text, TouchableOpacity, useWindowDimensions, View } from "react-native";
 
 interface Host {
   userId: string;
@@ -14,8 +15,9 @@ interface Host {
 export default function TopHostsCard({ data }: { data: Host[] }) {
   const { width } = useWindowDimensions();
   const isSmall = width < 360;
+  const router = useRouter();
 
-  // ✅ Nếu không có data thì hiển thị "Chưa có dữ liệu"
+  //  Nếu không có data thì hiển thị "Chưa có dữ liệu"
   if (!data || data.length === 0) {
     return (
       <ChartCardWrapper height={110} style={{ padding: 15 }}>
@@ -27,7 +29,7 @@ export default function TopHostsCard({ data }: { data: Host[] }) {
     );
   }
 
-  // ✅ Luôn hiển thị những host có sẵn (tối đa 5)
+  //  Luôn hiển thị những host có sẵn (tối đa 5)
   const displayedData = data
     .slice(0, 5)
     .map((item) => ({
@@ -37,6 +39,12 @@ export default function TopHostsCard({ data }: { data: Host[] }) {
           ? item.avatar
           : "https://cdn-icons-png.flaticon.com/512/149/149071.png", // avatar giả
     }));
+
+  const handleHostPress = (userId: string) => {
+    if (userId) {
+      router.push(`/(tabs)/user/${userId}`);
+    }
+  };
 
   return (
     <ChartCardWrapper height={isSmall ? 110 : 150} style={{ padding: 15 }}>
@@ -54,7 +62,9 @@ export default function TopHostsCard({ data }: { data: Host[] }) {
           paddingHorizontal: 4,
         }}
         renderItem={({ item }) => (
-          <View
+          <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={() => handleHostPress(item.userId)}
             className={`items-center ${
               isSmall ? "mr-[10px] w-[80px]" : "mr-[14px] w-[90px]"
             }`}
@@ -94,9 +104,10 @@ export default function TopHostsCard({ data }: { data: Host[] }) {
                 {item.totalViews || 0}
               </Text>
             </View>
-          </View>
+          </TouchableOpacity>
         )}
       />
     </ChartCardWrapper>
   );
 }
+

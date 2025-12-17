@@ -1,14 +1,14 @@
-import React, { useEffect, useState, useRef } from "react";
-import {
-  Animated,
-  View,
-  Text,
-  TouchableOpacity,
-  ImageBackground,
-} from "react-native";
+import { roomApi } from "@/services/roomApi";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { roomApi } from "@/services/roomApi";
+import React, { useEffect, useRef, useState } from "react";
+import {
+  Animated,
+  ImageBackground,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 const CARD_WIDTH = 180;
 const CARD_HEIGHT = 200;
@@ -99,9 +99,12 @@ export default function RoomCarousel({ rooms: propRooms = [] }: any) {
               <TouchableOpacity
                 activeOpacity={0.9}
                 className="flex-1 rounded-2xl overflow-hidden shadow-md"
-                onPress={() =>
-                  router.push(`/room/${item.slug || item.roomId || item._id}`)
-                }
+                onPress={() => {
+                  const roomIdentifier = item.slug || item.roomId || item._id || item.id || item.room?._id || item.room?.slug;
+                  if (roomIdentifier) {
+                    router.push(`/(tabs)/room/${roomIdentifier}`);
+                  }
+                }}
               >
                 <ImageBackground
                   source={{ uri: imageUri }}

@@ -110,10 +110,6 @@ export default function useEditRoomLogic(roomId: string) {
       const res = await roomApi.updateRoom(roomId, formData);
       return { success: true, data: res };
     } catch (err: any) {
-      console.log(
-        " Lỗi update phòng:",
-        err?.response?.data || err
-      );
       return { success: false };
     }
   };

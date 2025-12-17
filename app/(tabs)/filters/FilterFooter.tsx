@@ -1,5 +1,6 @@
+import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-import { View, TouchableOpacity, Text } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 import { useFilter } from "./FilterContext";
 
 export default function FilterFooter() {
@@ -20,7 +21,10 @@ export default function FilterFooter() {
         activeOpacity={0.8}
         className="bg-[#3F72AF] px-6 py-2 rounded-xl"
       >
-        <Text className="text-white font-semibold">Hiện kết quả</Text>
+        <View className="flex-row items-center justify-center">
+          <Ionicons name="search-outline" size={18} color="white" />
+          <Text className="text-white font-semibold ml-2">Hiện kết quả</Text>
+        </View>
       </TouchableOpacity>
     </View>
   );

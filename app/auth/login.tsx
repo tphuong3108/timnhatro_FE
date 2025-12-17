@@ -1,16 +1,17 @@
+import { useAuth } from "@/contexts/AuthContext";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Href, useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-  ActivityIndicator,
-  Alert,
-  KeyboardAvoidingView,
-  Platform,
-  SafeAreaView,
-  Text,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    Alert,
+    KeyboardAvoidingView,
+    Platform,
+    SafeAreaView,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
 import AppleIcon from "../../assets/images/apple.svg";
@@ -18,7 +19,6 @@ import FacebookIcon from "../../assets/images/facebook.svg";
 import GoogleIcon from "../../assets/images/google.svg";
 import Logo from "../../assets/images/logodoc.svg";
 import InputField from "../../components/InputField";
-import { useAuth } from "@/contexts/AuthContext";
 
 import apiClient from "@/services/apiClient";
 
@@ -39,7 +39,7 @@ export default function Login() {
 
     try {
       setLoading(true);
-      const res = await apiClient.post("users/login", { email, password });
+      const res = await apiClient.post("/users/login", { email, password });
       const { accessToken, userData } = res.data;
       const user = userData || res.data.user; 
 
