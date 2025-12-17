@@ -5,7 +5,6 @@ import {
   Inter_700Bold,
 } from "@expo-google-fonts/inter";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { DefaultTheme, ThemeProvider } from "@react-navigation/native";
 import * as Font from "expo-font";
 import { Stack, useRouter } from "expo-router";
@@ -37,18 +36,8 @@ export default function RootLayout() {
           ...AntDesign.font,
         });
 
-        const [token, guestMode] = await Promise.all([
-          AsyncStorage.getItem("token"),
-          AsyncStorage.getItem("guestMode"),
-        ]);
-
-        // Chỉ bỏ qua intro nếu đã đăng nhập hoặc chọn khách
-        if (token || guestMode) {
-          setInitialRoute("/(tabs)");
-        } else {
-          setInitialRoute("/");
-        }
-      } catch (err) {
+        setInitialRoute("/");
+      } catch {
       } finally {
         setAppReady(true);
       }
@@ -65,7 +54,7 @@ export default function RootLayout() {
         SplashScreen.hideAsync().catch(() => {});
       }, Platform.OS === "web" ? 100 : 0);
     }
-  }, [appReady, initialRoute]);
+  }, [appReady, initialRoute, router]);
 
   if (!appReady) {
     return (

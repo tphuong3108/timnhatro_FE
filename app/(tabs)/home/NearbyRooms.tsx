@@ -93,7 +93,7 @@ export default function NearbyRooms() {
         snapToInterval={CARD_WIDTH + SPACING}
         snapToAlignment="center"
         keyExtractor={(item) => item._id}
-        contentContainerStyle={{ paddingHorizontal: 20 }}
+        contentContainerStyle={{ paddingHorizontal: 12 }}
         ItemSeparatorComponent={() => <View style={{ width: SPACING }} />}
         renderItem={({ item }) => (
           <TouchableOpacity

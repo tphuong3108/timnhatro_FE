@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
+import { useAuth } from "@/constants/auth/AuthContext";
+import { roomApi } from "@/services/roomApi";
 import * as Location from "expo-location";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import { useEffect, useState } from "react";
 import { Alert, Linking, Share } from "react-native";
-import { roomApi } from "@/services/roomApi";
-import { useAuth } from "@/constants/auth/AuthContext";
 
 export function useRoomLogic() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -25,7 +25,12 @@ export function useRoomLogic() {
       try {
         setLoadingRoom(true);
 
-        const data = await roomApi.getRoomBySlug(id);
+        let data;
+        try {
+          data = await roomApi.getRoomBySlug(id);
+        } catch {
+          data = await roomApi.getRoomById(id);
+        }
 
         const normalizedRoom = {
           ...data,
@@ -57,7 +62,6 @@ export function useRoomLogic() {
     fetchRoom();
   }, [id, user?._id, router]);
 
-  //  Làm mới trạng thái like/lưu
   const refreshRoomStatus = async () => {
     if (!id) return;
     try {

@@ -64,8 +64,8 @@ export default function RoomCarousel({ rooms: propRooms = [] }: any) {
         decelerationRate="fast"
         snapToInterval={CARD_WIDTH + SPACING}
         snapToAlignment="center"
-        keyExtractor={(item) => item._id || item.roomId}
-        contentContainerStyle={{ paddingHorizontal: 20 }}
+        keyExtractor={(item, index) => `${item._id || item.roomId || 'room'}-${index}`}
+        contentContainerStyle={{ paddingHorizontal: 12 }}
         ItemSeparatorComponent={() => <View style={{ width: SPACING }} />}
         onScroll={Animated.event(
           [{ nativeEvent: { contentOffset: { x: scrollX } } }],
@@ -100,9 +100,19 @@ export default function RoomCarousel({ rooms: propRooms = [] }: any) {
                 activeOpacity={0.9}
                 className="flex-1 rounded-2xl overflow-hidden shadow-md"
                 onPress={() => {
-                  const roomIdentifier = item.slug || item.roomId || item._id || item.id || item.room?._id || item.room?.slug;
+                  const roomIdentifier = 
+                    item.slug || 
+                    item.roomId || 
+                    item._id || 
+                    item.id || 
+                    item.Id ||
+                    item._Id ||
+                    item.room?._id || 
+                    item.room?.slug ||
+                    item.room?.id;
+                  
                   if (roomIdentifier) {
-                    router.push(`/(tabs)/room/${roomIdentifier}`);
+                    router.push(`/(tabs)/room/${roomIdentifier}` as any);
                   }
                 }}
               >

@@ -29,11 +29,18 @@ export default function HostStatsScreen() {
           if (item.room) {
             return {
               ...item.room,
+              _id: item.room._id || item.roomId || item._id,
+              roomId: item.roomId || item.room._id || item._id,
+              slug: item.room.slug || item.slug,
               viewCount: item.viewCount || item.room.viewCount || 0,
             };
           }
           // Nếu dữ liệu là phòng trực tiếp
-          return item;
+          return {
+            ...item,
+            _id: item._id || item.roomId,
+            roomId: item.roomId || item._id,
+          };
         });
         setTopRooms(normalizedRooms);
       } catch (err) {

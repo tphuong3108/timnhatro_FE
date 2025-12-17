@@ -1,83 +1,101 @@
-import React from "react";
-import { View, Text, FlatList, ImageBackground, Dimensions } from "react-native";
+import { roomApi } from "@/services/roomApi";
+import { useRouter } from "expo-router";
+import React, { useCallback, useEffect, useState } from "react";
+import { ActivityIndicator, Dimensions, FlatList, ImageBackground, Text, TouchableOpacity, View } from "react-native";
 
 const { width } = Dimensions.get("window");
 const CARD_WIDTH = width / 4.5;
 
-const categories = [
-  {
-    id: "1",
-    title: "Phòng trọ sinh viên",
-    image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=60",
-  },
-  {
-    id: "2",
-    title: "Phòng trọ có gác rộng rãi thoáng mát",
-    image: "https://i.pinimg.com/736x/38/5b/f1/385bf135d2248704a163b95314da6a12.jpg",
-  },
-  {
-    id: "3",
-    title: "Phòng trọ giá rẻ",
-    image: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=800&q=60",
-  },
-  {
-    id: "4",
-    title: "Căn hộ dịch vụ",
-    image: "https://images.unsplash.com/photo-1560448075-bb485b067938?auto=format&fit=crop&w=800&q=60",
-  },
-  {
-    id: "5",
-    title: "Phòng full nội thất",
-    image: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=800&q=60",
-  },
-  {
-    id: "6",
-    title: "Phòng gần trường",
-    image: "https://i.pinimg.com/1200x/16/a4/2b/16a42b4be52177dbfc69f2b40576827a.jpg",
-  },
-  {
-    id: "7",
-    title: "Phòng mới xây",
-    image: "https://i.pinimg.com/736x/38/5b/f1/385bf135d2248704a163b95314da6a12.jpg",
-  },
-];
-
 export default function CategoryList() {
+  const router = useRouter();
+  const [topRooms, setTopRooms] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchTopRooms = useCallback(async () => {
+    try {
+      setLoading(true);
+      // Dùng getHotRooms giống RoomCarousel
+      const res = await roomApi.getHotRooms();
+      setTopRooms((res || []).slice(0, 7));
+    } catch (error) {
+      console.error("Failed to fetch hot rooms:", error);
+      setTopRooms([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchTopRooms();
+  }, [fetchTopRooms]);
+
+  const handleRoomPress = (item: any) => {
+    const roomId = item.slug || item._id;
+    router.push(`/(tabs)/room/${roomId}`);
+  };
+
+  if (loading) {
+    return (
+      <View className="flex-row justify-center items-center py-4">
+        <ActivityIndicator size="small" color="#3F72AF" />
+      </View>
+    );
+  }
+
+  if (!topRooms || topRooms.length === 0) {
+    return (
+      <View className="px-5 items-center py-4">
+        <Text className="text-gray-500 text-sm italic">
+          Chưa có phòng xu hướng
+        </Text>
+      </View>
+    );
+  }
+
   return (
     <FlatList
-      data={categories}
+      data={topRooms}
       horizontal
       showsHorizontalScrollIndicator={false}
-      keyExtractor={(item) => item.id}
+      keyExtractor={(item, index) => `${item._id || item.roomId || 'room'}-${index}`}
       contentContainerStyle={{
-        paddingHorizontal: 12,
         paddingVertical: 8,
       }}
-      renderItem={({ item }) => (
-        <View className="items-center mx-1.5" style={{ width: CARD_WIDTH }}>
-          <ImageBackground
-            source={{ uri: item.image }}
-            resizeMode="cover"
-            className="w-[80px] h-[80px] rounded-2xl overflow-hidden shadow-sm justify-end"
-            imageStyle={{ borderRadius: 16 }}
-          >
-            <View className="absolute inset-0 bg-black/10 rounded-2xl" />
-          </ImageBackground>
+      renderItem={({ item }) => {
+        // Giống RoomCarousel: check cả image và images
+        const imageUrl = item.image || item.images?.[0] || "https://via.placeholder.com/150";
+        const title = item.name || "Phòng trọ";
 
-          <Text
-            numberOfLines={1}
-            ellipsizeMode="tail"
-            className="text-center text-gray-700 font-medium mt-1"
-            style={{
-              fontSize: width > 400 ? 12 : 10,
-              lineHeight: 14,
-              maxWidth: CARD_WIDTH * 0.95,
-            }}
+        return (
+          <TouchableOpacity 
+            onPress={() => handleRoomPress(item)}
+            className="items-center mx-1.5" 
+            style={{ width: CARD_WIDTH }}
           >
-            {item.title}
-          </Text>
-        </View>
-      )}
+            <ImageBackground
+              source={{ uri: imageUrl }}
+              resizeMode="cover"
+              className="w-[80px] h-[80px] rounded-2xl overflow-hidden shadow-sm justify-end"
+              imageStyle={{ borderRadius: 16 }}
+            >
+              <View className="absolute inset-0 bg-black/10 rounded-2xl" />
+            </ImageBackground>
+
+            <Text
+              numberOfLines={1}
+              ellipsizeMode="tail"
+              className="text-center text-gray-700 font-medium mt-1"
+              style={{
+                fontSize: width > 400 ? 12 : 10,
+                lineHeight: 14,
+                maxWidth: CARD_WIDTH * 0.95,
+              }}
+            >
+              {title}
+            </Text>
+          </TouchableOpacity>
+        );
+      }}
     />
   );
 }

@@ -5,6 +5,7 @@ import AmenitiesList from "./AmenitiesList";
 import CategoryList from "./CategoryList";
 import HomeBanner from "./HomeBanner";
 import NearbyRooms from "./NearbyRooms";
+import RoomCarousel from "./RoomCarousel";
 import SectionHeader from "./SectionHeader";
 import ServicesSection from "./ServicesSection";
 import SloganSection from "./SloganSection";
@@ -65,7 +66,13 @@ export default function Home() {
             <NearbyRooms />
           </View>
 
-          {/* 6. Tiện ích phổ biến */}
+          {/* 6. Top phòng nổi bật */}
+          <View>
+            <SectionHeader title="Top phòng nổi bật" />
+            <RoomCarousel />
+          </View>
+
+          {/* 7. Tiện ích phổ biến */}
           <View>
             <SectionHeader 
               title="Tiện ích phổ biến" 
@@ -75,19 +82,16 @@ export default function Home() {
             <AmenitiesList showAll={showAllAmenities} />
           </View>
 
-          {/* 7. Khách hàng nói gì */}
+          {/* 8. Khách hàng nói gì */}
           <View>
             <SectionHeader title="Khách hàng nói gì" hideViewAll />
             <TestimonialsSection />
           </View>
 
-          {/* 8. Slogan */}
+          {/* 9. Slogan */}
           <SloganSection />
         </View>
       </ScrollView>
     </SafeAreaView>
   );
 }
-
-
-
