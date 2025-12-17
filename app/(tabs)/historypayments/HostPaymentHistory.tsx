@@ -43,10 +43,18 @@ export default function HostPaymentHistory() {
             setLoading(false);
         }
     }, [filter.status]);
-
     useEffect(() => {
+    fetchPayments();
+}, [fetchPayments]);
+    useEffect(() => {
+    if (payments.length === 0) return;
+
+    const interval = setInterval(() => {
         fetchPayments();
-    }, [fetchPayments]);
+    }, 5000);
+
+    return () => clearInterval(interval);
+}, [payments.length, fetchPayments]);
 
     const getStatusColor = (status: string) => {
         if (status === "success") return "#3F72AF";

@@ -1,7 +1,10 @@
 // index.tsx
+import { profileApi } from "@/services/profileApi";
+import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -15,8 +18,6 @@ import CoverSection from "./CoverSection";
 import Favorites from "./Favorites";
 import InfoSection from "./InfoSection";
 import MyPosts from "./MyPosts";
-import { profileApi } from "@/services/profileApi";
-import { Ionicons } from "@expo/vector-icons";
 
 export default function Profile() {
   const router = useRouter();
@@ -44,9 +45,11 @@ export default function Profile() {
     }
   };
 
-  useEffect(() => {
-    fetchProfile();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      fetchProfile();
+    }, [])
+  );
 
   const handleBanAccount = async () => {
     Alert.alert("Khóa tài khoản", "Bạn chắc chắn muốn khóa tài khoản?", [
@@ -121,34 +124,43 @@ export default function Profile() {
           </Text>
         </TouchableOpacity>
         {user?.role?.toLowerCase() === "host" && (
-  <TouchableOpacity
-    onPress={() => router.push("/(tabs)/historypayments/HostPaymentHistory")}
-    activeOpacity={0.8}
-    className="border border-[#3F72AF] py-3 rounded-full flex-row justify-center items-center mt-4"
-  >
-    <Ionicons name="cash-outline" size={20} color="#3F72AF" />
-    <Text className="text-[#3F72AF] font-semibold text-[15px] ml-2">
-      Lịch sử giao dịch
-    </Text>
-  </TouchableOpacity>
-)}
+          <TouchableOpacity
+            onPress={() => router.push("/(tabs)/historypayments/HostPaymentHistory")}
+            activeOpacity={0.8}
+            className="border border-[#3F72AF] py-3 rounded-full flex-row justify-center items-center mt-4"
+          >
+            <Ionicons name="cash-outline" size={20} color="#3F72AF" />
+            <Text className="text-[#3F72AF] font-semibold text-[15px] ml-2">
+              Lịch sử giao dịch
+            </Text>
+          </TouchableOpacity>
+        )}
 
-          {user?.role?.toLowerCase() === "host" && (
-            <TouchableOpacity
-              onPress={() => router.push("/(tabs)/user/HostStatsScreen")}
-              className="border border-[#3F72AF] py-3 rounded-full flex-row justify-center items-center mt-4"
-            >
-              <Ionicons name="bar-chart-outline" size={20} color="#3F72AF" />
-              <Text className="text-[#3F72AF] font-semibold text-[15px] ml-2">
-                Xem thống kê
-              </Text>
-            </TouchableOpacity>
-          )}
+        {user?.role?.toLowerCase() === "host" && (
+          <TouchableOpacity
+            onPress={() => router.push("/(tabs)/user/HostStatsScreen")}
+            className="border border-[#3F72AF] py-3 rounded-full flex-row justify-center items-center mt-4"
+          >
+            <Ionicons name="bar-chart-outline" size={20} color="#3F72AF" />
+            <Text className="text-[#3F72AF] font-semibold text-[15px] ml-2">
+              Xem thống kê
+            </Text>
+          </TouchableOpacity>
+        )}
         <ActionButtons activeTab={activeTab} onChangeTab={setActiveTab} />
 
         <View className="mt-8">
           {activeTab === "posts" ? (
-            <MyPosts rooms={user?.myRooms || []} />
+            <MyPosts
+              rooms={user?.myRooms || []}
+              onDelete={(id: string) => {
+                setUser((prev: any) => ({
+                  ...prev,
+                  myRooms: (prev?.myRooms || []).filter((r: any) => r._id !== id),
+                }));
+              }}
+              onEdit={(id: string) => router.push(`/(tabs)/room/edit/${id}`)}
+            />
           ) : (
             <Favorites favorites={user?.favorites || []} />
           )}

@@ -1,9 +1,9 @@
-import { useState, useEffect, useRef, useCallback } from "react";
 import apiClient from "@/services/apiClient";
+import { roomApi } from "@/services/roomApi";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as ImagePicker from "expo-image-picker";
 import * as Location from "expo-location";
-import { roomApi } from "@/services/roomApi";
+import { useCallback, useEffect, useRef, useState } from "react";
 export default function useEditRoomLogic(roomId: string) {
   const [roomData, setRoomData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -53,27 +53,70 @@ export default function useEditRoomLogic(roomId: string) {
     didFetchRef.current = false;
     fetchRoomData();
   }, [fetchRoomData]);;
-  
-  const handleUpdateRoom = async (updatedData: any) => {
-  try {
-    const payload = {
-      name: updatedData.name,
-      price: Number(updatedData.price),
-      address: updatedData.address,
-      description: updatedData.description,
-      amenities: selectedAmenities,
-      ward: roomData?.ward,
 
-      location: updatedData.location
-        ? updatedData.location
-        : roomData?.location,
-    };
-    const res = await roomApi.updateRoom(roomId, payload);
-    return { success: true, data: res };
-  } catch (err: any) {
-    return { success: false };
-  }
-};
+  const handleUpdateRoom = async (updatedData: any) => {
+    try {
+      const formData = new FormData();
+
+      formData.append("name", updatedData.name || "");
+      formData.append("price", String(Number(updatedData.price || 0)));
+      formData.append("address", updatedData.address || "");
+      formData.append("description", updatedData.description || "");
+      // Append amenities as repeated fields so backend can receive array
+      if (selectedAmenities && selectedAmenities.length > 0) {
+        selectedAmenities.forEach((id) => formData.append("amenities[]", id));
+      }
+      formData.append("ward", roomData?.ward || "");
+
+      const locationValue = updatedData.location || roomData?.location || null;
+      if (locationValue) {
+        // send as nested form fields so body-parser can create an object
+        const coords = locationValue.coordinates || locationValue;
+        // coords expected as [lng, lat]
+        formData.append("location[type]", "Point");
+        formData.append("location[coordinates][0]", String(coords[0]));
+        formData.append("location[coordinates][1]", String(coords[1]));
+      }
+
+      // Separate existing remote images and new local images
+      const allImages: string[] = roomData?.images || [];
+      const existingImages: string[] = allImages.filter((u) => typeof u === "string" && u.startsWith("http"));
+      const newImages: string[] = allImages.filter((u) => typeof u === "string" && !u.startsWith("http"));
+
+      if (existingImages.length > 0) {
+        // send each existing image url as existingImages[] so backend receives array
+        existingImages.forEach((url) => formData.append("existingImages[]", url));
+      }
+
+      // Append local files (from Expo ImagePicker) to 'images' field
+      for (let i = 0; i < newImages.length; i++) {
+        const uri = newImages[i];
+        // Derive filename and type
+        const uriParts = uri.split("/");
+        const filename = uriParts[uriParts.length - 1] || `image_${i}.jpg`;
+        const match = filename.match(/\.(\w+)$/);
+        const ext = match ? match[1].toLowerCase() : "jpg";
+        const mimeType = ext === "mov" || ext === "mp4" ? `video/${ext}` : `image/${ext === "jpg" ? "jpeg" : ext}`;
+
+        // For React Native FormData, append file objects with { uri, name, type }
+        // @ts-ignore
+        formData.append("images", {
+          uri,
+          name: filename,
+          type: mimeType,
+        });
+      }
+
+      const res = await roomApi.updateRoom(roomId, formData);
+      return { success: true, data: res };
+    } catch (err: any) {
+      console.log(
+        " Lỗi update phòng:",
+        err?.response?.data || err
+      );
+      return { success: false };
+    }
+  };
 
 
   const pickMedia = async () => {
@@ -108,7 +151,7 @@ export default function useEditRoomLogic(roomId: string) {
     setRoomData((prev: any) => ({
       ...prev,
       marker: { latitude, longitude },
-      location: { coordinates: [longitude, latitude] },
+      location: { type: "Point", coordinates: [longitude, latitude] },
     }));
   };
 
@@ -127,7 +170,7 @@ export default function useEditRoomLogic(roomId: string) {
       setRoomData((prev: any) => ({
         ...prev,
         marker: { latitude, longitude },
-        location: { coordinates: [longitude, latitude] },
+        location: { type: "Point", coordinates: [longitude, latitude] },
       }));
     } catch (err) {
     } finally {

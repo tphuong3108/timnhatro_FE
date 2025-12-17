@@ -50,7 +50,7 @@ export const roomApi = {
     const res = await apiClient.patch(`/rooms/${id}/like`);
     return res.data.data;
   },
-  
+
   updateRoomStatus: async (id: string, status: string) => {
     const res = await apiClient.patch(`/rooms/${id}/status`, { status });
     return res.data.data;
@@ -65,7 +65,7 @@ export const roomApi = {
     const res = await apiClient.delete(`/rooms/slug/${slug}/favorite`);
     return res.data.data;
   },
-  
+
   createRoom: async (formData: FormData) => {
     const res = await apiClient.post("/hosts/rooms", formData, {
       headers: {
@@ -106,13 +106,26 @@ export const roomApi = {
   },
   //lấy phòng đã thanh toán premium
   getPremiumStatus: async (id: string) => {
-  const res = await apiClient.get(`/rooms/${id}/premium-status`);
-  return res.data.data;
-},
-updateRoom: async (id: string, data: any) => {
-  const res = await apiClient.patch(`/rooms/${id}/update`, data);
-  return res.data.data;
-},
+    const res = await apiClient.get(`/rooms/${id}/premium-status`);
+    return res.data.data;
+  },
+  updateRoom: async (id: string, formDataOrObject: any) => {
+    // Accept either a FormData (for file uploads) or a plain object (JSON).
+    if (formDataOrObject instanceof FormData) {
+      const res = await apiClient.patch(`/hosts/rooms/${id}`, formDataOrObject, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        transformRequest: (data) => data,
+      });
+      return res.data;
+    } else {
+      // send JSON body for simple updates
+      const res = await apiClient.patch(`/hosts/rooms/${id}`, formDataOrObject);
+      return res.data;
+    }
+  },
+
 
 
 };
