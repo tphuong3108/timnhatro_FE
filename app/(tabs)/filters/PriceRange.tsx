@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, useWindowDimensions } from "react-native";
 import MultiSlider from "@ptomasroos/react-native-multi-slider";
-import { useFilter } from "./FilterContext";
+import { useFilter } from "@/components/filters/FilterContext";
 
 export default function PriceRange() {
   const { width } = useWindowDimensions();

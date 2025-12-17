@@ -1,18 +1,17 @@
+import { HostBookCard } from "@/components/room/HostBookCard";
+import { Room } from "@/constants/data/rooms";
+import { ResizeMode, Video } from "expo-av";
+import { Star } from "lucide-react-native";
 import React, { useRef, useState } from "react";
 import {
-  View,
-  Text,
-  Image,
-  Dimensions,
-  TouchableOpacity,
-  NativeSyntheticEvent,
-  NativeScrollEvent,
+    Dimensions,
+    Image,
+    NativeScrollEvent,
+    NativeSyntheticEvent,
+    Text,
+    View
 } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
-import { Star } from "lucide-react-native";
-import { Video, ResizeMode } from "expo-av";
-import { Room } from "@/constants/data/rooms";
-import { HostBookCard } from "@/app/(tabs)/room/HostBookCard";
 
 const { width } = Dimensions.get("window");
 const ITEM_WIDTH = width - 48;

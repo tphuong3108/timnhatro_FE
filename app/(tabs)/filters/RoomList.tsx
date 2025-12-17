@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, FlatList } from "react-native";
-import { useFilter } from "./FilterContext";
+import { useFilter } from "@/components/filters/FilterContext";
 import PostCard from "@/components/ui/PostCard";
 import { Ionicons } from "@expo/vector-icons";
 

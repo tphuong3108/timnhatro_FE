@@ -1,18 +1,18 @@
-import { DefaultTheme, ThemeProvider } from "@react-navigation/native";
-import { Stack, useRouter } from "expo-router";
-import { StatusBar } from "expo-status-bar";
-import React, { useEffect, useState, useRef } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as SplashScreen from "expo-splash-screen";
-import * as Font from "expo-font";
 import {
-  Inter_400Regular,
-  Inter_500Medium,
-  Inter_600SemiBold,
-  Inter_700Bold,
+    Inter_400Regular,
+    Inter_500Medium,
+    Inter_600SemiBold,
+    Inter_700Bold,
 } from "@expo-google-fonts/inter";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
-import { View, ActivityIndicator, Platform } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { DefaultTheme, ThemeProvider } from "@react-navigation/native";
+import * as Font from "expo-font";
+import { Stack, useRouter } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
+import { StatusBar } from "expo-status-bar";
+import React, { useEffect, useRef, useState } from "react";
+import { ActivityIndicator, Platform, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { AuthProvider } from "../contexts/AuthContext";
 SplashScreen.preventAutoHideAsync().catch(() => {});
@@ -92,16 +92,8 @@ export default function RootLayout() {
           {/* Auth */}
           <Stack.Screen name="auth" />
 
-          {/* Màn hình chi tiết phòng */}
-          <Stack.Screen
-            name="room"
-            options={{
-              gestureEnabled: true,
-              gestureDirection: "horizontal",
-              animation: "slide_from_right",
-            }}
-          />
-          <Stack.Screen name="user" />
+          {/* Admin */}
+          <Stack.Screen name="admin" />
 
           {/* Modal */}
           <Stack.Screen name="modal" />

@@ -1,16 +1,16 @@
+import { useLocalSearchParams } from "expo-router";
 import React from "react";
 import {
-  KeyboardAvoidingView,
-  Platform,
-  View,
+    KeyboardAvoidingView,
+    Platform,
+    View,
 } from "react-native";
-import { useLocalSearchParams } from "expo-router";
 import { useAuth } from "../../../contexts/AuthContext";
 
-import ChatHeader from "./components/ChatHeader";
-import RoomHeader from "./components/RoomHeader";
-import MessagesList from "./components/MessagesList";
-import MessageInput from "./components/MessageInput";
+import ChatHeader from "@/components/messages/ChatHeader";
+import MessageInput from "@/components/messages/MessageInput";
+import MessagesList from "@/components/messages/MessagesList";
+import RoomHeader from "@/components/messages/RoomHeader";
 import { useChatMessages } from "../../../hooks/useChatMessages";
 
 export default function ChatRoomScreen() {

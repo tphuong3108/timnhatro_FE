@@ -10,11 +10,11 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import ActionButtons from "./ActionButtons";
-import CoverSection from "./CoverSection";
-import Favorites from "./Favorites";
-import InfoSection from "./InfoSection";
-import MyPosts from "./MyPosts";
+import ActionButtons from "@/components/user/ActionButtons";
+import CoverSection from "@/components/user/CoverSection";
+import Favorites from "@/components/user/Favorites";
+import InfoSection from "@/components/user/InfoSection";
+import MyPosts from "@/components/user/MyPosts";
 import { profileApi } from "@/services/profileApi";
 import { Ionicons } from "@expo/vector-icons";
 

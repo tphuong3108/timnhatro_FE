@@ -1,8 +1,8 @@
-import React from "react";
-import { Tabs } from "expo-router";
-import { View } from "react-native";
-import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import Header from "@/components/Header";
+import { Tabs } from "expo-router";
+import React from "react";
+import { View } from "react-native";
 
 export default function TabsLayout() {
   return (
@@ -15,10 +15,10 @@ export default function TabsLayout() {
             tabBarStyle: { display: "none" },
           }}
         >
-          <Tabs.Screen name="home" />
-          <Tabs.Screen name="search" />
-          <Tabs.Screen name="favorite" />
-          <Tabs.Screen name="profile" />
+          <Tabs.Screen name="home/index" options={{ title: "Home" }} />
+          <Tabs.Screen name="filters/index" options={{ title: "Search" }} />
+          <Tabs.Screen name="user/Favorites" options={{ title: "Favorites" }} />
+          <Tabs.Screen name="user/index" options={{ title: "Profile" }} />
         </Tabs>
       </View>
 

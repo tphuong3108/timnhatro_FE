@@ -1,6 +1,6 @@
 import React from "react";
 import { View, TouchableOpacity, Text } from "react-native";
-import { useFilter } from "./FilterContext";
+import { useFilter } from "@/components/filters/FilterContext";
 
 export default function FilterFooter() {
   const { resetFilters, applyFilters } = useFilter();

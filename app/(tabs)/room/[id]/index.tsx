@@ -1,18 +1,18 @@
-import React, { useState,useEffect } from "react";
-import { ActivityIndicator, ScrollView, Text, View, TouchableOpacity } from "react-native";
+import AmenitiesList from "@/components/room/detail/AmenitiesList";
+import Banner from "@/components/room/detail/Banner";
+import HostInfo from "@/components/room/detail/HostInfo";
+import HostReviewForm from "@/components/room/detail/HostReviewForm";
+import InfoRoom from "@/components/room/detail/InfoRoom";
+import MapSection from "@/components/room/detail/MapSection";
+import RatingSection from "@/components/room/detail/RatingSection";
+import RoomDescription from "@/components/room/detail/RoomDescription";
+import { useRoomLogic } from "@/components/room/detail/RoomLogic";
+import React, { useEffect, useState } from "react";
+import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { bookingApi } from "../../../../services/bookingApi";
+import BookingDialog from "../../booking/BookingDialog";
 import NearbyRooms from "../../home/NearbyRooms";
 import SectionHeader from "../../home/SectionHeader";
-import AmenitiesList from "./AmenitiesList";
-import Banner from "./Banner";
-import HostInfo from "./HostInfo";
-import HostReviewForm from "./HostReviewForm";
-import InfoRoom from "./InfoRoom";
-import MapSection from "./MapSection";
-import RatingSection from "./RatingSection";
-import RoomDescription from "./RoomDescription";
-import { useRoomLogic } from "./RoomLogic";
-import BookingDialog from "../../booking/BookingDialog";
-import { bookingApi } from "../../../../services/bookingApi";
 
 
 export default function RoomDetailScreen() {

@@ -3,7 +3,7 @@ import React from "react";
 import { ScrollView, Text, View } from "react-native";
 import NearbyRooms from "../home/NearbyRooms";
 import AmenitiesSelector from "./AmenitiesSelector";
-import { FilterProvider } from "./FilterContext";
+import { FilterProvider } from "@/components/filters/FilterContext";
 import FilterFooter from "./FilterFooter";
 import FilterSection from "./FilterSection";
 import RoomList from "./RoomList";

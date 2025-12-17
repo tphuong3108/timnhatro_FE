@@ -10,7 +10,7 @@ import Animated, {
   FadeInUp,
 } from "react-native-reanimated";
 import { getAllAmenities } from "@/services/amenityApi";
-import { useFilter } from "./FilterContext";
+import { useFilter } from "@/components/filters/FilterContext";
 
 // 🌊 Hiệu ứng hiện dần
 function useRippleAnimation(index: number) {

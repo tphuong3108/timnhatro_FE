@@ -1,7 +1,7 @@
 import { getAllWards } from "@/services/wardApi";
 import React, { useEffect, useState } from "react";
 import { ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
-import { useFilter } from "./FilterContext";
+import { useFilter } from "@/components/filters/FilterContext";
 
 export default function AreaSelector() {
   const { filters, setFilters } = useFilter();

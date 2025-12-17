@@ -1,17 +1,17 @@
-import React, { useState, useRef, useEffect } from "react";
+import MessageBubble from "@/components/messages/MessageBubble";
+import MessageInputAI from "@/components/messages/MessageInputAI";
+import { useAuth } from "@/contexts/AuthContext";
+import React, { useEffect, useRef, useState } from "react";
 import {
-  View,
-  Text,
-  FlatList,
-  KeyboardAvoidingView,
-  Platform,
-  SafeAreaView,
+    FlatList,
+    KeyboardAvoidingView,
+    Platform,
+    SafeAreaView,
+    Text,
+    View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import MessageBubble from "./components/MessageBubble";
-import { useAuth } from "@/contexts/AuthContext";
 import { aiService } from "../../../services/aiService";
-import MessageInputAI from "./components/MessageInputAI";
 
 export default function ChatAI() {
   const insets = useSafeAreaInsets();

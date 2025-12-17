@@ -10,11 +10,11 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { Ionicons } from "@expo/vector-icons";
 import { adminApi } from "@/services/adminApi";
-import InfoSection from "@/app/(tabs)/user/InfoSection";
-import CoverSection from "@/app/(tabs)/user/CoverSection";
-import ActionButtons from "@/app/(tabs)/user/ActionButtons";
-import Favorites from "@/app/(tabs)/user/Favorites";
-import MyPosts from "@/app/(tabs)/user/MyPosts";
+import InfoSection from "@/components/user/InfoSection";
+import CoverSection from "@/components/user/CoverSection";
+import ActionButtons from "@/components/user/ActionButtons";
+import Favorites from "@/components/user/Favorites";
+import MyPosts from "@/components/user/MyPosts";
 
 
 export default function AdminUserDetail() {
