@@ -1,18 +1,18 @@
-import React, { useEffect, useState } from "react";
-import { FlatList, View, Text, TouchableOpacity } from "react-native";
+import { useFilter } from "@/components/filters/FilterContext";
+import { getAllAmenities } from "@/services/amenityApi";
 import { Ionicons } from "@expo/vector-icons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import React, { useEffect, useState } from "react";
+import { Text, TouchableOpacity } from "react-native";
 import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
   Easing,
   FadeInUp,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
 } from "react-native-reanimated";
-import { getAllAmenities } from "@/services/amenityApi";
-import { useFilter } from "./FilterContext";
 
-// 🌊 Hiệu ứng hiện dần
+// Hiệu ứng hiện dần
 function useRippleAnimation(index: number) {
   const scale = useSharedValue(0.85);
   const opacity = useSharedValue(0);
@@ -76,6 +76,7 @@ const ICON_MAP = [
   { keywords: ["công viên"], icon: "pine-tree", type: "Material" },
   { keywords: ["bus", "xe buýt", "bến xe"], icon: "bus-outline", type: "Ionicons" },
   { keywords: ["thể thao", "sân vận động"], icon: "run", type: "Material" },
+  { keywords: ["vân tay", "khóa vân tay", "fingerprint"], icon: "fingerprint", type: "Material" },
 ];
 
 function getIconForAmenity(name: string) {
@@ -138,9 +139,12 @@ const AmenityItem = ({ item, index, isSelected, onPress }: any) => {
   );
 };
 
+const INITIAL_COUNT = 6;
+
 export default function AmenitiesSelector() {
   const { filters, setFilters } = useFilter();
   const [amenities, setAmenities] = useState<any[]>([]);
+  const [showAll, setShowAll] = useState(false);
 
   useEffect(() => {
     const fetchAmenities = async () => {
@@ -172,6 +176,16 @@ export default function AmenitiesSelector() {
 
   if (!amenities || amenities.length === 0) return null;
 
+  // Hiển thị 6 item đầu tiên hoặc tất cả
+  const displayedAmenities = showAll ? amenities : amenities.slice(0, INITIAL_COUNT);
+  const hasMore = amenities.length > INITIAL_COUNT;
+
+  // Chia thành các hàng 3 cột
+  const rows = [];
+  for (let i = 0; i < displayedAmenities.length; i += 3) {
+    rows.push(displayedAmenities.slice(i, i + 3));
+  }
+
   return (
     <Animated.View
       entering={FadeInUp.duration(600)}
@@ -181,21 +195,48 @@ export default function AmenitiesSelector() {
         backgroundColor: "#fff",
       }}
     >
-      <FlatList
-        data={amenities}
-        numColumns={3}
-        keyExtractor={(item, i) => item._id || i.toString()}
-        columnWrapperStyle={{ justifyContent: "flex-start", gap: 12 }}
-        scrollEnabled={false}
-        renderItem={({ item, index }) => (
-          <AmenityItem
-            item={item}
-            index={index}
-            isSelected={filters.amenities.includes(item._id)}
-            onPress={() => toggleAmenity(item._id)}
+      {rows.map((row, rowIndex) => (
+        <Animated.View
+          key={rowIndex}
+          style={{ flexDirection: "row", justifyContent: "flex-start", gap: 12 }}
+        >
+          {row.map((item, itemIndex) => (
+            <AmenityItem
+              key={item._id}
+              item={item}
+              index={rowIndex * 3 + itemIndex}
+              isSelected={filters.amenities.includes(item._id)}
+              onPress={() => toggleAmenity(item._id)}
+            />
+          ))}
+        </Animated.View>
+      ))}
+
+      {/* Nút Xem thêm / Thu gọn */}
+      {hasMore && (
+        <TouchableOpacity
+          activeOpacity={0.8}
+          onPress={() => setShowAll(!showAll)}
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+            marginTop: 8,
+            paddingVertical: 10,
+            backgroundColor: "#3F72AF",
+            borderRadius: 12,
+          }}
+        >
+          <Ionicons
+            name={showAll ? "chevron-up-outline" : "chevron-down-outline"}
+            size={18}
+            color="#fff"
           />
-        )}
-      />
+          <Text style={{ color: "#fff", fontWeight: "600", marginLeft: 6 }}>
+            {showAll ? "Thu gọn" : `Xem thêm (${amenities.length - INITIAL_COUNT})`}
+          </Text>
+        </TouchableOpacity>
+      )}
     </Animated.View>
   );
 }

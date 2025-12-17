@@ -1,16 +1,17 @@
+import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
-import React, {useState,useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import {
-  ActivityIndicator,
-  FlatList,
-  Image,
-  Text,
-  TouchableOpacity,
-  View,Alert
+    ActivityIndicator,
+    Alert,
+    FlatList,
+    Image,
+    Text,
+    TouchableOpacity,
+    View
 } from "react-native";
 import { useAuth } from "../../../contexts/AuthContext";
 import { chatService } from "../../../services/chatService";
-import { useFocusEffect } from "@react-navigation/native";
 
 export default function ChatListScreen() {
   const [chats, setChats] = useState<any[]>([]);
@@ -109,6 +110,7 @@ export default function ChatListScreen() {
                     chatId: item._id,
                     receiverId: partner._id,
                     receiverName: `${partner.firstName} ${partner.lastName}`,
+                    receiverAvatar: partner.avatar || "",
                     roomId: item.roomId?._id,
                   },
                 });

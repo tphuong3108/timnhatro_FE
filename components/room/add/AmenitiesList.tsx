@@ -46,6 +46,7 @@ const ICON_MAP = [
   { keywords: ["công viên"], icon: "pine-tree", type: "Material" },
   { keywords: ["bus", "xe buýt", "bến xe"], icon: "bus-outline", type: "Ionicons" },
   { keywords: ["thể thao", "sân vận động"], icon: "run", type: "Material" },
+  { keywords: ["vân tay", "khóa vân tay", "fingerprint"], icon: "fingerprint", type: "Material" },
 ];
 
 function getIconForAmenity(name: string) {

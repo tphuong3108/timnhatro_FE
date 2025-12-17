@@ -1,3 +1,4 @@
+import FilterStatusPayment, { PaymentStatus } from "@/components/filters/FilterStatusPayment";
 import { paymentApi } from "@/services/paymentApi";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
@@ -6,11 +7,10 @@ import {
   FlatList,
   Modal,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
-  TextInput,
 } from "react-native";
-import FilterStatusPayment, { PaymentStatus } from "@/app/(tabs)/filters/FilterStatusPayment";
 
 interface AdminTransaction {
   _id: string;

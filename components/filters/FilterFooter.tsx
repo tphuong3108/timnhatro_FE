@@ -1,7 +1,7 @@
+import { useFilter } from "@/components/filters/FilterContext";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
-import { useFilter } from "./FilterContext";
 
 export default function FilterFooter() {
   const { resetFilters, applyFilters } = useFilter();

@@ -1,22 +1,19 @@
-import React, { useEffect, useState, useCallback } from "react";
-import {
-  View,
-  Text,
-  FlatList,
-  ActivityIndicator,
-  RefreshControl,
-} from "react-native";
 import PostCard from "@/components/ui/PostCard";
 import { roomApi } from "@/services/roomApi";
+import React, { useCallback, useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  Text,
+  View,
+} from "react-native";
 
 export default function TopRatedRooms() {
   const [topRooms, setTopRooms] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
 
   const fetchTopRooms = useCallback(async () => {
     try {
-      if (!refreshing) setLoading(true);
+      setLoading(true);
       const res = await roomApi.getAllRooms();
 
       const rooms =
@@ -42,9 +39,8 @@ export default function TopRatedRooms() {
       setTopRooms([]);
     } finally {
       setLoading(false);
-      setRefreshing(false);
     }
-  }, [refreshing]);
+  }, []);
 
   useEffect(() => {
     fetchTopRooms();
@@ -56,7 +52,7 @@ export default function TopRatedRooms() {
     return () => clearInterval(interval);
   }, [fetchTopRooms]);
 
-  if (loading && !refreshing) {
+  if (loading) {
     return (
       <View className="flex-1 justify-center items-center py-10">
         <ActivityIndicator size="large" color="#3F72AF" />
@@ -75,24 +71,26 @@ export default function TopRatedRooms() {
     );
   }
 
+  // Chia thành các hàng 2 cột
+  const rows = [];
+  for (let i = 0; i < topRooms.length; i += 2) {
+    rows.push(topRooms.slice(i, i + 2));
+  }
+
   return (
-    <View className="px-5">
-      <FlatList
-        data={topRooms}
-        numColumns={2}
-        keyExtractor={(item) => item._id}
-        renderItem={({ item }) => <PostCard item={item} />}
-        columnWrapperStyle={{ justifyContent: "space-between" }}
-        contentContainerStyle={{ paddingBottom: 10 }}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={() => setRefreshing(true)}
-            tintColor="#3F72AF"
-            colors={["#3F72AF"]}
-          />
-        }
-      />
+    <View>
+      {rows.map((row, rowIndex) => (
+        <View
+          key={rowIndex}
+          className="flex-row justify-between mb-2"
+        >
+          {row.map((item) => (
+            <PostCard key={item._id} item={item} />
+          ))}
+          {row.length === 1 && <View style={{ width: '48%' }} />}
+        </View>
+      ))}
     </View>
   );
 }
+

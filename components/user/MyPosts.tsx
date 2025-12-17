@@ -1,20 +1,23 @@
-import React from "react";
-import { View, Text, FlatList } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 import PostCard from "@/components/ui/PostCard";
+import { Ionicons } from "@expo/vector-icons";
+import React from "react";
+import { FlatList, Text, View } from "react-native";
 
 interface MyPostsProps {
   rooms?: any[];
   onEdit?: (id: string) => void;
   onDelete?: (id: string) => void;
+  isOwner?: boolean;
 }
 
-export default function MyPosts({ rooms = [], onEdit, onDelete }: MyPostsProps) {
+export default function MyPosts({ rooms = [], onEdit, onDelete, isOwner = false }: MyPostsProps) {
   if (rooms.length === 0)
     return (
       <View className="py-10 items-center">
         <Ionicons name="document-text-outline" size={60} color="#3F72AF" />
-        <Text className="text-gray-500 mt-3">Bạn chưa đăng bài nào</Text>
+        <Text className="text-gray-500 mt-3">
+          {isOwner ? "Bạn chưa đăng bài nào" : "Chưa có bài đăng nào"}
+        </Text>
       </View>
     );
 
@@ -36,7 +39,7 @@ export default function MyPosts({ rooms = [], onEdit, onDelete }: MyPostsProps) 
               createdBy: item.createdBy,
             }}
             onDeleted={() => onDelete?.(item._id)}
-            showActions={true}
+            showActions={isOwner}
           />
         )}
         columnWrapperStyle={{ justifyContent: "space-between" }}
@@ -46,3 +49,4 @@ export default function MyPosts({ rooms = [], onEdit, onDelete }: MyPostsProps) 
     </View>
   );
 }
+

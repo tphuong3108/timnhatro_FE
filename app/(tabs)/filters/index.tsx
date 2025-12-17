@@ -1,14 +1,15 @@
+import AmenitiesSelector from "@/components/filters/AmenitiesSelector";
+import { FilterProvider } from "@/components/filters/FilterContext";
+import FilterFooter from "@/components/filters/FilterFooter";
+import FilterSection from "@/components/filters/FilterSection";
+import RoomList from "@/components/filters/RoomList";
+import SearchBar from "@/components/filters/SearchBar";
+import TopRatedRooms from "@/components/filters/TopRatedRooms";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { ScrollView, Text, View } from "react-native";
 import NearbyRooms from "../home/NearbyRooms";
-import AmenitiesSelector from "./AmenitiesSelector";
-import { FilterProvider } from "./FilterContext";
-import FilterFooter from "./FilterFooter";
-import FilterSection from "./FilterSection";
-import RoomList from "./RoomList";
-import SearchBar from "./SearchBar";
-import TopRatedRooms from "./TopRatedRooms";
+
 
 export default function FindRoomIndex() {
   return (

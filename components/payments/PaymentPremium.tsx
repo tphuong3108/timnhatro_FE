@@ -1,6 +1,6 @@
+import { paymentApi } from "@/services/paymentApi";
+import { useEffect, useState } from "react";
 import { Alert, Linking } from "react-native";
-import { useState, useEffect } from "react";
-import { paymentApi } from "../../../services/paymentApi";
 
 export const PREMIUM_PACKAGES = [
   { days: 30, price: 10000 },

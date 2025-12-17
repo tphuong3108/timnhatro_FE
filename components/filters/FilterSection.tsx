@@ -3,7 +3,7 @@ import { Text, View } from "react-native";
 import AreaSelector from "./AreaSelector";
 import PriceRange from "./PriceRange";
 import AmenitiesSelector from "./AmenitiesSelector";
-import { useFilter } from "./FilterContext";
+import { useFilter } from "@/components/filters/FilterContext";
 import { Ionicons } from "@expo/vector-icons";
 
 // ⭐ Component chọn số sao

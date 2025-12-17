@@ -10,11 +10,11 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 import { Ionicons } from "@expo/vector-icons";
 import { profileApi } from "@/services/profileApi";
 
-import InfoSection from "./InfoSection";
-import ActionButtons from "./ActionButtons";
-import CoverSection from "./CoverSection";
-import MyPosts from "./MyPosts";
-import Favorites from "./Favorites";
+import InfoSection from "@/components/user/InfoSection";
+import ActionButtons from "@/components/user/ActionButtons";
+import CoverSection from "@/components/user/CoverSection";
+import MyPosts from "@/components/user/MyPosts";
+import Favorites from "@/components/user/Favorites";
 
 export default function UserProfile() {
   const { id } = useLocalSearchParams();

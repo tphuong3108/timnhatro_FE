@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { View, TextInput, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useFilter } from "./FilterContext";
+import { useFilter } from "@/components/filters/FilterContext";
 import { useLocalSearchParams } from "expo-router";
 
 export default function SearchBar() {

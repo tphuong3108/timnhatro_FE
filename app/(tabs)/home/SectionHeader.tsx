@@ -1,11 +1,31 @@
-import React from "react";
-import { View, Text, TouchableOpacity, Dimensions } from "react-native";
 import { useRouter } from "expo-router";
+import React from "react";
+import { Dimensions, Text, TouchableOpacity, View } from "react-native";
 
 const { width } = Dimensions.get("window");
 
-export default function SectionHeader({ title }: { title: string }) {
+interface SectionHeaderProps {
+  title: string;
+  onViewAll?: () => void;
+  hideViewAll?: boolean;
+  viewAllText?: string;
+}
+
+export default function SectionHeader({ 
+  title, 
+  onViewAll, 
+  hideViewAll = false,
+  viewAllText = "Xem tất cả"
+}: SectionHeaderProps) {
   const router = useRouter();
+
+  const handlePress = () => {
+    if (onViewAll) {
+      onViewAll();
+    } else {
+      router.push("/room" as any);
+    }
+  };
 
   return (
     <View className="flex-row justify-between items-center mb-2 px-1">
@@ -16,17 +36,20 @@ export default function SectionHeader({ title }: { title: string }) {
         {title}
       </Text>
 
-      <TouchableOpacity
-        activeOpacity={0.7}
-        onPress={() => router.push("/room" as any)}
-      >
-        <Text
-          className="text-[#3F72AF] font-medium"
-          style={{ fontSize: width > 400 ? 14 : 12 }}
+      {!hideViewAll && (
+        <TouchableOpacity
+          activeOpacity={0.7}
+          onPress={handlePress}
         >
-          Xem tất cả
-        </Text>
-      </TouchableOpacity>
+          <Text
+            className="text-[#3F72AF] font-medium"
+            style={{ fontSize: width > 400 ? 14 : 12 }}
+          >
+            {viewAllText}
+          </Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 }
+

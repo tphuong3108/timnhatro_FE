@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
-import { View, Text, FlatList } from "react-native";
-import NotificationItem from "./NotificationItem";
+import NotificationItem from "@/components/notifications/NotificationItem";
 import { notificationApi } from "@/services/notificationApi";
 import { useRouter } from "expo-router";
+import { useEffect, useState } from "react";
+import { FlatList, Text, View } from "react-native";
 
 interface INotification {
   _id?: string;

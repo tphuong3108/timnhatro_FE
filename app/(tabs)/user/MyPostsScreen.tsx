@@ -3,7 +3,7 @@ import { Alert, ScrollView, RefreshControl } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Toast from "react-native-toast-message";
 import apiClient from "@/services/apiClient";
-import MyPosts from "./MyPosts";
+import MyPosts from "@/components/user/MyPosts";
 import { useRouter } from "expo-router";
 
 export default function MyPostsScreen() {

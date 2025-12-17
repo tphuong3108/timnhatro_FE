@@ -1,17 +1,22 @@
 import SearchBar from "@/components/ui/SearchBar";
-import React from "react";
+import React, { useState } from "react";
 import { SafeAreaView, ScrollView, View, useWindowDimensions } from "react-native";
 import AmenitiesList from "./AmenitiesList";
 import CategoryList from "./CategoryList";
 import HomeBanner from "./HomeBanner";
 import NearbyRooms from "./NearbyRooms";
-import RoomCarousel from "./RoomCarousel";
 import SectionHeader from "./SectionHeader";
+import ServicesSection from "./ServicesSection";
+import SloganSection from "./SloganSection";
+import StatsSection from "./StatsSection";
+import TestimonialsSection from "./TestimonialsSection";
 
 export default function Home() {
   const { height } = useWindowDimensions();
   const isLargeScreen = height > 800;
   const isMediumScreen = height > 700 && height <= 800;
+
+  const [showAllAmenities, setShowAllAmenities] = useState(false);
 
   return (
     <SafeAreaView className="flex-1 bg-white">
@@ -36,33 +41,53 @@ export default function Home() {
             marginBottom: isLargeScreen ? 40 : 30,
           }}
         >
+          {/* 1. Thanh tìm kiếm */}
           <SearchBar />
 
-          {/* Xu hướng tìm phòng */}
+          {/* 2. Dịch vụ */}
+          <ServicesSection />
+
+          {/* 3. Con số ấn tượng */}
+          <View>
+            <SectionHeader title="Con số ấn tượng" hideViewAll />
+            <StatsSection />
+          </View>
+
+          {/* 4. Xu hướng tìm phòng */}
           <View>
             <SectionHeader title="Xu hướng tìm phòng" />
             <CategoryList />
           </View>
 
-          {/* Phòng xung quanh bạn */}
+          {/* 5. Phòng xung quanh bạn */}
           <View>
             <SectionHeader title="Phòng xung quanh bạn" />
             <NearbyRooms />
           </View>
 
-          {/* Top phòng nổi bật */}
+          {/* 6. Tiện ích phổ biến */}
           <View>
-            <SectionHeader title="Top phòng nổi bật" />
-            <RoomCarousel />
+            <SectionHeader 
+              title="Tiện ích phổ biến" 
+              onViewAll={() => setShowAllAmenities(!showAllAmenities)}
+              viewAllText={showAllAmenities ? "Thu gọn" : "Xem tất cả"}
+            />
+            <AmenitiesList showAll={showAllAmenities} />
           </View>
 
-          {/* Tiện ích phổ biến */}
+          {/* 7. Khách hàng nói gì */}
           <View>
-            <SectionHeader title="Tiện ích phổ biến" />
-            <AmenitiesList />
+            <SectionHeader title="Khách hàng nói gì" hideViewAll />
+            <TestimonialsSection />
           </View>
+
+          {/* 8. Slogan */}
+          <SloganSection />
         </View>
       </ScrollView>
     </SafeAreaView>
   );
 }
+
+
+

@@ -1,6 +1,6 @@
-import React, { useState } from "react";
-import { View, TextInput, TouchableOpacity, KeyboardAvoidingView,Platform } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import React, { useState } from "react";
+import { KeyboardAvoidingView, Platform, TextInput, TouchableOpacity, View } from "react-native";
 
 type MessageInputAIProps = {
   onSend: (text: string) => void;

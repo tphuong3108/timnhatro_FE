@@ -1,9 +1,9 @@
-import React from "react";
-import { View, Text, Image, TouchableOpacity } from "react-native";
-import { MaterialIcons, Feather, Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
-import { chatService } from "@/services/chatService";
 import { useAuth } from "@/contexts/AuthContext";
+import { chatService } from "@/services/chatService";
+import { Feather, Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
+import React from "react";
+import { Image, Text, TouchableOpacity, View } from "react-native";
 export default function HostInfo({ room, contactHost }: any) {
   const router = useRouter();
   const { user } = useAuth();
@@ -39,7 +39,8 @@ export default function HostInfo({ room, contactHost }: any) {
       params: { 
         chatId: chat._id,
         receiverId: room.host._id,
-        receiverName: room.host.fullName ,
+        receiverName: room.host.fullName,
+        receiverAvatar: room.host.avatar || "",
         roomId: room._id
       },
     });

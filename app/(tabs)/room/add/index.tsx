@@ -1,12 +1,12 @@
-import { View, Text, ScrollView, TouchableOpacity } from "react-native";
+import AddRoomForm from "@/components/room/add/AddRoomForm";
+import { useAddRoomLogic } from "@/components/room/add/AddRoomLogic";
+import AmenitiesList from "@/components/room/add/AmenitiesList";
+import MapPicker from "@/components/room/add/MapPicker";
+import MediaPicker from "@/components/room/add/MediaPicker";
 import { Ionicons } from "@expo/vector-icons";
-import AddRoomForm from "./AddRoomForm";
-import MapPicker from "./MapPicker";
-import MediaPicker from "./MediaPicker";
-import AmenitiesList from "./AmenitiesList";
-import { useAddRoomLogic } from "./AddRoomLogic";
 import { useRouter } from "expo-router";
-import React ,{ useState } from "react";
+import React from "react";
+import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 export default function AddRoomIndex() {
   const router = useRouter();
   const {

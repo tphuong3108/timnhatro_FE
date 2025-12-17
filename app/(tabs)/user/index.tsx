@@ -1,4 +1,9 @@
 // index.tsx
+import ActionButtons from "@/components/user/ActionButtons";
+import CoverSection from "@/components/user/CoverSection";
+import Favorites from "@/components/user/Favorites";
+import InfoSection from "@/components/user/InfoSection";
+import MyPosts from "@/components/user/MyPosts";
 import { profileApi } from "@/services/profileApi";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -13,11 +18,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import ActionButtons from "./ActionButtons";
-import CoverSection from "./CoverSection";
-import Favorites from "./Favorites";
-import InfoSection from "./InfoSection";
-import MyPosts from "./MyPosts";
 
 export default function Profile() {
   const router = useRouter();
@@ -25,7 +25,7 @@ export default function Profile() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"posts" | "favorites">("posts");
 
-  // ✅ Đây là profile của chính chủ
+  //  Đây là profile của chính chủ
   const isOwner = true;
 
   const fetchProfile = async () => {
@@ -86,7 +86,6 @@ export default function Profile() {
       showsVerticalScrollIndicator={false}
       contentContainerStyle={{ paddingBottom: 40 }}
     >
-      {/* ✅ Truyền isOwner = true để hiện camera và nút sửa */}
       <CoverSection user={user} isOwner={isOwner} />
 
       <View className="w-full max-w-[700px] self-center px-5">
@@ -153,6 +152,7 @@ export default function Profile() {
           {activeTab === "posts" ? (
             <MyPosts
               rooms={user?.myRooms || []}
+              isOwner={true}
               onDelete={(id: string) => {
                 setUser((prev: any) => ({
                   ...prev,

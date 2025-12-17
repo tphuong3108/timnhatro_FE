@@ -1,6 +1,9 @@
+import FilterStatusPayment, {
+    PaymentStatus,
+} from "@/components/filters/FilterStatusPayment";
 import { paymentApi } from "@/services/paymentApi";
 import { Ionicons } from "@expo/vector-icons";
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
     ActivityIndicator,
     FlatList,
@@ -8,9 +11,6 @@ import {
     TouchableOpacity,
     View,
 } from "react-native";
-import FilterStatusPayment, {
-    PaymentStatus,
-} from "../filters/FilterStatusPayment";
 
 interface Transaction {
     _id: string;

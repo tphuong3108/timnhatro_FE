@@ -1,25 +1,22 @@
-import React from "react";
-import { Tabs } from "expo-router";
-import { View } from "react-native";
-import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import Header from "@/components/Header";
+import { Stack } from "expo-router";
+import React from "react";
+import { View } from "react-native";
 
 export default function TabsLayout() {
   return (
     <View className="flex-1 bg-white relative overflow-hidden">
       <Header />
       <View className="flex-1 mb-[65px]">
-        <Tabs
+        <Stack
           screenOptions={{
             headerShown: false,
-            tabBarStyle: { display: "none" },
+            animation: "slide_from_right",
+            gestureEnabled: true,
+            gestureDirection: "horizontal",
           }}
-        >
-          <Tabs.Screen name="home" />
-          <Tabs.Screen name="search" />
-          <Tabs.Screen name="favorite" />
-          <Tabs.Screen name="profile" />
-        </Tabs>
+        />
       </View>
 
       <View className="absolute bottom-0 left-0 right-0 z-50 bg-white shadow-md">
@@ -28,3 +25,4 @@ export default function TabsLayout() {
     </View>
   );
 }
+

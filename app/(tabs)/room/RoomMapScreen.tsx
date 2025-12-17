@@ -1,8 +1,8 @@
+import { RoomBottomSheet } from "@/components/room/RoomBottomSheet";
+import { RoomMap } from "@/components/room/RoomMap";
+import { useRoomMapLogic } from "@/hooks/useRoomMapLogic";
 import React from "react";
 import { View } from "react-native";
-import { useRoomMapLogic } from "@/hooks/useRoomMapLogic";
-import { RoomBottomSheet } from "./RoomBottomSheet";
-import { RoomMap } from "./RoomMap";
 
 export default function RoomMapScreen() {
   const logic = useRoomMapLogic();

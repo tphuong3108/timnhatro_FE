@@ -1,7 +1,7 @@
+import { ChatMessage } from "@/hooks/useChatMessages";
 import React from "react";
 import { FlatList } from "react-native";
 import MessageBubble from "./MessageBubble";
-import { ChatMessage } from "../../../../hooks/useChatMessages";
 
 interface Props {
   messages: ChatMessage[];
