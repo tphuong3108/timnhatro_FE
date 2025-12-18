@@ -1,8 +1,9 @@
+import { useAuth } from "@/contexts/AuthContext";
 import { profileApi } from "@/services/profileApi";
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter, usePathname } from "expo-router";
+import { usePathname, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import { Dimensions, TouchableOpacity, View, Text } from "react-native";
+import { Dimensions, Text, TouchableOpacity, View } from "react-native";
 import Toast from "react-native-toast-message";
 
 interface FooterProps {
@@ -12,6 +13,7 @@ interface FooterProps {
 export default function Footer({ onTabPress }: FooterProps) {
   const router = useRouter();
   const pathname = usePathname();
+  const { user, setUser } = useAuth();
   const [activeTab, setActiveTab] = useState<string>("");
 
   const { width } = Dimensions.get("window");
@@ -30,46 +32,51 @@ export default function Footer({ onTabPress }: FooterProps) {
     onTabPress?.(tab.key);
   };
 
-const handleAddRoom = async () => {
-  try {
-    // 🧠 Lấy thông tin user hiện tại
-    const me = await profileApi.getMyProfile();
+  const handleAddRoom = async () => {
+    try {
+      // 🧠 Kiểm tra role từ context (không cần gọi API)
+      const currentRole = user?.role;
 
-    if (me.role === "tenant") {
-      // Tenant thì nâng cấp thành host
-      await profileApi.upgradeRole({ revert: false });
+      if (currentRole === "host") {
+        router.push("/room/add");
+        return;
+      }
 
-      Toast.show({
-        type: "success",
-        text1: "Đã nâng cấp tài khoản",
-        text2: "Bạn hiện là chủ trọ 🎉",
-      });
-    } else if (me.role === "host") {
-      // Host thì bỏ qua nâng cấp, chuyển luôn
-      router.push("/room/add");
-      return;
-    } else {
+      if (currentRole === "tenant") {
+        // 🔄 Tenant → gọi API nâng cấp thành host
+        await profileApi.upgradeRole({ revert: false });
+
+        // Cập nhật role trong context
+        if (user) {
+          setUser({ ...user, role: "host" });
+        }
+
+        Toast.show({
+          type: "success",
+          text1: "Đã nâng cấp tài khoản",
+          text2: "Bạn hiện là chủ trọ 🎉",
+        });
+
+        // Chuyển tới trang thêm phòng
+        router.push("/room/add");
+        return;
+      }
+
       Toast.show({
         type: "error",
         text1: "Không thể đăng phòng",
-        text2: "Chỉ tenant hoặc host mới có thể đăng phòng.",
+        text2: "Vui lòng đăng nhập để đăng phòng.",
       });
-      return;
+    } catch (error: any) {
+      Toast.show({
+        type: "error",
+        text1: "Lỗi khi thêm phòng",
+        text2:
+          error?.response?.data?.message ||
+          "Vui lòng thử lại sau hoặc kiểm tra kết nối mạng.",
+      });
     }
-
-    // Sau khi nâng cấp xong → chuyển tới trang thêm phòng
-    router.push("/room/add");
-  } catch (error: any) {
-
-    Toast.show({
-      type: "error",
-      text1: "Lỗi khi thêm phòng",
-      text2:
-        error?.response?.data?.message ||
-        "Vui lòng thử lại sau hoặc kiểm tra kết nối mạng.",
-    });
-  }
-};
+  };
 
 
   useEffect(() => {

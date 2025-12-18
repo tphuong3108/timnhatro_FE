@@ -1,6 +1,8 @@
 import { paymentApi } from "@/services/paymentApi";
+import * as Linking from "expo-linking";
+import * as WebBrowser from "expo-web-browser";
 import { useEffect, useState } from "react";
-import { Alert, Linking } from "react-native";
+import { Alert } from "react-native";
 
 export const PREMIUM_PACKAGES = [
   { days: 30, price: 10000 },
@@ -8,7 +10,7 @@ export const PREMIUM_PACKAGES = [
   { days: 90, price: 120000 },
 ];
 
-export function usePaymentPremium(roomId: string) {
+export function usePaymentPremium(roomId: string, onBrowserClosed?: () => void) {
   const [selectedPackage, setSelectedPackage] = useState<number | null>(null);
   const [paymentAmount, setPaymentAmount] = useState("");
   const [premiumOrderId, setPremiumOrderId] = useState<string | null>(null);
@@ -29,6 +31,9 @@ export function usePaymentPremium(roomId: string) {
     }
 
     try {
+      // Tạo redirect URL với scheme của app
+      const redirectUrl = Linking.createURL("payment-result");
+      
       const response = await paymentApi.createPremiumPayment({
         roomId,
         durationDays: selectedPackage,
@@ -41,7 +46,17 @@ export function usePaymentPremium(roomId: string) {
       if (url) setPaymentUrl(url); 
 
       if (url) {
-        await Linking.openURL(url);
+        // Sử dụng openAuthSessionAsync để tự động quay lại app
+        const result = await WebBrowser.openAuthSessionAsync(url, redirectUrl);
+        
+        // Xử lý kết quả khi browser đóng
+        if (result.type === "success" && result.url) {
+          // Parse orderId từ URL nếu có
+          console.log("Payment redirect URL:", result.url);
+          onBrowserClosed?.();
+        } else if (result.type === "dismiss" || result.type === "cancel") {
+          onBrowserClosed?.();
+        }
       } else {
         Alert.alert("Lỗi", "Không nhận được link thanh toán");
       }

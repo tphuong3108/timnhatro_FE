@@ -1,13 +1,13 @@
-import React, { useEffect } from "react";
-import { FlatList, View, Text } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import React, { useEffect } from "react";
+import { FlatList, Text } from "react-native";
 import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-  Easing,
-  FadeInUp,
+    Easing,
+    FadeInUp,
+    useAnimatedStyle,
+    useSharedValue,
+    withTiming,
 } from "react-native-reanimated";
 
 // Hiệu ứng
@@ -35,19 +35,60 @@ function useRippleAnimation(index: number) {
   return animatedStyle;
 }
 
-const iconMapping = [
-  { keyword: "wifi", icon: "wifi-outline", type: "Ionicons" },
-  { keyword: "tv", icon: "tv-outline", type: "Ionicons" },
-  { keyword: "điều hòa", icon: "snowflake", type: "Material" },
-  { keyword: "máy giặt", icon: "washing-machine", type: "Material" },
-  { keyword: "bếp", icon: "stove", type: "Material" },
-  { keyword: "tủ lạnh", icon: "fridge-outline", type: "Material" },
-  { keyword: "xe", icon: "car-outline", type: "Ionicons" },
-  { keyword: "khói", icon: "smoke-detector", type: "Material" },
-  { keyword: "an ninh", icon: "shield-account", type: "Material" },
-  { keyword: "sơ cứu", icon: "medical-bag", type: "Material" },
-  { keyword: "chữa cháy", icon: "fire-extinguisher", type: "Material" },
+// Icon mapping đồng bộ với trang Home
+const ICON_MAP = [
+  // --- Nhóm điện tử & Gia dụng ---
+  { keywords: ["wifi", "internet", "mạng"], icon: "wifi-outline", type: "Ionicons" },
+  { keywords: ["tivi", "tv", "truyền hình"], icon: "tv-outline", type: "Ionicons" },
+  { keywords: ["điều hòa", "máy lạnh"], icon: "snowflake", type: "Material" },
+  { keywords: ["máy giặt", "giặt là"], icon: "washing-machine", type: "Material" },
+  { keywords: ["tủ lạnh"], icon: "fridge-outline", type: "Material" },
+  { keywords: ["nóng lạnh", "bình nước nóng", "máy nước nóng"], icon: "water-thermometer", type: "Material" },  
+  { keywords: ["máy báo khói", "báo khói", "khói"], icon: "smoke-detector", type: "Material" },
+
+  // --- Nhóm nội thất & Cấu trúc phòng ---
+  { keywords: ["bếp", "nấu ăn"], icon: "stove", type: "Material" },
+  { keywords: ["làm việc", "bàn làm việc"], icon: "briefcase", type: "Material" },
+  { keywords: ["gác", "gác lửng"], icon: "stairs", type: "Material" },  
+  { keywords: ["vệ sinh", "toilet", "wc"], icon: "toilet", type: "Material" },  
+  { keywords: ["phòng tắm", "tắm", "vòi sen"], icon: "shower", type: "Material" },  
+  { keywords: ["bồn tắm"], icon: "bathtub", type: "Material" },
+  { keywords: ["giường", "nệm", "đệm"], icon: "bed", type: "Material" },  
+  { keywords: ["tủ áo", "tủ quần áo", "quần áo"], icon: "wardrobe", type: "Material" },  
+  { keywords: ["ban công", "sân nhỏ"], icon: "balcony", type: "Material" },
+
+  // --- Nhóm tiện ích chung & An ninh ---
+  { keywords: ["xe", "ô tô", "bãi đậu xe", "để xe"], icon: "car-outline", type: "Ionicons" },
+  { keywords: ["thang máy"], icon: "elevator", type: "Material" },  
+  { keywords: ["camera", "camera an ninh"], icon: "cctv", type: "Material" },  
+  { keywords: ["an ninh", "bảo vệ"], icon: "shield-account", type: "Material" },
+  { keywords: ["chữa cháy", "bình chữa cháy"], icon: "fire-extinguisher", type: "Material" },
+  { keywords: ["sơ cứu", "y tế"], icon: "medical-bag", type: "Material" },
+  { keywords: ["gym", "thể dục"], icon: "dumbbell", type: "Material" },
+  { keywords: ["hồ bơi", "bể bơi"], icon: "pool", type: "Material" },
+  { keywords: ["sân vườn", "cây xanh"], icon: "tree", type: "Material" },  
+  { keywords: ["ăn uống", "bàn ăn"], icon: "silverware-fork-knife", type: "Material" },
+
+  // --- Nhóm môi trường xung quanh ---
+  { keywords: ["chợ"], icon: "storefront-outline", type: "Ionicons" },
+  { keywords: ["siêu thị"], icon: "cart-outline", type: "Ionicons" },
+  { keywords: ["bệnh viện", "cơ sở y tế"], icon: "hospital-box-outline", type: "Material" },
+  { keywords: ["trường", "học", "đại học"], icon: "school-outline", type: "Ionicons" },
+  { keywords: ["công viên"], icon: "pine-tree", type: "Material" },
+  { keywords: ["bus", "xe buýt", "bến xe"], icon: "bus-outline", type: "Ionicons" },
+  { keywords: ["thể thao", "sân vận động"], icon: "run", type: "Material" },
+  { keywords: ["vân tay", "khóa vân tay", "fingerprint"], icon: "fingerprint", type: "Material" },
 ];
+
+function getIconForAmenity(name: string) {
+  const normalized = name.toLowerCase().replace(/[\s\-_/]+/g, "");
+  const found = ICON_MAP.find((i) =>
+    i.keywords.some((kw) => normalized.includes(kw.replace(/[\s\-_/]+/g, "")))
+  );
+  return found
+    ? { icon: found.icon, type: found.type }
+    : { icon: "checkmark-circle-outline", type: "Ionicons" };
+}
 
 const AmenityItem = ({ item, index }: { item: any; index: number }) => {
   const animatedStyle = useRippleAnimation(index);
@@ -81,13 +122,11 @@ export default function AmenitiesList({ amenities }: { amenities: any[] }) {
   const validAmenities = Array.isArray(amenities) ? amenities : [];
 
   const enrichedAmenities = validAmenities.map((a: any) => {
-    const match = iconMapping.find((i) =>
-      a.name?.toLowerCase().includes(i.keyword)
-    );
+    const iconInfo = getIconForAmenity(a.name || "");
     return {
       ...a,
-      icon: match?.icon || "checkmark-circle",
-      type: match?.type || "Ionicons",
+      icon: iconInfo.icon,
+      type: iconInfo.type,
       color: "#3F72AF",
     };
   });

@@ -19,8 +19,10 @@ export default function PaymentContainer() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
-  const { orderId, setOrderId, paymentStatus } = useCheckPaymentStatus();
+  const { orderId, setOrderId, paymentStatus, checkStatus } = useCheckPaymentStatus();
+
   const premium = usePaymentPremium(roomId);
+  
   useEffect(() => {
     if ((paymentStatus === "success" || paymentStatus === "failed") && orderId) {
       router.push({
@@ -33,8 +35,14 @@ export default function PaymentContainer() {
   const handleSubmit = async () => {
     setLoading(true);
 
+    // handlePremiumPayment sẽ mở browser và đợi user đóng, sau đó return orderId
     const oid = await premium.handlePremiumPayment();
-    if (oid) setOrderId(oid);
+    
+    if (oid) {
+      setOrderId(oid);
+      // Check status ngay sau khi browser đóng
+      await checkStatus(oid);
+    }
 
     setLoading(false);
   };

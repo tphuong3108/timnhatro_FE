@@ -3,7 +3,7 @@ import { io } from "socket.io-client";
 
 // ⚙️ Dùng chung IP & PORT như apiClient
 
-const LOCAL_IP = "192.168.1.8";
+const LOCAL_IP = "192.168.1.9";
 const PORT = 5050; 
 
 // NOTE: ensure there is NO trailing space in the IP string (was causing invalid URL)
