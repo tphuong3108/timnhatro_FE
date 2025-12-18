@@ -85,13 +85,13 @@ function StatItem({ stat, animKey }: { stat: typeof stats[0]; animKey: number })
       </View>
       <Text
         className="font-bold text-[#112D4E]"
-        style={{ fontSize: isSmallScreen ? 22 : 26 }}
+        style={{ fontSize: isSmallScreen ? 24 : 28 }}
       >
         {stat.isDecimal ? animatedValue.toFixed(1) : animatedValue}{stat.suffix}
       </Text>
       <Text
         className="text-gray-500"
-        style={{ fontSize: isSmallScreen ? 12 : 14 }}
+        style={{ fontSize: isSmallScreen ? 14 : 15 }}
       >
         {stat.label}
       </Text>

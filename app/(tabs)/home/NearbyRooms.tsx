@@ -4,12 +4,12 @@ import * as Location from "expo-location";
 import { useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import {
-  ActivityIndicator,
-  Animated,
-  ImageBackground,
-  Text,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    Animated,
+    ImageBackground,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 
 const CARD_WIDTH = 180;
@@ -114,19 +114,19 @@ export default function NearbyRooms() {
               {/* Nội dung thẻ */}
               <View className="p-3 flex-col space-y-1">
                 <Text
-                  className="text-white font-semibold text-[15px] leading-tight drop-shadow-md"
+                  className="text-white font-semibold text-[16px] leading-tight drop-shadow-md"
                   numberOfLines={1}
                 >
                   {item.name}
                 </Text>
 
-                <Text className="text-gray-200 text-[12px]" numberOfLines={1}>
+                <Text className="text-gray-200 text-[13px]" numberOfLines={1}>
                   {item.address || item.ward?.name || "—"}
                 </Text>
 
                 {/*  Khoảng cách */}
                 {item.distance && (
-                  <Text className="text-gray-300 text-[12px]">
+                  <Text className="text-gray-300 text-[13px]">
                     {(item.distance / 1000).toFixed(1)} km
                   </Text>
                 )}
@@ -134,7 +134,7 @@ export default function NearbyRooms() {
                 {/*  Tim 👁 */}
                 <View className="flex-row items-center mt-1">
                   <Ionicons name="star" size={14} color="#FFD700" />
-                  <Text className="text-gray-100 text-[12px] ml-1">
+                  <Text className="text-gray-100 text-[13px] ml-1">
                     {item.avgRating?.toFixed(1) || 0}
                   </Text>
 
@@ -144,7 +144,7 @@ export default function NearbyRooms() {
                     color="#ff9eb3"
                     style={{ marginLeft: 8 }}
                   />
-                  <Text className="text-gray-100 text-[12px] ml-1">
+                  <Text className="text-gray-100 text-[13px] ml-1">
                     {item.totalLikes || 0}
                   </Text>
 
@@ -154,7 +154,7 @@ export default function NearbyRooms() {
                     color="#9ca3af"
                     style={{ marginLeft: 8 }}
                   />
-                  <Text className="text-gray-100 text-[12px] ml-1">
+                  <Text className="text-gray-100 text-[13px] ml-1">
                     {item.viewCount || 0}
                   </Text>
                 </View>

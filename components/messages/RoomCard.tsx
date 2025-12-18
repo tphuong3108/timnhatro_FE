@@ -81,7 +81,7 @@ export default function RoomCard({ room }: RoomCardProps) {
 
       <View className="flex-1 py-2 pr-3 justify-center">
         <Text
-          className="text-[13px] font-semibold text-gray-800"
+          className="text-[14px] font-semibold text-gray-800"
           numberOfLines={2}
         >
           {displayName}
@@ -90,21 +90,21 @@ export default function RoomCard({ room }: RoomCardProps) {
         {/* Address */}
         <View className="flex-row items-center mt-1">
           <Ionicons name="location-outline" size={12} color="#9CA3AF" />
-          <Text className="text-[11px] text-gray-400 ml-1 flex-1" numberOfLines={1}>
+          <Text className="text-[12px] text-gray-400 ml-1 flex-1" numberOfLines={1}>
             {room.address}
           </Text>
         </View>
 
         {/* Price + Amenities */}
         <View className="flex-row items-center justify-between mt-1.5">
-          <Text className="text-red-500 font-bold text-[13px]">
+          <Text className="text-red-500 font-bold text-[14px]">
             {formatPrice(room.price)}
           </Text>
           
           {amenitiesArray.length > 0 && (
             <View className="flex-row items-center">
               <MaterialCommunityIcons name="check-circle" size={12} color="#10B981" />
-              <Text className="text-[10px] text-gray-500 ml-0.5">
+              <Text className="text-[11px] text-gray-500 ml-0.5">
                 {amenitiesArray.length} tiện ích
               </Text>
             </View>

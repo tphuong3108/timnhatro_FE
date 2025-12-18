@@ -46,7 +46,7 @@ export default function MessageBubble({ text, isMe, avatar, rooms = [] }: Props)
               : "bg-gray-200 rounded-bl-none"
           )}
         >
-          <Text className={clsx(isMe ? "text-white" : "text-gray-900")}>
+          <Text className={clsx("text-[15px]", isMe ? "text-white" : "text-gray-900")}>
             {text}
           </Text>
         </View>

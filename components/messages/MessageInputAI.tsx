@@ -32,7 +32,7 @@ export default function MessageInputAI({ onSend , bottomInset = 0 }: MessageInpu
           onChangeText={setValue}
           placeholder="Hỏi AI điều gì đó..."
           placeholderTextColor="#6B7280"
-          className="flex-1 bg-gray-100 rounded-full px-4 py-2 text-[14px] text-black"
+          className="flex-1 bg-gray-100 rounded-full px-4 py-2 text-[15px] text-black"
           style={{ minHeight: 40 }}
         />
 

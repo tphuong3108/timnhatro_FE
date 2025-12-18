@@ -31,7 +31,7 @@ export default function SectionHeader({
     <View className="flex-row justify-between items-center mb-2 px-1">
       <Text
         className="font-bold text-[#3F72AF]"
-        style={{ fontSize: width > 400 ? 18 : 16 }}
+        style={{ fontSize: width > 400 ? 20 : 18 }}
       >
         {title}
       </Text>
@@ -43,7 +43,7 @@ export default function SectionHeader({
         >
           <Text
             className="text-[#3F72AF] font-medium"
-            style={{ fontSize: width > 400 ? 14 : 12 }}
+            style={{ fontSize: width > 400 ? 15 : 14 }}
           >
             {viewAllText}
           </Text>

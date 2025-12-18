@@ -86,8 +86,8 @@ export default function CategoryList() {
               ellipsizeMode="tail"
               className="text-center text-gray-700 font-medium mt-1"
               style={{
-                fontSize: width > 400 ? 12 : 10,
-                lineHeight: 14,
+                fontSize: width > 400 ? 14 : 13,
+                lineHeight: 18,
                 maxWidth: CARD_WIDTH * 0.95,
               }}
             >

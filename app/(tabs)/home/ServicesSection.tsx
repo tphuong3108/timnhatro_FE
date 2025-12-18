@@ -40,13 +40,13 @@ export default function ServicesSection() {
       <View className="mb-4 px-1">
         <Text 
           className="text-[#3F72AF] font-bold mb-1"
-          style={{ fontSize: width > 400 ? 18 : 16 }}
+          style={{ fontSize: width > 400 ? 20 : 18 }}
         >
           Dịch vụ của chúng tôi
         </Text>
         <Text 
           className="text-[#112D4E] font-bold"
-          style={{ fontSize: isSmallScreen ? 20 : 24 }}
+          style={{ fontSize: isSmallScreen ? 22 : 26 }}
         >
           Khám phá, kết nối và trải nghiệm
         </Text>
@@ -75,7 +75,7 @@ export default function ServicesSection() {
             {/* Title */}
             <Text 
               className="text-[#112D4E] font-bold mb-1"
-              style={{ fontSize: isSmallScreen ? 15 : 16 }}
+              style={{ fontSize: isSmallScreen ? 16 : 17 }}
             >
               {service.title}
             </Text>
@@ -83,7 +83,7 @@ export default function ServicesSection() {
             {/* Description */}
             <Text 
               className="text-gray-500 leading-5"
-              style={{ fontSize: isSmallScreen ? 12 : 13 }}
+              style={{ fontSize: isSmallScreen ? 13 : 14 }}
             >
               {service.description}
             </Text>

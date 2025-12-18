@@ -2,13 +2,13 @@ import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import React, { useCallback, useState } from "react";
 import {
-    ActivityIndicator,
-    Alert,
-    FlatList,
-    Image,
-    Text,
-    TouchableOpacity,
-    View
+  ActivityIndicator,
+  Alert,
+  FlatList,
+  Image,
+  Text,
+  TouchableOpacity,
+  View
 } from "react-native";
 import { useAuth } from "../../../contexts/AuthContext";
 import { chatService } from "../../../services/chatService";
@@ -85,10 +85,10 @@ export default function ChatListScreen() {
           className="w-12 h-12 rounded-full mr-3"
         />
         <View>
-          <Text className="font-semibold text-[16px] text-gray-800">
+          <Text className="font-semibold text-[17px] text-gray-800">
             Trợ lý AI
           </Text>
-          <Text className="text-gray-500 text-[13px]">Hỏi tôi bất cứ điều gì...</Text>
+          <Text className="text-gray-500 text-[14px]">Hỏi tôi bất cứ điều gì...</Text>
         </View>
       </TouchableOpacity>
 
@@ -126,10 +126,10 @@ export default function ChatListScreen() {
                 className="w-12 h-12 rounded-full mr-3 border border-gray-300"
               />
               <View className="flex-1">
-                <Text className="font-semibold text-[16px] text-gray-800">
+                <Text className="font-semibold text-[17px] text-gray-800">
                   {partner.firstName} {partner.lastName}
                 </Text>
-                <Text className="text-gray-500 text-[14px] mt-1">
+                <Text className="text-gray-500 text-[15px] mt-1">
                   {item.lastMessage?.content || "Chưa có tin nhắn"}
                 </Text>
               </View>

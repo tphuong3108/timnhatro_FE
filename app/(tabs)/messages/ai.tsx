@@ -3,12 +3,12 @@ import MessageInputAI from "@/components/messages/MessageInputAI";
 import { useAuth } from "@/contexts/AuthContext";
 import React, { useEffect, useRef, useState } from "react";
 import {
-  FlatList,
-  KeyboardAvoidingView,
-  Platform,
-  SafeAreaView,
-  Text,
-  View,
+    FlatList,
+    KeyboardAvoidingView,
+    Platform,
+    SafeAreaView,
+    Text,
+    View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { aiService } from "../../../services/aiService";
@@ -102,7 +102,7 @@ export default function ChatAI() {
     <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
       {/* Header */}
       <View className="bg-[#BFD7ED] px-4 py-2 items-center border-b border-gray-200">
-        <Text className="text-lg font-semibold">Chat với AI</Text>
+        <Text className="text-xl font-semibold">Chat với AI</Text>
       </View>
 
       {/* Chat */}

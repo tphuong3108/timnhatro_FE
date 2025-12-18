@@ -135,7 +135,7 @@ export default function AmenitiesList({ showAll = false }: AmenitiesListProps) {
             <Text
               numberOfLines={1}
               ellipsizeMode="tail"
-              className="text-gray-700 text-center text-[12px] mt-1 font-medium w-[70px]"
+              className="text-gray-700 text-center text-[13px] mt-1 font-medium w-[70px]"
             >
               {item.name}
             </Text>

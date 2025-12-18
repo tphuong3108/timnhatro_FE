@@ -14,13 +14,13 @@ export default function SloganSection() {
       <Ionicons name="heart" size={36} color="#3F72AF" />
       <Text 
         className="text-[#112D4E] font-bold text-center mt-4"
-        style={{ fontSize: isSmallScreen ? 20 : 24 }}
+        style={{ fontSize: isSmallScreen ? 22 : 26 }}
       >
         Tìm phòng dễ dàng{"\n"}An cư lạc nghiệp
       </Text>
       <Text 
         className="text-gray-600 text-center mt-3"
-        style={{ fontSize: isSmallScreen ? 14 : 15 }}
+        style={{ fontSize: isSmallScreen ? 15 : 16 }}
       >
         Chúng tôi giúp bạn tìm được nơi ở lý tưởng{"\n"}với chi phí hợp lý nhất
       </Text>

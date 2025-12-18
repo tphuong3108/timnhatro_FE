@@ -32,7 +32,7 @@ export default function ChatHeader({ name, avatar, hostId }: Props) {
           }}
           className="w-10 h-10 rounded-full mr-3"
         />
-        <Text className="text-lg font-semibold text-white">{name}</Text>
+        <Text className="text-xl font-semibold text-white">{name}</Text>
       </TouchableOpacity>
     </View>
   );

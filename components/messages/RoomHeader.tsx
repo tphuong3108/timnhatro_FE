@@ -35,18 +35,18 @@ export default function RoomHeader({ room }: Props) {
         />
 
         <View className="flex-1 justify-center">
-          <Text className="font-semibold text-[15px] text-gray-900" numberOfLines={2}>
+          <Text className="font-semibold text-[16px] text-gray-900" numberOfLines={2}>
             {room?.name}
           </Text>
 
           {room?.address && (
-            <Text className="text-gray-600 mt-1" numberOfLines={1}>
+            <Text className="text-gray-600 mt-1 text-[14px]" numberOfLines={1}>
               📍 {room.address}
             </Text>
           )}
 
           {room?.price && (
-            <Text className="text-[#3F72AF] font-bold mt-1">
+            <Text className="text-[#3F72AF] font-bold mt-1 text-[15px]">
               {room.price.toLocaleString()} VNĐ / tháng
             </Text>
           )}

@@ -1,12 +1,12 @@
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import {
-  ActivityIndicator,
-  KeyboardAvoidingView,
-  Platform,
-  TextInput,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    KeyboardAvoidingView,
+    Platform,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
 
 interface Props {
@@ -45,7 +45,7 @@ export default function MessageInput({ receiverId, onMessageSent }: Props) {
           placeholder="Nhập tin nhắn..."
           placeholderTextColor="#6B7280"
           editable={!loading}
-          className="flex-1 bg-gray-100 rounded-full px-4 py-2 text-[14px] text-black"
+          className="flex-1 bg-gray-100 rounded-full px-4 py-2 text-[15px] text-black"
           style={{ minHeight: 40 }}
         />
 
