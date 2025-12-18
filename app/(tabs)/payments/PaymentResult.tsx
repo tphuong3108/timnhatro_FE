@@ -1,18 +1,54 @@
-import React, { useEffect } from "react";
-import { View, Text, ActivityIndicator, TouchableOpacity } from "react-native";
-import { useCheckPaymentStatus } from "../../../hooks/useCheckPaymentStatus";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import Animated, { FadeIn, ZoomIn } from "react-native-reanimated";
 import { Ionicons } from "@expo/vector-icons";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import * as Speech from "expo-speech";
+import React, { useEffect, useRef } from "react";
+import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
+import Animated, { FadeIn, ZoomIn } from "react-native-reanimated";
+import { useCheckPaymentStatus } from "../../../hooks/useCheckPaymentStatus";
 
 export default function PaymentResultScreen() {
   const router = useRouter();
   const { orderId } = useLocalSearchParams();
   const { paymentStatus, paymentInfo, checkStatus } = useCheckPaymentStatus();
+  
+  // Dùng ref để track orderId đã spoken - không bị reset khi re-render
+  const spokenOrderIdRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (orderId) checkStatus(orderId.toString());
-  }, [orderId,checkStatus]);
+  }, [orderId, checkStatus]);
+
+  useEffect(() => {
+    const currentOrderId = orderId?.toString();
+    
+    if (
+      paymentStatus === "success" && 
+      paymentInfo?.amount && 
+      currentOrderId &&
+      spokenOrderIdRef.current !== currentOrderId
+    ) {
+      spokenOrderIdRef.current = currentOrderId;
+      
+      Speech.stop();
+      
+      const amountText = paymentInfo.amount.toLocaleString("vi-VN");
+      const message = `Bạn đã thanh toán thành công với số tiền ${amountText} đồng`;
+      
+      // Đọc ngay khi popup hiện
+      Speech.speak(message, {
+        language: "vi-VN",
+        pitch: 0.9,
+        rate: 0.9,
+      });
+    }
+  }, [paymentStatus, paymentInfo, orderId]);
+
+  // Cleanup khi unmount
+  useEffect(() => {
+    return () => {
+      Speech.stop();
+    };
+  }, []);
 
   const renderContent = () => {
     if (paymentStatus === "idle")
