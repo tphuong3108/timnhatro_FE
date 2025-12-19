@@ -9,14 +9,14 @@ const isSmallScreen = width < 380;
 const stats = [
   {
     icon: "home-outline",
-    value: 1654,
+    value: 500,
     suffix: "+",
     label: "Phòng trọ",
     color: "#3F72AF",
   },
   {
     icon: "people-outline",
-    value: 546,
+    value: 100,
     suffix: "+",
     label: "Khách thuê",
     color: "#10B981",
