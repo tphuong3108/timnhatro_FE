@@ -2,21 +2,22 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-    Alert,
-    Dimensions,
-    Image,
-    Modal,
-    Pressable,
-    ScrollView,
-    Text,
-    TouchableOpacity,
-    View,
+  Alert,
+  Dimensions,
+  Image,
+  Modal,
+  Pressable,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 const { width, height } = Dimensions.get("window");
 
 interface RoomReport {
   id: string;
+  slug?: string;
   name: string;
   address: string;
   image: string;
@@ -62,7 +63,7 @@ export default function RoomReportCard({ room, onApprove, onReject }: Props) {
     <View className="bg-white rounded-3xl shadow-sm mb-5 p-4 border border-gray-100">
       {/* Header */}
       <TouchableOpacity
-        onPress={() => router.push(`/room/${room.id}`)}
+        onPress={() => router.push(`/room/${room.slug || room.id}`)}
         activeOpacity={0.8}
         className="flex-row"
       >

@@ -1,11 +1,10 @@
 import { useRoomReportData } from "@/constants/data/useRoomReportData";
-import { adminApi } from "@/services/adminApi";
 import React, { useState } from "react";
-import { Alert, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import RoomReportCard from "./RoomReportCard";
 
 export default function RoomReportList() {
-  const { rooms, loading, removeRoom } = useRoomReportData();
+  const { rooms, loading, handleApprove, handleReject } = useRoomReportData();
   const [filter, setFilter] = useState<"all" | "approved" | "pending" | "rejected">("all");
 
   const handleProcessReport = async (roomId: string, decision: "approve" | "confirm") => {
@@ -70,15 +69,14 @@ export default function RoomReportList() {
         })}
       </ScrollView>
 
-      {/* Danh sách */}
-      {filtered.length > 0 ? (
-        filtered.map((room) => (
-            <RoomReportCard
-              key={room.id}
-              room={room}
-              onApprove={() => handleProcessReport(room.id, "approve")}
-              onReject={() => handleProcessReport(room.id, "confirm")}
-            />
+      {filteredRooms.length > 0 ? (
+        filteredRooms.map((room) => (
+          <RoomReportCard
+            key={room.id}
+            room={room}
+            onApprove={() => handleApprove(room.id)}
+            onReject={() => handleReject(room.id)}
+          />
         ))
       ) : (
         <View className="items-center justify-center mt-10">

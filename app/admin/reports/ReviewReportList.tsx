@@ -1,11 +1,10 @@
 import { useReviewReportData } from "@/constants/data/useReviewReportData";
-import { adminApi } from "@/services/adminApi";
 import React, { useState } from "react";
-import { Alert, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import ReviewReportCard from "./ReviewReportCard";
 
 export default function ReviewReportList() {
-  const { reviews, loading, removeReview } = useReviewReportData();
+  const { reviews, loading, handleApprove, handleReject } = useReviewReportData();
   const [filter, setFilter] = useState<"all" | "approved" | "pending" | "rejected">("all");
 
   const handleProcessReport = async (reviewId: string, decision: "approve" | "confirm") => {
@@ -80,8 +79,8 @@ export default function ReviewReportList() {
               key={review.id}
               review={review}
               roomSlug={review.roomSlug}
-              onApprove={() => handleProcessReport(review.id, "approve")}
-              onReject={() => handleProcessReport(review.id, "confirm")}
+              onApprove={() => handleApprove(review.id)}
+              onReject={() => handleReject(review.id)}
             />
           ))
       ) : (
