@@ -20,7 +20,7 @@ export default function AdminRoomReports() {
       <View className="flex-row mb-5 ">
         {[
           { key: "room", label: "Báo cáo Phòng" },
-          { key: "review", label: "Báo cáo Review" },
+          { key: "review", label: "Báo cáo Đánh giá" },
         ].map((tab) => {
           const isActive = reportType === tab.key;
           return (

@@ -47,14 +47,14 @@ export default function ReviewReportCard({
   };
 
   const handleApprove = () => {
-    Alert.alert("Xác nhận", "Duyệt báo cáo review này?", [
+    Alert.alert("Xác nhận", "Duyệt báo cáo đánh giá này?", [
       { text: "Hủy", style: "cancel" },
       { text: "Duyệt", onPress: onApprove || (() => {}) },
     ]);
   };
 
   const handleReject = () => {
-    Alert.alert("Xác nhận", "Từ chối báo cáo review này?", [
+    Alert.alert("Xác nhận", "Từ chối báo cáo đánh giá này?", [
       { text: "Hủy", style: "cancel" },
       { text: "Từ chối", onPress: onReject || (() => {}) },
     ]);
