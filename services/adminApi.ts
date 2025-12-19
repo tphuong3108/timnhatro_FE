@@ -86,9 +86,21 @@ export const adminApi = {
     const res = await apiClient.get("/admin/stats/reports");
     return res.data.data || res.data;
   },
-  processReports: async () => {
-    const res = await apiClient.post("/admin/stats/processReports");
-    return res.data.data || res.data;
+  /**
+   * Xử lý báo cáo - hỗ trợ cả tự động và thủ công
+   * @param options - Tham số tùy chọn cho xử lý thủ công
+   * @param options.type - 'room' hoặc 'review'
+   * @param options.id - ID của room/review
+   * @param options.action - 'approve' hoặc 'reject'
+   * Nếu không truyền options → xử lý TỰ ĐỘNG tất cả báo cáo
+   */
+  processReports: async (options?: {
+    type?: 'room' | 'review';
+    id?: string;
+    action?: 'approve' | 'reject';
+  }) => {
+    const res = await apiClient.post("/admin/stats/processReports", options || {});
+    return res.data;
   },
   getReviewReports: async () => {
     const res = await apiClient.get("admin/reviews/reports");

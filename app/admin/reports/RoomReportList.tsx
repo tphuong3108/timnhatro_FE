@@ -1,10 +1,10 @@
-import React, { useState } from "react";
-import { View, Text, TouchableOpacity, ScrollView } from "react-native";
-import RoomReportCard from "./RoomReportCard";
 import { useRoomReportData } from "@/constants/data/useRoomReportData";
+import React, { useState } from "react";
+import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import RoomReportCard from "./RoomReportCard";
 
 export default function RoomReportList() {
-  const { rooms, loading } = useRoomReportData();
+  const { rooms, loading, handleApprove, handleReject } = useRoomReportData();
   const [filter, setFilter] = useState<"all" | "approved" | "pending" | "rejected">("all");
 
   if (loading) {
@@ -60,7 +60,14 @@ export default function RoomReportList() {
       </ScrollView>
 
       {filteredRooms.length > 0 ? (
-        filteredRooms.map((room) => <RoomReportCard key={room.id} room={room} />)
+        filteredRooms.map((room) => (
+          <RoomReportCard
+            key={room.id}
+            room={room}
+            onApprove={() => handleApprove(room.id)}
+            onReject={() => handleReject(room.id)}
+          />
+        ))
       ) : (
         <View className="items-center justify-center mt-10">
           <Text className="text-gray-400">Không có báo cáo nào phù hợp</Text>

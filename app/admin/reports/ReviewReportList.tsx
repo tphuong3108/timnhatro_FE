@@ -1,10 +1,10 @@
-import React, { useState } from "react";
-import { View, Text, ScrollView, TouchableOpacity } from "react-native";
 import { useReviewReportData } from "@/constants/data/useReviewReportData";
+import React, { useState } from "react";
+import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import ReviewReportCard from "./ReviewReportCard";
 
 export default function ReviewReportList() {
-  const { reviews, loading } = useReviewReportData();
+  const { reviews, loading, handleApprove, handleReject } = useReviewReportData();
   const [filter, setFilter] = useState<"all" | "approved" | "pending" | "rejected">("all");
 
   if (loading) {
@@ -68,6 +68,8 @@ export default function ReviewReportList() {
               key={review.id}
               review={review}
               roomSlug={review.roomSlug}
+              onApprove={() => handleApprove(review.id)}
+              onReject={() => handleReject(review.id)}
             />
           ))
       ) : (
