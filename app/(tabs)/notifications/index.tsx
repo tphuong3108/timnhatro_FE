@@ -79,7 +79,7 @@ export default function NotificationsScreen() {
 
   useEffect(() => {
     loadNotifs();
-    const interval = setInterval(loadNotifs, 5000);
+    const interval = setInterval(loadNotifs, 1000);
     return () => clearInterval(interval);
   }, []);
 

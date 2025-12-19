@@ -2,15 +2,15 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-  ActivityIndicator,
-  Alert,
-  KeyboardAvoidingView,
-  Platform,
-  SafeAreaView,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    Alert,
+    KeyboardAvoidingView,
+    Platform,
+    SafeAreaView,
+    ScrollView,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
 import AppleIcon from "../../assets/images/apple.svg";
@@ -54,6 +54,7 @@ export default function Register() {
 
     try {
       setLoading(true);
+      // Tăng timeout lên 30s vì gửi email có thể mất thời gian
       await apiClient.post("/users/register", {
         firstName,
         lastName,
@@ -61,7 +62,7 @@ export default function Register() {
         password,
         confirmPassword,
         email,
-      });
+      }, { timeout: 30000 });
 
       Alert.alert("🎉 OTP đã được gửi!", "Vui lòng kiểm tra email để lấy mã OTP.", [
         {
@@ -79,10 +80,23 @@ export default function Register() {
         },
       ]);
     } catch (error: any) {
-      Alert.alert(
-        "Lỗi gửi OTP",
-        error.response?.data?.message || "Không thể gửi mã OTP. Thử lại sau."
-      );
+      console.log("=== LỖI ĐĂNG KÝ ===");
+      console.log("Error code:", error.code);
+      console.log("Error message:", error.message);
+      console.log("Response status:", error.response?.status);
+      console.log("Response data:", error.response?.data);
+      
+      let errorMessage = "Không thể gửi mã OTP. Thử lại sau.";
+      
+      if (error.code === "ECONNABORTED") {
+        errorMessage = "Kết nối bị timeout. Vui lòng thử lại.";
+      } else if (error.code === "ERR_NETWORK") {
+        errorMessage = "Lỗi kết nối mạng. Kiểm tra internet của bạn.";
+      } else if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      }
+      
+      Alert.alert("Lỗi gửi OTP", errorMessage);
     } finally {
       setLoading(false);
     }
