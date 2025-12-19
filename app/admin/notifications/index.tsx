@@ -1,7 +1,7 @@
 import { notificationApi } from "@/services/notificationApi";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import { FlatList, Text } from "react-native";
+import { FlatList, Text, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import NotificationItemAdmin from "./NotificationItemAdmin";
 
@@ -25,7 +25,6 @@ export default function AdminNotificationsScreen() {
       const arr = await notificationApi.getAdminNotifications();
       setNotis(Array.isArray(arr) ? arr : []);
     } catch {
-      // Error loading notifications
     }
   };
 
@@ -51,13 +50,16 @@ export default function AdminNotificationsScreen() {
 
   useEffect(() => {
     loadNotifs();
-    const interval = setInterval(loadNotifs, 5000);
+    const interval = setInterval(loadNotifs, 2000);
     return () => clearInterval(interval);
   }, []);
 
   return (
-    <GestureHandlerRootView className="flex-1 -mx-4 bg-[#F9FAFB]">
-      <Text className="text-xl font-bold p-4">Thông báo quản trị</Text>
+    <GestureHandlerRootView className="flex-1 bg-[#F9FAFB] px-4 pt-4">
+      <View className="mb-4">
+        <Text className="text-2xl font-bold text-[#112D4E]">Thông báo quản trị</Text>
+        <Text className="text-gray-500 text-sm">Theo dõi hoạt động hệ thống</Text>
+      </View>
 
       <FlatList
         data={notis}

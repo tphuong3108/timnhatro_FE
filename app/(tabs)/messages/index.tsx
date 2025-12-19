@@ -1,6 +1,6 @@
 import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -37,6 +37,13 @@ export default function ChatListScreen() {
       loadChats();
     }, [])
   );
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      loadChats();
+    }, 2000);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleDeleteChat = (chatId: string) => {
     Alert.alert(

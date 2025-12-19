@@ -1,8 +1,16 @@
-import React, { useState, useEffect } from "react";
-import { View, Text, TouchableOpacity, Dimensions } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter, usePathname, Href } from "expo-router";
+import { Href, usePathname, useRouter } from "expo-router";
+import React, { useEffect, useState } from "react";
+import { Dimensions, Text, TouchableOpacity, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
+
+const tabs: { key: string; route: Href; icon: string; activeIcon: string }[] = [
+  { key: "Dashboard", route: "/admin/dashboard" as Href, icon: "grid-outline", activeIcon: "grid" },
+  { key: "Bài đăng", route: "/admin/posts" as Href, icon: "document-text-outline", activeIcon: "document-text" },
+  { key: "Người dùng", route: "/admin/users" as Href, icon: "people-outline", activeIcon: "people" },
+  { key: "Báo cáo", route: "/admin/reports" as Href, icon: "bar-chart-outline", activeIcon: "bar-chart" },
+  { key: "Thanh toán", route: "/admin/payments" as Href, icon: "card-outline", activeIcon: "card" },
+];
 
 export default function AdminFooter() {
   const router = useRouter();
@@ -11,13 +19,6 @@ export default function AdminFooter() {
 
   const { width } = Dimensions.get("window");
   const isWide = width >= 480;
-
-  const tabs: { key: string; route: Href; icon: string; activeIcon: string }[] = [
-    { key: "Dashboard", route: "/admin/dashboard" as Href, icon: "grid-outline", activeIcon: "grid" },
-    { key: "Bài đăng", route: "/admin/posts" as Href, icon: "document-text-outline", activeIcon: "document-text" },
-    { key: "Người dùng", route: "/admin/users" as Href, icon: "people-outline", activeIcon: "people" },
-    { key: "Báo cáo", route: "/admin/reports" as Href, icon: "bar-chart-outline", activeIcon: "bar-chart" },
-  ];
 
   useEffect(() => {
     const found = tabs.find((t) => pathname.startsWith(t.route as string));

@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, FlatList, Image, TouchableOpacity, ActivityIndicator } from "react-native";
-import { bookingApi, Booking } from "../../../services/bookingApi";
 import { Ionicons } from "@expo/vector-icons";
+import React, { useEffect, useState } from "react";
+import { ActivityIndicator, FlatList, Image, Text, TouchableOpacity, View } from "react-native";
 import Toast from "react-native-toast-message";
+import { Booking, bookingApi } from "../../../services/bookingApi";
 
 const STATUS_COLORS: Record<string, string> = {
   pending: "#8FAFD6",
@@ -30,6 +30,8 @@ const UserBookingList = () => {
 
   useEffect(() => {
     loadData();
+    const interval = setInterval(loadData, 2000);
+    return () => clearInterval(interval);
   }, []);
 
   const handleCancel = async (id: string) => {
