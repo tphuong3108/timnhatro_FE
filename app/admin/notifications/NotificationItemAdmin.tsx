@@ -36,7 +36,7 @@ export default function NotificationItemAdmin({ item, onPress, onDelete }: Props
         className="bg-red-500 justify-center items-center px-6"
         style={{ marginVertical: 0 }}
       >
-        <Animated.View style={{ transform: [{ scale }] }}>
+        <Animated.View style={{ transform: [{ scale }] }} className="items-center">
           <Ionicons name="trash-outline" size={24} color="#fff" />
           <Text className="text-white text-xs mt-1">Xóa</Text>
         </Animated.View>
