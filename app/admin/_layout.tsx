@@ -52,7 +52,7 @@ export default function AdminLayout() {
   return (
     <View className="flex-1 bg-[#F9FAFB] relative overflow-hidden">
       <AdminHeader />
-      <View className="flex-1 mb-[65px] px-4">
+      <View className="flex-1 mb-[65px]">
         <Stack
           screenOptions={{
             headerShown: false,

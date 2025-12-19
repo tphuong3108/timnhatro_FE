@@ -57,6 +57,8 @@ export default function AdminPaymentHistory() {
 
   useEffect(() => {
     fetchPayments();
+    const interval = setInterval(fetchPayments, 2000);
+    return () => clearInterval(interval);
   }, []);
 
   const getStatusColor = (status: string) => {

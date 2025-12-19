@@ -3,8 +3,6 @@ import FilterStatusPayment, {
 } from "@/components/filters/FilterStatusPayment";
 import { paymentApi } from "@/services/paymentApi";
 import { Ionicons } from "@expo/vector-icons";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useRouter } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import {
     ActivityIndicator,
@@ -20,54 +18,21 @@ interface Transaction {
     type: string;
     amount: number;
     status: "pending" | "success" | "failed";
-    roomId?: { 
-        _id: string;
-        name: string;
-        address?: string;
-        slug?: string;
-    };
-    orderId?: string;
-    durationDays?: number;
-    premiumExpiry?: string;
+    roomId?: { name: string };
     createdAt: string;
 }
 
 export default function HostPaymentHistory() {
-    const router = useRouter();
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const [payments, setPayments] = useState<Transaction[]>([]);
     const [showFilterModal, setShowFilterModal] = useState(false);
-    const [isHost, setIsHost] = useState<boolean | null>(null);
 
     const [filter, setFilter] = useState({
         status: "" as PaymentStatus,
     });
 
-    // Kiểm tra role khi mount
-    useEffect(() => {
-        const checkRole = async () => {
-            try {
-                const userData = await AsyncStorage.getItem("user");
-                if (userData) {
-                    const user = JSON.parse(userData);
-                    setIsHost(user?.role?.toLowerCase() === "host");
-                } else {
-                    setIsHost(false);
-                }
-            } catch {
-                setIsHost(false);
-            }
-        };
-        checkRole();
-    }, []);
-
     const fetchPayments = useCallback(async (isBackground = false) => {
-        if (isHost === false) {
-            setLoading(false);
-            return;
-        }
-        
         try {
             if (!isBackground) setLoading(true);
             const queryParams: any = {};
@@ -82,23 +47,19 @@ export default function HostPaymentHistory() {
             setLoading(false);
             setRefreshing(false);
         }
-    }, [filter.status, isHost]);
+    }, [filter.status]);
 
     useEffect(() => {
-        if (isHost !== null) {
-            fetchPayments();
-        }
-    }, [fetchPayments, isHost]);
+        fetchPayments();
+    }, [fetchPayments]);
 
     useEffect(() => {
-        if (isHost !== true) return; 
-        
         const interval = setInterval(() => {
             fetchPayments(true);
         }, 2000);
 
         return () => clearInterval(interval);
-    }, [fetchPayments, isHost]);
+    }, [fetchPayments]);
 
     const onRefresh = () => {
         setRefreshing(true);
@@ -107,7 +68,7 @@ export default function HostPaymentHistory() {
 
     const getStatusColor = (status: string) => {
         if (status === "success") return "#3F72AF";
-        if (status === "failed") return "#F38181"; 
+        if (status === "failed") return "#F38181"; // Đổi sang màu đỏ nhạt cho đồng bộ
         return "#F9A825";
     };
 
@@ -159,18 +120,8 @@ export default function HostPaymentHistory() {
                         const color = getStatusColor(item.status);
 
                         return (
-                            <TouchableOpacity
+                            <View
                                 className="bg-white rounded-3xl p-5 mb-4 border border-gray-100 shadow-sm"
-                                activeOpacity={0.7}
-                                onPress={() => {
-                                    router.push({
-                                        pathname: "/(tabs)/historypayments/[id]",
-                                        params: { 
-                                            id: item._id,
-                                            transactionData: JSON.stringify(item)
-                                        }
-                                    });
-                                }}
                             >
                                 <View className="flex-row justify-between items-center mb-3">
                                     <View className="flex-row items-center">
@@ -210,17 +161,14 @@ export default function HostPaymentHistory() {
                                         </View>
                                     )}
 
-                                    <View className="flex-row items-center justify-between pt-2 border-t border-gray-50 mt-2">
-                                        <View className="flex-row items-center">
-                                            <Ionicons name="calendar-outline" size={14} color="#A0AEC0" />
-                                            <Text className="ml-2 text-gray-400 text-xs">
-                                                {new Date(item.createdAt).toLocaleString("vi-VN")}
-                                            </Text>
-                                        </View>
-                                        <Ionicons name="chevron-forward" size={16} color="#CBD5E0" />
+                                    <View className="flex-row items-center pt-2 border-t border-gray-50 mt-2">
+                                        <Ionicons name="calendar-outline" size={14} color="#A0AEC0" />
+                                        <Text className="ml-2 text-gray-400 text-xs">
+                                            {new Date(item.createdAt).toLocaleString("vi-VN")}
+                                        </Text>
                                     </View>
                                 </View>
-                            </TouchableOpacity>
+                            </View>
                         );
                     }}
                     ListEmptyComponent={

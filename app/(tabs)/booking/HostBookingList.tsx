@@ -29,6 +29,8 @@ const HostBookingList = () => {
 
   useEffect(() => {
     loadData();
+    const interval = setInterval(loadData, 2000);
+    return () => clearInterval(interval);
   }, []);
 
   const handleAction = async (id: string, action: "approve" | "decline" | "complete") => {

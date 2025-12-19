@@ -50,6 +50,15 @@ export const paymentApi = {
   getAdminPaymentHistory: async (filter?: PaymentFilter) => {
     const query = buildQueryString(filter || {});
     return apiClient.get(`/payment/history/admin${query}`);
+  },
+  // Lấy chi tiết thanh toán (Host)
+  getHostPaymentDetail: async (paymentId: string) => {
+    return apiClient.get(`/payment/premium/${paymentId}`);
+  },
+
+  // Lấy chi tiết thanh toán (Admin)
+  getAdminPaymentDetail: async (paymentId: string) => {
+    return apiClient.get(`/payment/admin/${paymentId}`);
   }
 
 };

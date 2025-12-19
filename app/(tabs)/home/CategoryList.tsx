@@ -62,7 +62,7 @@ export default function CategoryList() {
       }}
       renderItem={({ item }) => {
         // Giống RoomCarousel: check cả image và images
-        const imageUrl = item.image || item.images?.[0] || "https://via.placeholder.com/150";
+        const imageUrl = item.image || item.images?.[0] || "/image.png";
         const title = item.name || "Phòng trọ";
 
         return (
