@@ -1,6 +1,6 @@
 import ChartCardWrapper from "@/components/admin/ChartCardWrapper";
 import React from "react";
-import { View, Text, useWindowDimensions } from "react-native";
+import { Text, useWindowDimensions, View } from "react-native";
 import { LineChart } from "react-native-chart-kit";
 
 export default function LineChartCard({ title, data }: any) {
@@ -62,6 +62,7 @@ export default function LineChartCard({ title, data }: any) {
         />
       </View>
 
+      {/* Ghi chú tháng này / tháng trước */}
       <View
         style={{
           flexDirection: "row",

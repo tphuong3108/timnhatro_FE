@@ -1,5 +1,5 @@
 import React from "react";
-import { View, useWindowDimensions, ViewStyle, StyleProp } from "react-native";
+import { StyleProp, useWindowDimensions, View, ViewStyle } from "react-native";
 
 interface Props {
   children: React.ReactNode;
@@ -10,7 +10,7 @@ interface Props {
 
 export default function ChartCardWrapper({ children, height, style }: Props) {
   const { width } = useWindowDimensions();
-  const defaultHeight = width < 350 ? 250 : 270; 
+  const defaultHeight = width < 350 ? 280 : 310; 
   return (
     <View
       style={[
@@ -29,7 +29,6 @@ export default function ChartCardWrapper({ children, height, style }: Props) {
           height: height || defaultHeight,
           alignSelf: "center",
           justifyContent: "space-between",
-          overflow: "hidden",
         },
         style,
       ]}

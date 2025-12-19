@@ -4,15 +4,15 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import {
-    ActivityIndicator,
-    FlatList,
-    Image,
-    Modal,
-    RefreshControl,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View
+  ActivityIndicator,
+  FlatList,
+  Image,
+  Modal,
+  RefreshControl,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
 } from "react-native";
 import Animated, { FadeInUp } from "react-native-reanimated";
 
@@ -199,16 +199,16 @@ export default function AdminPaymentHistory() {
           <Text className="text-gray-500 text-sm">Quản lý giao dịch hệ thống</Text>
         </View>
 
-        <View className="flex-row space-x-2">
+        <View className="flex-row gap-2">
           <TouchableOpacity
             onPress={() => setShowStatusFilter(true)}
-            className="w-10 h-10 bg-white rounded-xl items-center justify-center shadow-sm border border-gray-100"
+            className="w-10 h-10 bg-white rounded-xl items-center justify-center border border-gray-100"
           >
             <Ionicons name="filter" size={20} color="#3F72AF" />
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => setShowDateFilter(true)}
-            className="w-10 h-10 bg-white rounded-xl items-center justify-center shadow-sm border border-gray-100"
+            className="w-10 h-10 bg-white rounded-xl items-center justify-center border border-gray-100"
           >
             <Ionicons name="calendar" size={20} color="#112D4E" />
           </TouchableOpacity>
@@ -277,7 +277,7 @@ export default function AdminPaymentHistory() {
               />
             </View>
 
-            <View className="flex-row space-x-3">
+            <View className="flex-row gap-3">
               <TouchableOpacity
                 onPress={() => setShowDateFilter(false)}
                 className="flex-1 py-4 rounded-2xl bg-gray-100"
