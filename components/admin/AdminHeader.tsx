@@ -1,20 +1,20 @@
+import Logo from "@/assets/images/logo.svg";
+import apiClient from "@/services/apiClient";
+import { notificationApi } from "@/services/notificationApi";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { BlurView } from "expo-blur";
 import { useRouter } from "expo-router";
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
-  Alert,
-  Platform,
-  TouchableOpacity,
-  View,
-  Text,
-  ActivityIndicator,
+    ActivityIndicator,
+    Alert,
+    Platform,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
-import Logo from "@/assets/images/logo.svg";
-import apiClient from "@/services/apiClient";
-import { notificationApi } from "@/services/notificationApi";
 
 export default function AdminHeader() {
   const router = useRouter();
@@ -104,9 +104,9 @@ export default function AdminHeader() {
                 />
 
                 {unread > 0 && (
-                  <View className="absolute -top-1 -right-1 bg-red-600 w-4 h-4 rounded-full items-center justify-center">
-                    <Text className="text-white text-[10px] font-bold">
-                      {unread}
+                  <View className={`absolute -top-1 -right-1 bg-red-600 rounded-full items-center justify-center ${unread >= 99 ? 'px-1 min-w-[20px] h-[16px]' : 'w-4 h-4'}`}>
+                    <Text className="text-white text-[9px] font-bold">
+                      {unread >= 99 ? "99+" : unread}
                     </Text>
                   </View>
                 )}

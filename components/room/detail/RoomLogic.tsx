@@ -126,7 +126,7 @@ export function useRoomLogic() {
 
   const reportRoom = () => {
     setShowMenu(false);
-    if (room?._id) router.push(`/room/ReportRoom?id=${room._id}`);
+    if (room?._id) router.push(`/(tabs)/room/ReportRoom?id=${room._id}`);
   };
 
   return {

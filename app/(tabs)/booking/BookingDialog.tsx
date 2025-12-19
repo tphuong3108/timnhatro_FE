@@ -1,19 +1,29 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
-  View,
-  Text,
-  TouchableOpacity,
-  Modal,
   Alert,
   FlatList,
-  TextInput,
   KeyboardAvoidingView,
+  Modal,
   Platform,
   ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { Calendar } from "react-native-calendars";
-import { bookingApi } from "../../../services/bookingApi";
 import Toast from "react-native-toast-message";
+import { bookingApi } from "../../../services/bookingApi";
+
+// Primary color theme - xanh dương chủ đạo
+const PRIMARY_COLOR = "#3F72AF";
+
+// Hàm lấy ngày mai (chặn đặt lịch trong ngày)
+const getTomorrowDate = () => {
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  return tomorrow.toISOString().split("T")[0];
+};
 
 interface BookingDialogProps {
   visible: boolean;
@@ -23,6 +33,9 @@ interface BookingDialogProps {
   roomName?: string;
   onBooked?: () => void;
 }
+
+// Các view mode - chỉ dùng 1 Modal, switch nội dung
+type ViewMode = "form" | "date" | "time";
 
 export default function BookingDialog({
   visible,
@@ -36,8 +49,7 @@ export default function BookingDialog({
   const [time, setTime] = useState<string | null>(null);
   const [note, setNote] = useState("");
   const [alreadyBooked, setAlreadyBooked] = useState(false);
-  const [openDatePicker, setOpenDatePicker] = useState(false);
-  const [openTimePicker, setOpenTimePicker] = useState(false);
+  const [viewMode, setViewMode] = useState<ViewMode>("form");
 
   const hours = [
     "08:00", "08:30", "09:00", "09:30",
@@ -47,6 +59,13 @@ export default function BookingDialog({
     "17:00", "17:30", "18:00", "18:30",
     "19:00", "19:30", "20:00",
   ];
+
+  // Reset viewMode khi đóng dialog
+  useEffect(() => {
+    if (!visible) {
+      setViewMode("form");
+    }
+  }, [visible]);
 
   useEffect(() => {
     if (!visible) return;
@@ -93,130 +112,153 @@ export default function BookingDialog({
     }
   };
 
+  // Render nội dung form chính
+  const renderFormContent = () => (
+    <View className="bg-white p-6 rounded-t-3xl max-h-[90%]">
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <Text className="text-xl font-bold mb-3 text-gray-800">Đặt lịch xem phòng</Text>
+        {roomName && (
+          <Text style={{ color: PRIMARY_COLOR }} className="text-lg font-semibold mb-4">{roomName}</Text>
+        )}
+
+        {/* Chọn ngày */}
+        <Text className="font-semibold mb-1 text-gray-700">Ngày xem phòng</Text>
+        <TouchableOpacity
+          onPress={() => setViewMode("date")}
+          style={{ borderColor: date ? PRIMARY_COLOR : '#d1d5db' }}
+          className="border p-3 rounded-xl mb-3"
+        >
+          <Text style={{ color: date ? PRIMARY_COLOR : '#6b7280' }}>{date || "Chọn ngày"}</Text>
+        </TouchableOpacity>
+
+        {/* Chọn giờ */}
+        <Text className="font-semibold mb-1 text-gray-700">Giờ xem phòng</Text>
+        <TouchableOpacity
+          onPress={() => setViewMode("time")}
+          style={{ borderColor: time ? PRIMARY_COLOR : '#d1d5db' }}
+          className="border p-3 rounded-xl mb-3"
+        >
+          <Text style={{ color: time ? PRIMARY_COLOR : '#6b7280' }}>{time || "Chọn giờ"}</Text>
+        </TouchableOpacity>
+
+        {/* Ghi chú */}
+        <Text className="font-semibold mb-1 text-gray-700">Ghi chú</Text>
+        <TextInput
+          className="border border-gray-300 text-[#3F72AF]  p-3 rounded-xl mb-3 min-h-[80px]"
+          placeholder="Thông tin bạn muốn trao đổi..."
+          value={note}
+          onChangeText={setNote}
+          multiline
+          textAlignVertical="top"
+          placeholderTextColor="#9ca3af"
+        />
+
+        {/* Nút đặt lịch */}
+        <TouchableOpacity
+          style={{ backgroundColor: alreadyBooked ? '#9ca3af' : PRIMARY_COLOR }}
+          className="py-4 rounded-xl mt-2"
+          disabled={alreadyBooked}
+          onPress={handleSubmit}
+        >
+          <Text className="text-white text-center font-semibold text-lg">
+            {alreadyBooked ? "Đã đặt rồi" : "Đặt lịch"}
+          </Text>
+        </TouchableOpacity>
+
+        {/* Nút đóng */}
+        <TouchableOpacity
+          onPress={onClose}
+          className="py-3 mt-3 rounded-xl bg-gray-100"
+        >
+          <Text className="text-center text-gray-600 font-semibold">Đóng</Text>
+        </TouchableOpacity>
+      </ScrollView>
+    </View>
+  );
+
+  // Render nội dung chọn ngày
+  const renderDateContent = () => (
+    <View className="bg-white p-4 rounded-t-3xl">
+      <Text style={{ color: PRIMARY_COLOR }} className="text-lg font-bold mb-3 text-center">
+        Chọn ngày xem phòng
+      </Text>
+      <Calendar
+        minDate={getTomorrowDate()}
+        onDayPress={(day) => {
+          setDate(day.dateString);
+          setViewMode("form");
+        }}
+        markedDates={{
+          [date || ""]: { selected: true, selectedColor: PRIMARY_COLOR },
+        }}
+        theme={{
+          todayTextColor: PRIMARY_COLOR,
+          arrowColor: PRIMARY_COLOR,
+          selectedDayBackgroundColor: PRIMARY_COLOR,
+          dotColor: PRIMARY_COLOR,
+        }}
+      />
+      <TouchableOpacity
+        onPress={() => setViewMode("form")}
+        className="p-3 rounded-xl mt-3 bg-gray-100"
+      >
+        <Text className="text-center text-gray-600 font-semibold">Quay lại</Text>
+      </TouchableOpacity>
+    </View>
+  );
+
+  // Render nội dung chọn giờ
+  const renderTimeContent = () => (
+    <View className="bg-white p-4 rounded-t-3xl max-h-[60%]">
+      <Text style={{ color: PRIMARY_COLOR }} className="text-lg font-bold mb-3 text-center">
+        Chọn khung giờ
+      </Text>
+      <FlatList
+        data={hours}
+        numColumns={3}
+        columnWrapperStyle={{ justifyContent: "space-between" }}
+        renderItem={({ item }) => (
+          <TouchableOpacity
+            onPress={() => {
+              setTime(item);
+              setViewMode("form");
+            }}
+            style={{
+              backgroundColor: time === item ? PRIMARY_COLOR : 'transparent',
+              borderColor: time === item ? PRIMARY_COLOR : '#d1d5db',
+            }}
+            className="p-3 rounded-xl border mb-3 w-[30%]"
+          >
+            <Text 
+              style={{ color: time === item ? '#ffffff' : '#374151' }}
+              className="text-center font-medium"
+            >
+              {item}
+            </Text>
+          </TouchableOpacity>
+        )}
+        keyExtractor={(item) => item}
+      />
+      <TouchableOpacity
+        onPress={() => setViewMode("form")}
+        className="p-3 rounded-xl mt-3 bg-gray-100"
+      >
+        <Text className="text-center text-gray-600 font-semibold">Quay lại</Text>
+      </TouchableOpacity>
+    </View>
+  );
+
   return (
     <Modal visible={visible} transparent animationType="slide">
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
-        <View className="flex-1 justify-end bg-black/30">
-          <View className="bg-white p-6 rounded-t-3xl max-h-[90%]">
-            <ScrollView showsVerticalScrollIndicator={false}>
-              <Text className="text-xl font-bold mb-3">Đặt lịch xem phòng</Text>
-              {roomName && (
-                <Text className="text-lg font-semibold text-blue-600 mb-4">{roomName}</Text>
-              )}
-
-              {/* Chọn ngày */}
-              <Text className="font-semibold mb-1">Ngày xem phòng</Text>
-              <TouchableOpacity
-                onPress={() => setOpenDatePicker(true)}
-                className="border border-gray-300 p-3 rounded-xl mb-3"
-              >
-                <Text>{date || "Chọn ngày"}</Text>
-              </TouchableOpacity>
-
-              {/* Chọn giờ */}
-              <Text className="font-semibold mb-1">Giờ xem phòng</Text>
-              <TouchableOpacity
-                onPress={() => setOpenTimePicker(true)}
-                className="border border-gray-300 p-3 rounded-xl mb-3"
-              >
-                <Text>{time || "Chọn giờ"}</Text>
-              </TouchableOpacity>
-
-              {/* Ghi chú */}
-              <Text className="font-semibold mb-1">Ghi chú</Text>
-              <TextInput
-                className="border border-gray-300 p-3 rounded-xl mb-3 min-h-[80px]"
-                placeholder="Thông tin bạn muốn trao đổi..."
-                value={note}
-                onChangeText={setNote}
-                multiline
-                textAlignVertical="top"
-              />
-
-              {/* Nút đặt lịch */}
-              <TouchableOpacity
-                className={`py-4 rounded-xl mt-2 ${alreadyBooked ? "bg-gray-400" : "bg-blue-600"}`}
-                disabled={alreadyBooked}
-                onPress={handleSubmit}
-              >
-                <Text className="text-white text-center font-semibold text-lg">
-                  {alreadyBooked ? "Đã đặt rồi" : "Đặt lịch"}
-                </Text>
-              </TouchableOpacity>
-
-              {/* Nút đóng */}
-              <TouchableOpacity
-                onPress={onClose}
-                className="py-3 mt-3 rounded-xl bg-gray-200"
-              >
-                <Text className="text-center text-gray-700 font-semibold">Đóng</Text>
-              </TouchableOpacity>
-            </ScrollView>
-          </View>
+        <View className="flex-1 justify-end bg-black/40">
+          {viewMode === "form" && renderFormContent()}
+          {viewMode === "date" && renderDateContent()}
+          {viewMode === "time" && renderTimeContent()}
         </View>
-
-        {/* Modal chọn ngày */}
-        <Modal visible={openDatePicker} transparent animationType="fade">
-          <View className="flex-1 justify-end bg-black/40">
-            <View className="bg-white p-4 rounded-t-3xl">
-              <Calendar
-                minDate={new Date().toISOString().split("T")[0]}
-                onDayPress={(day) => {
-                  setDate(day.dateString);
-                  setOpenDatePicker(false);
-                }}
-                markedDates={{
-                  [date || ""]: { selected: true, selectedColor: "#3B82F6" },
-                }}
-              />
-              <TouchableOpacity
-                onPress={() => setOpenDatePicker(false)}
-                className="bg-red-500 p-3 rounded-xl mt-3"
-              >
-                <Text className="text-center text-white font-semibold">Hủy</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </Modal>
-
-        {/* Modal chọn giờ */}
-        <Modal visible={openTimePicker} transparent animationType="fade">
-          <View className="flex-1 justify-end bg-black/40">
-            <View className="bg-white p-4 rounded-t-3xl max-h-[60%]">
-              <Text className="text-lg font-bold mb-3">Chọn khung giờ</Text>
-              <FlatList
-                data={hours}
-                numColumns={3}
-                columnWrapperStyle={{ justifyContent: "space-between" }}
-                renderItem={({ item }) => (
-                  <TouchableOpacity
-                    onPress={() => {
-                      setTime(item);
-                      setOpenTimePicker(false);
-                    }}
-                    className={`p-3 rounded-xl border mb-3 w-[30%] ${
-                      time === item ? "bg-blue-500 border-blue-500" : "border-gray-300"
-                    }`}
-                  >
-                    <Text className={`text-center ${time === item ? "text-white" : "text-gray-800"}`}>
-                      {item}
-                    </Text>
-                  </TouchableOpacity>
-                )}
-                keyExtractor={(item) => item}
-              />
-              <TouchableOpacity
-                onPress={() => setOpenTimePicker(false)}
-                className="bg-red-500 p-3 rounded-xl mt-3"
-              >
-                <Text className="text-center text-white font-semibold">Hủy</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </Modal>
       </KeyboardAvoidingView>
       <Toast position="top" />
     </Modal>

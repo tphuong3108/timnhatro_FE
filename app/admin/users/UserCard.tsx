@@ -1,7 +1,7 @@
-import React from "react";
-import { View, Text, Image, TouchableOpacity, Alert } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import React from "react";
+import { Alert, Image, Text, TouchableOpacity, View } from "react-native";
 
 interface User {
   id: string;
@@ -34,13 +34,13 @@ export default function UserCard({ user, onToggleActive }: Props) {
   return (
     <TouchableOpacity
       activeOpacity={0.85}
-      onPress={() => router.push(`/user/${user.id}`)} // 🔹 điều hướng đến chi tiết user
+      onPress={() => router.push(`/admin/users/${user.id}`)} // 🔹 điều hướng đến chi tiết user trong admin
       className="bg-white rounded-3xl shadow-sm border border-gray-100 p-4 mb-4"
     >
       <View className="flex-row items-center">
         {/* Avatar */}
         <Image
-          source={{ uri: user.avatar || "https://i.pravatar.cc/150" }}
+          source={{ uri: user.avatar || "https://cdn-icons-png.flaticon.com/512/149/149071.png" }}
           className="w-[64px] h-[64px] rounded-full mr-4"
         />
 

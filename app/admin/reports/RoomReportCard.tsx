@@ -1,17 +1,17 @@
-import React, { useState } from "react";
-import {
-  View,
-  Text,
-  Image,
-  TouchableOpacity,
-  ScrollView,
-  Alert,
-  Modal,
-  Pressable,
-  Dimensions,
-} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import React, { useState } from "react";
+import {
+    Alert,
+    Dimensions,
+    Image,
+    Modal,
+    Pressable,
+    ScrollView,
+    Text,
+    TouchableOpacity,
+    View,
+} from "react-native";
 
 const { width, height } = Dimensions.get("window");
 
@@ -85,19 +85,15 @@ export default function RoomReportCard({ room, onApprove, onReject }: Props) {
             </Text>
 
             {/* Chủ trọ */}
-            <TouchableOpacity
-              onPress={() => router.push(`/user/${room.host.name}`)}
-              activeOpacity={0.8}
-              className="flex-row items-center mt-2"
-            >
+            <View className="flex-row items-center mt-2">
               <Image
-                source={{ uri: room.host.avatar }}
+                source={{ uri: room.host.avatar || "https://cdn-icons-png.flaticon.com/512/149/149071.png" }}
                 className="w-[26px] h-[26px] rounded-full mr-2"
               />
               <Text className="text-gray-700 text-[13px]" numberOfLines={1}>
                 Chủ trọ: {room.host.name}
               </Text>
-            </TouchableOpacity>
+            </View>
           </View>
         </View>
       </TouchableOpacity>

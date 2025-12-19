@@ -1,9 +1,8 @@
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, Alert } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { Alert, Text, TextInput, TouchableOpacity, View } from "react-native";
 import Animated, { FadeInUp } from "react-native-reanimated";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+
 import { reviewApi } from "@/services/reviewApi";
 import { useRouter } from "expo-router";
 
@@ -37,12 +36,12 @@ export default function HostReviewForm({ room, onSubmit }: HostReviewFormProps) 
   return (
     <Animated.View
       entering={FadeInUp.duration(600)}
-      className="px-5 py-8 bg-[#F9F7F7] rounded-2xl p-4 mt-4 border border-gray-200"
+      className="mx-4 px-5 py-6 bg-white rounded-2xl mt-4 shadow shadow-black/10"
     >
       <View className="flex-row items-center mb-2">
         <MaterialCommunityIcons name="pencil-outline" size={20} color="#2d69adff" />
         <Text className="text-xl font-semibold text-[#3F72AF] ml-2">
-          Gửi cảm nhận về chủ trọ
+          Gửi cảm nhận về phòng trọ
         </Text>
       </View>
 

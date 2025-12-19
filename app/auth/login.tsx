@@ -4,14 +4,14 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Href, useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-    ActivityIndicator,
-    Alert,
-    KeyboardAvoidingView,
-    Platform,
-    SafeAreaView,
-    Text,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  SafeAreaView,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
 import AppleIcon from "../../assets/images/apple.svg";
@@ -21,6 +21,7 @@ import Logo from "../../assets/images/logodoc.svg";
 import InputField from "../../components/InputField";
 
 import apiClient from "@/services/apiClient";
+import { TextInput } from "react-native-paper";
 
 export default function Login() {
   const router = useRouter();
@@ -116,11 +117,10 @@ export default function Login() {
             onChangeText={setPassword}
             secureTextEntry={!passwordVisible}
             right={
-              <Ionicons
-                name={passwordVisible ? "eye-outline" : "eye-off-outline"}
-                size={RFValue(20)}
-                color="gray"
+              <TextInput.Icon
+                icon={passwordVisible ? "eye-outline" : "eye-off-outline"}
                 onPress={() => setPasswordVisible(!passwordVisible)}
+                size={RFValue(20)}
               />
             }
           />

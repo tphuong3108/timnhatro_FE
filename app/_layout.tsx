@@ -1,8 +1,8 @@
 import {
-  Inter_400Regular,
-  Inter_500Medium,
-  Inter_600SemiBold,
-  Inter_700Bold,
+    Inter_400Regular,
+    Inter_500Medium,
+    Inter_600SemiBold,
+    Inter_700Bold,
 } from "@expo-google-fonts/inter";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
 import { DefaultTheme, ThemeProvider } from "@react-navigation/native";
@@ -84,8 +84,8 @@ export default function RootLayout() {
           {/* Auth */}
           <Stack.Screen name="auth" />
 
-          {/* Admin */}
-          <Stack.Screen name="admin" />
+          {/* Admin - disable gesture để không bị vuốt thoát */}
+          <Stack.Screen name="admin" options={{ gestureEnabled: false }} />
 
           {/* Modal */}
           <Stack.Screen name="modal" />

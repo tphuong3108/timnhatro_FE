@@ -94,4 +94,14 @@ export const adminApi = {
     const res = await apiClient.get("admin/reviews/reports");
     return res.data.data;
   },
+  // Xử lý báo cáo phòng (duyệt/từ chối)
+  processRoomReport: async (id: string, decision: "approve" | "confirm") => {
+    const res = await apiClient.post(`/admin/reports/room/${id}`, { decision });
+    return res.data.data || res.data;
+  },
+  // Xử lý báo cáo review (duyệt/từ chối)
+  processReviewReport: async (id: string, decision: "approve" | "confirm") => {
+    const res = await apiClient.post(`/admin/reports/review/${id}`, { decision });
+    return res.data.data || res.data;
+  },
 };

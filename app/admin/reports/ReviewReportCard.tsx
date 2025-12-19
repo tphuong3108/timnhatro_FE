@@ -1,7 +1,7 @@
-import React from "react";
-import { View, Text, TouchableOpacity, Alert } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import React from "react";
+import { Alert, Text, TouchableOpacity, View } from "react-native";
 
 interface ReviewReport {
   id: string;
@@ -12,12 +12,12 @@ interface ReviewReport {
   reviewer: string;
   rating: number;
   status: "approved" | "pending" | "rejected";
-  reports: Array<{
+  reports: {
     [x: string]: string;
     userId: string;
     reason: string;
     reportedAt: string;
-  }>;
+  }[];
 }
 
 interface Props {
@@ -72,7 +72,7 @@ export default function ReviewReportCard({
           Người đánh giá: {review.reviewer}
         </Text>
         <Text className="text-gray-500 text-[13px] mt-1">
-          Báo cáo bởi: {review.reports[0].reportedByName || review.reportedBy}
+          Báo cáo bởi: {review.reports?.[0]?.reporterName || "Ẩn danh"}
         </Text>
 
         {/* Hiển thị lý do báo cáo */}

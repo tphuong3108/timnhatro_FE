@@ -9,22 +9,22 @@ export default function HostInfo({ room, contactHost }: any) {
   const { user } = useAuth();
   if (!room.host) return null;
 
-  const renderStars = (rating: number) => {
-    const stars = [];
-    for (let i = 1; i <= 5; i++) {
-      if (rating >= i)
-        stars.push(<Ionicons key={i} name="star" size={18} color="#FFD700" />);
-      else if (rating >= i - 0.5)
-        stars.push(
-          <Ionicons key={i} name="star-half" size={18} color="#FFD700" />
-        );
-      else
-        stars.push(
-          <Ionicons key={i} name="star-outline" size={18} color="#FFD700" />
-        );
-    }
-    return stars;
-  };
+  // const renderStars = (rating: number) => {
+  //   const stars = [];
+  //   for (let i = 1; i <= 5; i++) {
+  //     if (rating >= i)
+  //       stars.push(<Ionicons key={i} name="star" size={18} color="#FFD700" />);
+  //     else if (rating >= i - 0.5)
+  //       stars.push(
+  //         <Ionicons key={i} name="star-half" size={18} color="#FFD700" />
+  //       );
+  //     else
+  //       stars.push(
+  //         <Ionicons key={i} name="star-outline" size={18} color="#FFD700" />
+  //       );
+  //   }
+  //   return stars;
+  // };
 
   const handleChatNow = async () => {
   try {
@@ -79,12 +79,12 @@ export default function HostInfo({ room, contactHost }: any) {
               {room.host.bio}
             </Text>
           )}
-          <View className="flex-row items-center mt-1">
+          {/* <View className="flex-row items-center mt-1">
             {renderStars(room.avgRating)}
             <Text className="ml-2 text-gray-700 text-[13px]">
               {room.avgRating.toFixed(2)} ({room.totalRatings} đánh giá)
             </Text>
-          </View>
+          </View> */}
         </View>
       </View>
 

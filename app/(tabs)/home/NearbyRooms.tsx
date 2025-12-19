@@ -4,12 +4,12 @@ import * as Location from "expo-location";
 import { useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import {
-    ActivityIndicator,
-    Animated,
-    ImageBackground,
-    Text,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Animated,
+  ImageBackground,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 const CARD_WIDTH = 180;
@@ -37,10 +37,10 @@ export default function NearbyRooms() {
         const { latitude, longitude } = location.coords;
 
         // Gọi API lấy phòng gần đây
-        const res = await roomApi.getNearbyRooms(latitude, longitude, 20000);
+        const res = await roomApi.getNearbyRooms(latitude, longitude, 15000);
 
         if (Array.isArray(res) && res.length > 0) {
-          setRooms(res);
+          setRooms(res.slice(0, 8));
         } else {
           setRooms([]);
         }
@@ -139,7 +139,7 @@ export default function NearbyRooms() {
                   </Text>
 
                   <Ionicons
-                    name="heart-outline"
+                    name="heart"
                     size={14}
                     color="#ff9eb3"
                     style={{ marginLeft: 8 }}

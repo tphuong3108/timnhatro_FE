@@ -35,5 +35,10 @@ export function useReviewReportData() {
     fetchReports();
   }, []);
 
-  return { reviews, loading, fetchReports };
+  const removeReview = (id: string) => {
+    setReviews(prev => prev.filter(review => review.id !== id));
+  };
+
+  return { reviews, loading, fetchReports, removeReview };
 }
+

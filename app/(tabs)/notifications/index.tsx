@@ -2,7 +2,8 @@ import NotificationItem from "@/components/notifications/NotificationItem";
 import { notificationApi } from "@/services/notificationApi";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import { FlatList, Text, View } from "react-native";
+import { FlatList, Text } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 interface INotification {
   _id?: string;
@@ -29,7 +30,7 @@ export default function NotificationsScreen() {
       const data = await notificationApi.getMyNotifications();
       if (!Array.isArray(data)) return setNotis([]);
       setNotis(data);
-    } catch (e) {
+    } catch {
     }
   };
 
@@ -48,7 +49,7 @@ export default function NotificationsScreen() {
             getRealId(n) === realId ? { ...n, isRead: true } : n
           )
         );
-      } catch (e) {
+      } catch {
       }
     }
 
@@ -76,6 +77,18 @@ export default function NotificationsScreen() {
     }
   };
 
+  // Xóa thông báo
+  const handleDeleteNotification = async (item: INotification) => {
+    const realId = getRealId(item);
+    if (!realId) return;
+
+    try {
+      await notificationApi.deleteNotification(realId);
+      setNotis(prev => prev.filter(n => getRealId(n) !== realId));
+    } catch {
+    }
+  };
+
 
   useEffect(() => {
     loadNotifs();
@@ -84,16 +97,21 @@ export default function NotificationsScreen() {
   }, []);
 
   return (
-    <View className="flex-1 bg-white">
+    <GestureHandlerRootView className="flex-1 bg-white">
       <Text className="text-xl font-bold p-4">Thông báo</Text>
 
       <FlatList
         data={notis}
         keyExtractor={(item) => getRealId(item) || Math.random().toString()}
         renderItem={({ item }) => (
-          <NotificationItem item={item} onPress={() => handleOpenNotification(item)} />
+          <NotificationItem 
+            item={item} 
+            onPress={() => handleOpenNotification(item)} 
+            onDelete={() => handleDeleteNotification(item)}
+          />
         )}
       />
-    </View>
+    </GestureHandlerRootView>
   );
 }
+

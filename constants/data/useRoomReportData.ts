@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
 import { adminApi } from "@/services/adminApi";
+import { useEffect, useState } from "react";
 
 export interface RoomReport {
   id: string;
@@ -43,7 +43,9 @@ export function useRoomReportData() {
             },
             reporter: {
               name: r.reports?.[0]?.reporterName || "Ẩn danh",
-              avatar: r.reports?.[0]?.reporterAvatar || "https://i.pravatar.cc/150?img=9",
+              avatar: r.reports?.[0]?.reporterAvatar && r.reports[0].reporterAvatar.trim() !== "" 
+                ? r.reports[0].reporterAvatar 
+                : "https://cdn-icons-png.flaticon.com/512/149/149071.png",
             },
             status: "pending",
             views: r.viewCount || 0,
@@ -65,5 +67,9 @@ export function useRoomReportData() {
     fetchReports();
   }, []);
 
-  return { rooms, loading, fetchReports };
+  const removeRoom = (id: string) => {
+    setRooms(prev => prev.filter(room => room.id !== id));
+  };
+
+  return { rooms, loading, fetchReports, removeRoom };
 }

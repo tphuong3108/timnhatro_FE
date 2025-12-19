@@ -50,7 +50,6 @@ export default function AdminPaymentHistory() {
       const response = await paymentApi.getAdminPaymentHistory(queryParams);
       setPayments(response.data.data || []);
     } catch (error) {
-      console.error("Failed to fetch admin payment history:", error);
     } finally {
       setLoading(false);
     }

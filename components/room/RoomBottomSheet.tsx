@@ -1,16 +1,16 @@
+import { MapRoomCard } from "@/components/MapRoomCard";
+import { SNAP_POINTS } from "@/hooks/useRoomMapLogic";
+import { useRouter } from "expo-router";
 import React from "react";
 import {
-  TouchableOpacity,
-  FlatList,
   Animated,
   Dimensions,
-  View,
+  FlatList,
   Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import { useRouter } from "expo-router";
-import { SNAP_POINTS } from "@/hooks/useRoomMapLogic";
 import { SheetHeader } from "./SheetHeader";
-import { MapRoomCard } from "@/components/MapRoomCard";
 
 export function RoomBottomSheet({
   rooms,
@@ -102,7 +102,7 @@ export function RoomBottomSheet({
               </View>
             ) : !hasMore ? (
               <View className="py-4 items-center">
-                <Text className="text-gray-400">Đã hết dữ liệu</Text>
+                {/* <Text className="text-gray-400">Đã hết dữ liệu</Text> */}
               </View>
             ) : null
           }

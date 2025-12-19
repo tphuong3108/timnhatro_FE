@@ -1,7 +1,8 @@
 import { notificationApi } from "@/services/notificationApi";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import { FlatList, Text, View } from "react-native";
+import { FlatList, Text } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import NotificationItemAdmin from "./NotificationItemAdmin";
 
 interface IAdminNotification {
@@ -19,15 +20,14 @@ export default function AdminNotificationsScreen() {
   const router = useRouter();
   const [notis, setNotis] = useState<IAdminNotification[]>([]);
 
-    const loadNotifs = async () => {
+  const loadNotifs = async () => {
     try {
-        const arr = await notificationApi.getAdminNotifications();
-        setNotis(Array.isArray(arr) ? arr : []);
-    } catch (e) {
-        // Error loading notifications
+      const arr = await notificationApi.getAdminNotifications();
+      setNotis(Array.isArray(arr) ? arr : []);
+    } catch {
+      // Error loading notifications
     }
-    };
-
+  };
 
   // mark as read
   const markAsRead = async (id: string) => {
@@ -36,7 +36,16 @@ export default function AdminNotificationsScreen() {
       setNotis(prev =>
         prev.map(n => (n._id === id ? { ...n, isRead: true } : n))
       );
-    } catch (e) {
+    } catch {
+    }
+  };
+
+  // Xóa thông báo
+  const handleDeleteNotification = async (id: string) => {
+    try {
+      await notificationApi.deleteNotification(id);
+      setNotis(prev => prev.filter(n => n._id !== id));
+    } catch {
     }
   };
 
@@ -47,7 +56,7 @@ export default function AdminNotificationsScreen() {
   }, []);
 
   return (
-    <View className="flex-1 -mx-4 bg-[#F9FAFB]">
+    <GestureHandlerRootView className="flex-1 -mx-4 bg-[#F9FAFB]">
       <Text className="text-xl font-bold p-4">Thông báo quản trị</Text>
 
       <FlatList
@@ -65,9 +74,12 @@ export default function AdminNotificationsScreen() {
                 return;
               }
             }}
+            onDelete={() => handleDeleteNotification(item._id)}
           />
         )}
       />
-    </View>
+    </GestureHandlerRootView>
   );
 }
+
+

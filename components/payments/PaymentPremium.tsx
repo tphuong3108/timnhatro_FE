@@ -52,7 +52,6 @@ export function usePaymentPremium(roomId: string, onBrowserClosed?: () => void) 
         // Xử lý kết quả khi browser đóng
         if (result.type === "success" && result.url) {
           // Parse orderId từ URL nếu có
-          console.log("Payment redirect URL:", result.url);
           onBrowserClosed?.();
         } else if (result.type === "dismiss" || result.type === "cancel") {
           onBrowserClosed?.();

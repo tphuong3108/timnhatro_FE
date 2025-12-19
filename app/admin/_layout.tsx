@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react";
-import { View, ActivityIndicator, ScrollView } from "react-native";
-import { Slot, Redirect } from "expo-router";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import AdminHeader from "@/components/admin/AdminHeader";
 import AdminFooter from "@/components/admin/AdminFooter";
+import AdminHeader from "@/components/admin/AdminHeader";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Redirect, Stack } from "expo-router";
+import React, { useEffect, useState } from "react";
+import { ActivityIndicator, View } from "react-native";
 
 export default function AdminLayout() {
   const [isChecking, setIsChecking] = useState(true);
@@ -25,7 +25,7 @@ export default function AdminLayout() {
         const user = JSON.parse(userData);
         setIsLoggedIn(true);
         setIsAdmin(user?.role?.toLowerCase() === "admin");
-      } catch (error) {
+      } catch {
       } finally {
         setIsChecking(false);
       }
@@ -50,18 +50,23 @@ export default function AdminLayout() {
   }
 
   return (
-    <View className="flex-1 bg-[#F9FAFB]">
+    <View className="flex-1 bg-[#F9FAFB] relative overflow-hidden">
       <AdminHeader />
-      <ScrollView
-        className="flex-1 px-4"
-        contentContainerStyle={{
-          paddingBottom: 90,
-        }}
-        showsVerticalScrollIndicator={false}
-      >
-        <Slot />
-      </ScrollView>
-      <AdminFooter />
+      <View className="flex-1 mb-[65px] px-4">
+        <Stack
+          screenOptions={{
+            headerShown: false,
+            animation: "slide_from_right",
+            gestureEnabled: true,
+            gestureDirection: "horizontal",
+            contentStyle: { backgroundColor: "#F9FAFB" },
+          }}
+        />
+      </View>
+
+      <View className="absolute bottom-0 left-0 right-0 z-50 bg-white shadow-md">
+        <AdminFooter />
+      </View>
     </View>
   );
 }

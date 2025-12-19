@@ -18,7 +18,6 @@ export default function CategoryList() {
       const res = await roomApi.getHotRooms();
       setTopRooms((res || []).slice(0, 7));
     } catch (error) {
-      console.error("Failed to fetch hot rooms:", error);
       setTopRooms([]);
     } finally {
       setLoading(false);

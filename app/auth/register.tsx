@@ -2,16 +2,17 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-    ActivityIndicator,
-    Alert,
-    KeyboardAvoidingView,
-    Platform,
-    SafeAreaView,
-    ScrollView,
-    Text,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  SafeAreaView,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
+import { TextInput } from "react-native-paper";
 import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
 import AppleIcon from "../../assets/images/apple.svg";
 import FacebookIcon from "../../assets/images/facebook.svg";
@@ -80,12 +81,7 @@ export default function Register() {
         },
       ]);
     } catch (error: any) {
-      console.log("=== LỖI ĐĂNG KÝ ===");
-      console.log("Error code:", error.code);
-      console.log("Error message:", error.message);
-      console.log("Response status:", error.response?.status);
-      console.log("Response data:", error.response?.data);
-      
+
       let errorMessage = "Không thể gửi mã OTP. Thử lại sau.";
       
       if (error.code === "ECONNABORTED") {
@@ -164,13 +160,11 @@ export default function Register() {
               onChangeText={setPassword}
               secureTextEntry={!passwordVisible}
               right={
-                <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)}>
-                  <Ionicons
-                    name={passwordVisible ? "eye-outline" : "eye-off-outline"}
-                    size={RFValue(20)}
-                    color="gray"
-                  />
-                </TouchableOpacity>
+                <TextInput.Icon
+                  icon={passwordVisible ? "eye-outline" : "eye-off-outline"}
+                  onPress={() => setPasswordVisible(!passwordVisible)}
+                  size={RFValue(20)}
+                />
               }
             />
 
@@ -180,17 +174,11 @@ export default function Register() {
               onChangeText={setConfirmPassword}
               secureTextEntry={!confirmPasswordVisible}
               right={
-                <TouchableOpacity
-                  onPress={() =>
-                    setConfirmPasswordVisible(!confirmPasswordVisible)
-                  }
-                >
-                  <Ionicons
-                    name={confirmPasswordVisible ? "eye-outline" : "eye-off-outline"}
-                    size={RFValue(20)}
-                    color="gray"
-                  />
-                </TouchableOpacity>
+                <TextInput.Icon
+                  icon={confirmPasswordVisible ? "eye-outline" : "eye-off-outline"}
+                  onPress={() => setConfirmPasswordVisible(!confirmPasswordVisible)}
+                  size={RFValue(20)}
+                />
               }
             />
 

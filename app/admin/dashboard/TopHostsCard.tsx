@@ -42,7 +42,7 @@ export default function TopHostsCard({ data }: { data: Host[] }) {
 
   const handleHostPress = (userId: string) => {
     if (userId) {
-      router.push(`/(tabs)/user/${userId}`);
+      router.push(`/admin/users/${userId}`);
     }
   };
 

@@ -3,11 +3,11 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import {
-  Animated,
-  ImageBackground,
-  Text,
-  TouchableOpacity,
-  View,
+    Animated,
+    ImageBackground,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 
 const CARD_WIDTH = 180;
@@ -153,7 +153,7 @@ export default function RoomCarousel({ rooms: propRooms = [] }: any) {
                       </View>
 
                       <View className="flex-row items-center mr-3">
-                        <Ionicons name="heart-outline" size={14} color="#ff9eb3" />
+                        <Ionicons name="heart" size={14} color="#ff9eb3" />
                         <Text className="text-gray-100 text-[12px] ml-1">
                           {item.totalLikes || 0}
                         </Text>

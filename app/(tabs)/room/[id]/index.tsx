@@ -123,18 +123,69 @@ useEffect(() => {
 
         {/* Đánh giá phòng */}
         <View className="mt-2">
-          <RatingSection key={refreshKey} room={room} />
+          <RatingSection 
+            key={refreshKey} 
+            room={room}
+            onDeleteReview={(deletedReviewId: string) => {
+              setRoom((prev: any) => {
+                const oldReviews = prev?.reviews || [];
+                const newReviews = oldReviews.filter((r: any) => r._id !== deletedReviewId);
+                const newTotalRatings = newReviews.length;
+                
+                // Tính lại avgRating
+                const sumRatings = newReviews.reduce((sum: number, r: any) => sum + (r.rating || 0), 0);
+                const newAvgRating = newTotalRatings > 0 ? sumRatings / newTotalRatings : 0;
+                
+                return {
+                  ...prev,
+                  reviews: newReviews,
+                  totalRatings: newTotalRatings,
+                  avgRating: newAvgRating,
+                };
+              });
+              setRefreshKey((prev) => prev + 1);
+            }}
+            onUpdateReview={(updatedReview: any) => {
+              setRoom((prev: any) => {
+                const oldReviews = prev?.reviews || [];
+                const newReviews = oldReviews.map((r: any) => 
+                  r._id === updatedReview._id ? { ...r, ...updatedReview } : r
+                );
+                
+                // Tính lại avgRating
+                const sumRatings = newReviews.reduce((sum: number, r: any) => sum + (r.rating || 0), 0);
+                const newAvgRating = newReviews.length > 0 ? sumRatings / newReviews.length : 0;
+                
+                return {
+                  ...prev,
+                  reviews: newReviews,
+                  avgRating: newAvgRating,
+                };
+              });
+              setRefreshKey((prev) => prev + 1);
+            }}
+          />
         </View>
 
         {/* Form gửi đánh giá */}
         <HostReviewForm
           room={room}
           onSubmit={(newReview) => {
-            setRoom((prev: any) => ({
-              ...prev,
-              reviews: [newReview, ...(prev?.reviews || [])],
-              totalRatings: (prev?.totalRatings || 0) + 1,
-            }));
+            setRoom((prev: any) => {
+              const oldReviews = prev?.reviews || [];
+              const newReviews = [newReview, ...oldReviews];
+              const newTotalRatings = newReviews.length;
+              
+              const sumRatings = newReviews.reduce((sum: number, r: any) => sum + (r.rating || 0), 0);
+              const newAvgRating = newTotalRatings > 0 ? sumRatings / newTotalRatings : 0;
+              
+              return {
+                ...prev,
+                reviews: newReviews,
+                totalRatings: newTotalRatings,
+                avgRating: newAvgRating,
+              };
+            });
             setRefreshKey((prev) => prev + 1);
           }}
         />

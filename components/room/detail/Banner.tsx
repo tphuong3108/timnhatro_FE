@@ -1,22 +1,22 @@
+import { roomApi } from "@/services/roomApi";
+import { Feather, Ionicons } from "@expo/vector-icons";
+import { ResizeMode, Video } from "expo-av";
+import { useRouter } from "expo-router";
+import { Heart } from "lucide-react-native";
 import React, { useState } from "react";
 import {
-  View,
-  ScrollView,
-  Image,
-  TouchableOpacity,
-  Text,
-  Dimensions,
-  Modal,
-  Pressable,
-  Alert,
-  NativeSyntheticEvent,
-  NativeScrollEvent,
+    Alert,
+    Dimensions,
+    Image,
+    Modal,
+    NativeScrollEvent,
+    NativeSyntheticEvent,
+    Pressable,
+    ScrollView,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
-import { Video, ResizeMode } from "expo-av";
-import { Feather, Ionicons } from "@expo/vector-icons";
-import { Heart } from "lucide-react-native";
-import { useRouter } from "expo-router";
-import { roomApi } from "@/services/roomApi";
 
 const { width, height } = Dimensions.get("window");
 
@@ -83,7 +83,7 @@ export default function Banner({
   const handleReport = () => {
     setShowMenu(false);
     if (!room?._id) return Alert.alert("Lỗi", "Không thể xác định phòng.");
-    router.push(`/room/ReportRoom?id=${room._id}`);
+    router.push(`/(tabs)/room/ReportRoom?id=${room._id}`);
   };
 
   const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {

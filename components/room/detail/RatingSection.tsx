@@ -1,32 +1,40 @@
-import React, { useState, useMemo } from "react";
-import {
-  View,
-  Text,
-  Image,
-  TouchableOpacity,
-  ScrollView,
-  Alert,
-  Modal,
-  TextInput
-} from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import Animated, { FadeInUp } from "react-native-reanimated";
-import { useRouter } from "expo-router";
+import { useAuth } from "@/contexts/AuthContext";
+import { reviewApi } from "@/services/reviewApi";
 import { roomApi } from "@/services/roomApi";
-import { useAuth } from "@/constants/auth/AuthContext";
+import { Ionicons } from "@expo/vector-icons";
+import React, { useMemo, useState } from "react";
+import {
+  Alert,
+  Image,
+  Modal,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
+} from "react-native";
+import Animated, { FadeInUp } from "react-native-reanimated";
 
 interface RatingSectionProps {
   room: any;
   refreshRoomStatus?: () => Promise<void>;
+  onDeleteReview?: (reviewId: string) => void;
+  onUpdateReview?: (updatedReview: any) => void;
 }
 
-export default function RatingSection({ room, refreshRoomStatus }: RatingSectionProps) {
+export default function RatingSection({ room, refreshRoomStatus, onDeleteReview, onUpdateReview }: RatingSectionProps) {
   const [showAll, setShowAll] = useState(false);
   const [reportModal, setReportModal] = useState(false);
   const [reportReason, setReportReason] = useState("");
   const [selectedReviewId, setSelectedReviewId] = useState<string | null>(null);
+  
+  // State cho edit modal
+  const [editModal, setEditModal] = useState(false);
+  const [editReviewId, setEditReviewId] = useState<string | null>(null);
+  const [editComment, setEditComment] = useState("");
+  const [editRating, setEditRating] = useState(0);
+  const [editLoading, setEditLoading] = useState(false);
 
-  const router = useRouter();
   const { user } = useAuth();
 
   const ratingStats = useMemo(() => {
@@ -91,11 +99,56 @@ export default function RatingSection({ room, refreshRoomStatus }: RatingSection
       await roomApi.deleteReview(reviewId);
       Alert.alert("Đã xóa", "Đánh giá đã được xóa.");
 
-      if (refreshRoomStatus) await refreshRoomStatus();
-      else router.reload();
+      // Gọi callback để cập nhật realtime
+      if (onDeleteReview) {
+        onDeleteReview(reviewId);
+      } else if (refreshRoomStatus) {
+        await refreshRoomStatus();
+      }
 
     } catch (error) {
       Alert.alert("Lỗi", "Không thể xóa đánh giá.");
+    }
+  };
+
+  // ✏️✏️ SỬA REVIEW ✏️✏️
+  const openEditModal = (review: any) => {
+    setEditReviewId(review._id);
+    setEditComment(review.comment || "");
+    setEditRating(review.rating || 0);
+    setEditModal(true);
+  };
+
+  const handleUpdateReview = async () => {
+    if (!editComment.trim() || editRating === 0) {
+      Alert.alert("Thông báo", "Vui lòng nhập đầy đủ nội dung và số sao.");
+      return;
+    }
+    
+    try {
+      setEditLoading(true);
+      await reviewApi.updateReview(editReviewId!, {
+        comment: editComment,
+        rating: editRating,
+      });
+      
+      setEditModal(false);
+      Alert.alert("Thành công", "Đánh giá đã được cập nhật.");
+      
+      // Chỉ truyền các field đã thay đổi, giữ nguyên userId object
+      if (onUpdateReview) {
+        onUpdateReview({ 
+          _id: editReviewId, 
+          comment: editComment, 
+          rating: editRating 
+        });
+      } else if (refreshRoomStatus) {
+        await refreshRoomStatus();
+      }
+    } catch (error) {
+      Alert.alert("Lỗi", "Không thể cập nhật đánh giá.");
+    } finally {
+      setEditLoading(false);
     }
   };
 
@@ -104,47 +157,70 @@ export default function RatingSection({ room, refreshRoomStatus }: RatingSection
       entering={FadeInUp.duration(600)}
       className="px-5 py-5 bg-white mx-4 mt-3 mb-5 rounded-2xl p-4 shadow shadow-black/10"
     >
-      {/* Tổng lượt đánh giá */}
-      <View className="flex-row items-center mb-3">
-        <Ionicons name="chatbubbles-outline" size={20} color="#3F72AF" />
+      {/* Header - Đánh giá & Xếp hạng style CH Play */}
+      <View className="flex-row items-center mb-4">
+        <Ionicons name="star" size={20} color="#3F72AF" />
         <Text className="text-lg font-semibold text-[#112D4E] ml-2">
-          {ratingStats.total} lượt đánh giá
+          Đánh giá & Xếp hạng
         </Text>
       </View>
 
-      {/* Biểu đồ đánh giá */}
-      <Animated.View entering={FadeInUp.delay(150).duration(500)} className="mb-4">
-        <View className="flex-row items-center mb-2">
-          <Ionicons name="stats-chart-outline" size={20} color="#3F72AF" />
-          <Text className="text-base font-medium text-[#112D4E] ml-2">
-            Xếp hạng tổng thể
+      {/* Layout CH Play: Số sao lớn bên trái + Biểu đồ bên phải */}
+      <Animated.View entering={FadeInUp.delay(150).duration(500)} className="flex-row mb-4">
+        {/* Bên trái: Số sao lớn */}
+        <View className="items-center justify-center pr-4" style={{ width: 100 }}>
+          <Text className="text-5xl font-bold text-[#112D4E]">
+            {(room.avgRating || 0).toFixed(1)}
+          </Text>
+          <View className="flex-row mt-1">
+            {[1, 2, 3, 4, 5].map((star) => (
+              <Ionicons
+                key={star}
+                name={room.avgRating >= star ? "star" : room.avgRating >= star - 0.5 ? "star-half" : "star-outline"}
+                size={14}
+                color="#FFD700"
+              />
+            ))}
+          </View>
+          <Text className="text-gray-500 text-xs mt-1">
+            {ratingStats.total} đánh giá
           </Text>
         </View>
 
-        {[5, 4, 3, 2, 1].map((star, i) => {
-          const percent = ratingStats.percentages[star - 1];
-          return (
-            <View key={i} className="flex-row items-center mb-1">
-              <Text className="w-4 text-[12px] text-gray-700">{star}</Text>
-              <View className="flex-1 h-[6px] bg-gray-200 rounded-full mx-1">
-                <View
-                  style={{
-                    width: `${percent}%`,
-                    backgroundColor: "#3F72AF",
-                    height: 6,
-                    borderRadius: 4,
-                  }}
-                />
+        {/* Bên phải: Biểu đồ thanh */}
+        <View className="flex-1">
+          {[5, 4, 3, 2, 1].map((star) => {
+            const percent = ratingStats.percentages[star - 1];
+            const count = ratingStats.counts[star - 1];
+            return (
+              <View key={star} className="flex-row items-center mb-1">
+                <Text className="w-3 text-[11px] text-gray-600">{star}</Text>
+                <Ionicons name="star" size={10} color="#FFD700" style={{ marginHorizontal: 2 }} />
+                <View className="flex-1 h-[8px] bg-gray-200 rounded-full mx-1">
+                  <View
+                    style={{
+                      width: `${percent}%`,
+                      backgroundColor: "#3F72AF",
+                      height: 8,
+                      borderRadius: 4,
+                    }}
+                  />
+                </View>
+                <Text className="w-6 text-[11px] text-gray-500 text-right">{count}</Text>
               </View>
-            </View>
-          );
-        })}
+            );
+          })}
+        </View>
       </Animated.View>
 
       {/* Danh sách đánh giá */}
       <ScrollView nestedScrollEnabled showsVerticalScrollIndicator={false}>
         {displayedReviews.map((r: any, i: number) => {
-          const userInfo = r.userId || {};
+          // Xử lý trường hợp userId là object hoặc string
+          const isUserIdObject = typeof r.userId === 'object' && r.userId !== null;
+          const userInfo = isUserIdObject ? r.userId : {};
+          const reviewOwnerId = isUserIdObject ? r.userId._id : r.userId; // ID của người viết đánh giá
+          
           const avatar =
             userInfo.avatar || "https://cdn-icons-png.flaticon.com/512/3177/3177440.png";
           const name =
@@ -154,6 +230,9 @@ export default function RatingSection({ room, refreshRoomStatus }: RatingSection
           const date = r.createdAt
             ? new Date(r.createdAt).toLocaleDateString("vi-VN")
             : "Không xác định";
+          
+          // Kiểm tra xem user hiện tại có phải chủ đánh giá không
+          const isReviewOwner = String(user?._id) === String(reviewOwnerId);
 
           return (
             <Animated.View
@@ -189,23 +268,36 @@ export default function RatingSection({ room, refreshRoomStatus }: RatingSection
                 {/* —— Nút hành động —— */}
                 <View className="flex-row mt-1">
 
-                  {/* Báo cáo */}
-                  <TouchableOpacity
-                    onPress={() => openReportModal(r._id)}
-                    className="flex-row items-center mr-5"
-                  >
-                    <Ionicons name="flag-outline" size={15} color="#EF4444" />
-                    <Text className="text-red-500 text-[12px] ml-1">Báo cáo</Text>
-                  </TouchableOpacity>
+                  {/* Báo cáo — chỉ người KHÁC mới báo cáo được */}
+                  {!isReviewOwner && (
+                    <TouchableOpacity
+                      onPress={() => openReportModal(r._id)}
+                      className="flex-row items-center mr-4"
+                    >
+                      <Ionicons name="flag-outline" size={15} color="#9ca3af" />
+                      <Text className="text-gray-500 text-[12px] ml-1">Báo cáo</Text>
+                    </TouchableOpacity>
+                  )}
 
-                  {/* Xóa — chỉ chủ review được xóa */}
-                  {user?._id === userInfo._id && (
+                  {/* Sửa — chỉ chủ đánh giá được sửa */}
+                  {isReviewOwner && (
+                    <TouchableOpacity
+                      onPress={() => openEditModal(r)}
+                      className="flex-row items-center mr-4"
+                    >
+                      <Ionicons name="create-outline" size={15} color="#3F72AF" />
+                      <Text className="text-[#3F72AF] text-[12px] ml-1">Sửa</Text>
+                    </TouchableOpacity>
+                  )}
+
+                  {/* Xóa — chỉ chủ đánh giá được xóa */}
+                  {isReviewOwner && (
                     <TouchableOpacity
                       onPress={() => confirmDeleteReview(r._id)}
                       className="flex-row items-center"
                     >
-                      <Ionicons name="trash-outline" size={15} color="#3F72AF" />
-                      <Text className="text-[#3F72AF] text-[12px] ml-1">Xóa</Text>
+                      <Ionicons name="trash-outline" size={15} color="#EF4444" />
+                      <Text className="text-red-500 text-[12px] ml-1">Xóa</Text>
                     </TouchableOpacity>
                   )}
 
@@ -251,6 +343,56 @@ export default function RatingSection({ room, refreshRoomStatus }: RatingSection
 
               <TouchableOpacity onPress={sendReport}>
                 <Text className="text-red-500 font-semibold">Gửi báo cáo</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* MODAL SỬA ĐÁNH GIÁ */}
+      <Modal transparent visible={editModal} animationType="fade">
+        <View className="flex-1 bg-black/40 justify-center items-center p-6">
+          <View className="bg-white w-full rounded-2xl p-5">
+            <Text className="text-lg font-semibold text-[#112D4E] mb-3">
+              Sửa đánh giá
+            </Text>
+
+            {/* Rating Stars */}
+            <View className="flex-row mb-3">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <TouchableOpacity key={star} onPress={() => setEditRating(star)}>
+                  <Ionicons
+                    name={editRating >= star ? "star" : "star-outline"}
+                    size={28}
+                    color={editRating >= star ? "#FFD700" : "#ccc"}
+                  />
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            {/* Comment Input */}
+            <TextInput
+              value={editComment}
+              onChangeText={setEditComment}
+              placeholder="Nhập nội dung đánh giá..."
+              multiline
+              editable={!editLoading}
+              className="border border-gray-300 p-3 rounded-lg min-h-[100px] text-gray-700"
+            />
+
+            <View className="flex-row justify-end mt-4">
+              <TouchableOpacity 
+                onPress={() => setEditModal(false)} 
+                className="mr-4"
+                disabled={editLoading}
+              >
+                <Text className="text-gray-500 font-medium">Hủy</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity onPress={handleUpdateReview} disabled={editLoading}>
+                <Text className="text-[#3F72AF] font-semibold">
+                  {editLoading ? "Đang lưu..." : "Lưu thay đổi"}
+                </Text>
               </TouchableOpacity>
             </View>
           </View>

@@ -1,25 +1,37 @@
-import React, { useState } from "react";
-import { View, Text, TouchableOpacity, ScrollView } from "react-native";
-import RoomReportCard from "./RoomReportCard";
 import { useRoomReportData } from "@/constants/data/useRoomReportData";
+import { adminApi } from "@/services/adminApi";
+import React, { useState } from "react";
+import { Alert, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import RoomReportCard from "./RoomReportCard";
 
 export default function RoomReportList() {
-  const { rooms, loading } = useRoomReportData();
+  const { rooms, loading, removeRoom } = useRoomReportData();
   const [filter, setFilter] = useState<"all" | "approved" | "pending" | "rejected">("all");
+
+  const handleProcessReport = async (roomId: string, decision: "approve" | "confirm") => {
+    try {
+      await adminApi.processRoomReport(roomId, decision);
+      removeRoom(roomId);
+      Alert.alert("Thành công", `Đã ${decision === "approve" ? "duyệt" : "từ chối"} báo cáo.`);
+    } catch (error) {
+      console.error("Error processing report:", error);
+      Alert.alert("Lỗi", "Không thể xử lý báo cáo. Vui lòng thử lại sau.");
+    }
+  };
 
   if (loading) {
     return (
       <View className="flex-1 justify-center items-center py-20">
-        <Text className="text-gray-500">Đang tải báo cáo...</Text>
+        <Text className="text-gray-500">Đang tải báo cáo phòng...</Text>
       </View>
     );
   }
 
-  const filteredRooms =
-    filter === "all" ? rooms : rooms.filter((r) => r.status === filter);
+  const filtered = filter === "all" ? rooms : rooms.filter((r) => r.status === filter);
 
   return (
     <View className="flex-1">
+      {/* Bộ lọc */}
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -42,8 +54,7 @@ export default function RoomReportList() {
             <TouchableOpacity
               key={tab.key}
               onPress={() => setFilter(tab.key as any)}
-              activeOpacity={0.8}
-              className={`px-5 py-2 mx-1 rounded-full ${
+              className={`px-5 py-2 mr-2 rounded-full ${
                 isActive ? "bg-[#3F72AF]" : "bg-gray-200"
               }`}
             >
@@ -59,8 +70,16 @@ export default function RoomReportList() {
         })}
       </ScrollView>
 
-      {filteredRooms.length > 0 ? (
-        filteredRooms.map((room) => <RoomReportCard key={room.id} room={room} />)
+      {/* Danh sách */}
+      {filtered.length > 0 ? (
+        filtered.map((room) => (
+            <RoomReportCard
+              key={room.id}
+              room={room}
+              onApprove={() => handleProcessReport(room.id, "approve")}
+              onReject={() => handleProcessReport(room.id, "confirm")}
+            />
+        ))
       ) : (
         <View className="items-center justify-center mt-10">
           <Text className="text-gray-400">Không có báo cáo nào phù hợp</Text>
