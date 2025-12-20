@@ -15,21 +15,21 @@ const HostBookingList = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const loadData = async () => {
-    setLoading(true);
+  const loadData = async (isBackground = false) => {
+    if (!isBackground) setLoading(true);
     try {
       const res = await bookingApi.getHostBookings();
       setBookings(res.data);
-    } catch (err) {
+    } catch  {
       Toast.show({ type: 'error', text1: 'Lỗi', text2: 'Không thể tải danh sách booking.' });
     } finally {
-      setLoading(false);
+      if (!isBackground) setLoading(false);
     }
   };
 
   useEffect(() => {
     loadData();
-    const interval = setInterval(loadData, 2000);
+    const interval = setInterval(() => loadData(true), 2000); // Background refresh
     return () => clearInterval(interval);
   }, []);
 

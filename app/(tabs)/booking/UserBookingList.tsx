@@ -16,21 +16,21 @@ const UserBookingList = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const loadData = async () => {
-    setLoading(true);
+  const loadData = async (isBackground = false) => {
+    if (!isBackground) setLoading(true); // Only show loading on initial load
     try {
       const res = await bookingApi.getUserBookings();
       setBookings(res.data);
-    } catch (err) {
+    } catch {
       Toast.show({ type: 'error', text1: 'Lỗi', text2: 'Không thể tải danh sách booking.' });
     } finally {
-      setLoading(false);
+      if (!isBackground) setLoading(false);
     }
   };
 
   useEffect(() => {
-    loadData();
-    const interval = setInterval(loadData, 2000);
+    loadData(); // Initial load with loading spinner
+    const interval = setInterval(() => loadData(true), 2000); // Background refresh every 2s
     return () => clearInterval(interval);
   }, []);
 

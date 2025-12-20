@@ -38,9 +38,9 @@ export default function AdminPaymentHistory() {
     endDate: "",
   });
 
-  const fetchPayments = async () => {
+  const fetchPayments = async (isBackground = false) => {
     try {
-      setLoading(true);
+      if (!isBackground) setLoading(true);
       const queryParams: any = {};
 
       if (filter.status) queryParams.status = filter.status;
@@ -49,17 +49,17 @@ export default function AdminPaymentHistory() {
 
       const response = await paymentApi.getAdminPaymentHistory(queryParams);
       setPayments(response.data.data || []);
-    } catch (error) {
+    } catch {
     } finally {
-      setLoading(false);
+      if (!isBackground) setLoading(false);
     }
   };
 
   useEffect(() => {
     fetchPayments();
-    const interval = setInterval(fetchPayments, 2000);
+    const interval = setInterval(() => fetchPayments(true), 2000);
     return () => clearInterval(interval);
-  }, []);
+  },);
 
   const getStatusColor = (status: string) => {
     if (status === "success") return "#3F72AF";

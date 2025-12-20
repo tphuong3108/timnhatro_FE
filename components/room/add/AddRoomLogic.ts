@@ -24,15 +24,15 @@ export const useAddRoomLogic = () => {
   const [selectedWard, setSelectedWard] = useState<string>("");
   const [isPremiumPost, setIsPremiumPost] = useState(false);
   const resetForm = () => {
-  setRoomName("");
-  setPrice("");
-  setLocation("");
-  setDescription("");
-  setMedia([]);
-  setSelectedAmenities([]);
-  setMarker(null);
-  setSelectedWard("");
-};
+    setRoomName("");
+    setPrice("");
+    setLocation("");
+    setDescription("");
+    setMedia([]);
+    setSelectedAmenities([]);
+    setMarker(null);
+    setSelectedWard("");
+  };
 
 
   // 🧭 Lấy vị trí hiện tại
@@ -51,7 +51,7 @@ export const useAddRoomLogic = () => {
         longitude: loc.coords.longitude,
       });
       Toast.show({ type: "info", text1: "Đã chọn vị trí hiện tại!" });
-    } catch (err) {
+    } catch {
       Toast.show({ type: "error", text1: "Không thể lấy vị trí hiện tại!" });
     } finally {
       setLoadingLocation(false);
@@ -71,7 +71,7 @@ export const useAddRoomLogic = () => {
         const uris = result.assets.map((a) => a.uri);
         setMedia((prev) => [...prev, ...uris]);
       }
-    } catch (err) {
+    } catch {
       Toast.show({ type: "error", text1: "Không thể chọn ảnh hoặc video!" });
     }
   };
@@ -85,7 +85,6 @@ export const useAddRoomLogic = () => {
     const { latitude, longitude } = e.nativeEvent.coordinate;
     setMarker({ latitude, longitude });
   };
-
   //  Lấy wardId theo tên
   const fetchWardIdByName = async (wardName: string): Promise<string | null> => {
     try {
@@ -95,17 +94,18 @@ export const useAddRoomLogic = () => {
       return null;
     }
   };
-  useEffect(() => {
-  const loadWards = async () => {
-    try {
-      const res = await apiClient.get("/wards");
-      setWards(res.data);
-    } catch (err) {
-    }
-  };
 
-  loadWards();
-}, []);
+  useEffect(() => {
+    const loadWards = async () => {
+      try {
+        const res = await apiClient.get("/wards");
+        setWards(res.data);
+      } catch {
+      }
+    };
+
+    loadWards();
+  }, []);
 
 
   useEffect(() => {
@@ -120,7 +120,7 @@ export const useAddRoomLogic = () => {
           Toast.show({ type: "info", text1: "Đã đổi quyền sang Host" });
         }
         setIsHost(true);
-      } catch (err) {
+      } catch {
       }
     };
 
@@ -150,7 +150,7 @@ export const useAddRoomLogic = () => {
           const address = `${street} ${ward ? ward + ", " : ""}${city}`;
           setLocation(address);
         }
-      } catch (error) {
+      } catch {
       }
     };
     updateAddressFromMarker();
@@ -180,24 +180,24 @@ export const useAddRoomLogic = () => {
         try {
           const base64 = await FileSystem.readAsStringAsync(uri, { encoding: "base64" });
           base64Images.push(`data:image/jpeg;base64,${base64}`);
-        } catch (err) {
+        } catch {
         }
       }
 
 
-    const body = {
-      name: roomName,
-      address: location,
-      price,
-      description,
-      ward: selectedWard,
-      amenities: selectedAmenities,
-      location: {
-        type: "Point",
-        coordinates: [marker.longitude, marker.latitude],
-      },
-      images: base64Images,
-    };
+      const body = {
+        name: roomName,
+        address: location,
+        price,
+        description,
+        ward: selectedWard,
+        amenities: selectedAmenities,
+        location: {
+          type: "Point",
+          coordinates: [marker.longitude, marker.latitude],
+        },
+        images: base64Images,
+      };
 
       const res = await fetch(uploadUrl, {
         method: "POST",
@@ -209,16 +209,37 @@ export const useAddRoomLogic = () => {
       });
 
       const data = await res.json();
-      if (!res.ok) return 
-        const roomId = data.data?._id;
-        if (!isPremiumPost) {
-            Alert.alert( "🎉 Thành công",
-                  "Phòng của bạn đã được gửi, vui lòng chờ admin duyệt.");
-            resetForm();
-            router.push("/(tabs)/home");
-            return;
-        }
-        router.push(`/(tabs)/payments/PaymentContainer?roomId=${roomId}&isPremium=true`);
+
+      if (!res.ok) {
+        Toast.show({
+          type: "error",
+          text1: "Đăng phòng thất bại!",
+          text2: data.message || "Vui lòng thử lại sau.",
+        });
+        return;
+      }
+
+      const roomId = data.data?._id;
+
+      // Kiểm tra roomId hợp lệ trước khi redirect
+      if (!roomId) {
+        Toast.show({
+          type: "error",
+          text1: "Lỗi",
+          text2: "Không thể lấy ID phòng",
+        });
+        return;
+      }
+
+      if (!isPremiumPost) {
+        Alert.alert("🎉 Thành công",
+          "Phòng của bạn đã được gửi, vui lòng chờ admin duyệt.");
+        resetForm();
+        router.push("/(tabs)/home");
+        return;
+      }
+
+      router.push(`/(tabs)/payments/PaymentContainer?roomId=${roomId}&isPremium=true`);
     } catch (err: any) {
       Toast.show({
         type: "error",
@@ -248,8 +269,8 @@ export const useAddRoomLogic = () => {
     loadingLocation,
     getCurrentLocation,
     wards,
-  selectedWard,
-  setSelectedWard,
+    selectedWard,
+    setSelectedWard,
     loadingSubmit,
     handleSubmit,
     handleMapPress,

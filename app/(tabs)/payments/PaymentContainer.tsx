@@ -3,12 +3,13 @@ import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-    ActivityIndicator,
-    ScrollView,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Alert,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { useCheckPaymentStatus } from "../../../hooks/useCheckPaymentStatus";
 
@@ -19,9 +20,23 @@ export default function PaymentContainer() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
-  const { orderId, setOrderId, paymentStatus, checkStatus } = useCheckPaymentStatus();
+  const { orderId, setOrderId, paymentStatus, checkStatus, resetState } = useCheckPaymentStatus();
 
   const premium = usePaymentPremium(roomId);
+  
+  // Reset state khi component mount để tránh stale data
+  useEffect(() => {
+    resetState();
+  }, [resetState]);
+  
+  // Validate roomId
+  useEffect(() => {
+    if (!roomId || roomId === "undefined") {
+      Alert.alert("Lỗi", "Không tìm thấy thông tin phòng", [
+        { text: "OK", onPress: () => router.back() }
+      ]);
+    }
+  }, [roomId, router]);
   
   useEffect(() => {
     if ((paymentStatus === "success" || paymentStatus === "failed") && orderId) {

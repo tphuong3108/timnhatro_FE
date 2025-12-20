@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { AppState } from "react-native";
 import { paymentApi } from "../services/paymentApi";
 
@@ -23,10 +23,17 @@ export function useCheckPaymentStatus() {
       if (status === "success") setPaymentStatus("success");
       else if (status === "failed") setPaymentStatus("failed");
       else setPaymentStatus("pending");
-    } catch (err) {
+    } catch {
       setPaymentStatus("failed");
     }
   }, [orderId]); 
+
+  // Reset tất cả state về giá trị ban đầu
+  const resetState = useCallback(() => {
+    setOrderId(null);
+    setPaymentStatus("idle");
+    setPaymentInfo(null);
+  }, []);
 
   useEffect(() => {
     const subscription = AppState.addEventListener("change", (state) => {
@@ -38,5 +45,5 @@ export function useCheckPaymentStatus() {
     return () => subscription.remove();
   }, [orderId, checkStatus]);
 
-  return { orderId, setOrderId, paymentStatus, paymentInfo, checkStatus };
+  return { orderId, setOrderId, paymentStatus, paymentInfo, checkStatus, resetState };
 }

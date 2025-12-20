@@ -38,7 +38,7 @@ export default function Profile() {
 
       const data = await profileApi.getMyProfile();
       setUser(data);
-    } catch (error) {
+    } catch {
       Alert.alert("Lỗi", "Không thể tải hồ sơ người dùng.");
     } finally {
       setLoading(false);
@@ -48,6 +48,7 @@ export default function Profile() {
   useFocusEffect(
     useCallback(() => {
       fetchProfile();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
   );
 

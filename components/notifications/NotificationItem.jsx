@@ -7,7 +7,6 @@ import { Swipeable } from "react-native-gesture-handler";
 export default function NotificationItem({ item, onPress, onDelete }) {
   const isUnread = !item.isRead;
 
-  // Render nút xóa khi vuốt sang trái
   const renderRightActions = (progress, dragX) => {
     const scale = dragX.interpolate({
       inputRange: [-100, 0],
